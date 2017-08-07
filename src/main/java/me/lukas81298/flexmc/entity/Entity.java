@@ -21,7 +21,7 @@ public abstract class Entity {
 
     protected int ticksAlive = 0;
 
-    @Getter private volatile boolean alive = true;
+    @Getter protected volatile boolean alive = true;
 
     public Entity( int entityId, Location location, World world ) {
         this.entityId = entityId;

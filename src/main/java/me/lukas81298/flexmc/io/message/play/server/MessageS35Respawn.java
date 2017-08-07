@@ -1,4 +1,4 @@
-package me.lukas81298.flexmc.io.message.play.client;
+package me.lukas81298.flexmc.io.message.play.server;
 
 import io.netty.buffer.ByteBuf;
 import lombok.*;

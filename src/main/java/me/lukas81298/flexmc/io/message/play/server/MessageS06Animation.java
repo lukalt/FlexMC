@@ -1,4 +1,4 @@
-package me.lukas81298.flexmc.io.message.play.client;
+package me.lukas81298.flexmc.io.message.play.server;
 
 import io.netty.buffer.ByteBuf;
 import lombok.*;
@@ -8,17 +8,17 @@ import java.io.IOException;
 
 /**
  * @author lukas
- * @since 07.08.2017
+ * @since 06.08.2017
  */
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode( callSuper = false )
-public class MessageS33RemoveEntityEffect extends Message {
+public class MessageS06Animation extends Message {
 
     private int entityId;
-    private byte effectId;
+    private AnimationType animationType;
 
     @Override
     public void read( ByteBuf buf ) throws IOException {
@@ -28,6 +28,15 @@ public class MessageS33RemoveEntityEffect extends Message {
     @Override
     public void write( ByteBuf buf ) throws IOException {
         writeVarInt( entityId, buf );
-        buf.writeByte( effectId );
+        buf.writeByte( animationType.ordinal() );
+    }
+
+    public enum AnimationType {
+        SWING_MAIN_ARM,
+        TAKE_DAMAGE,
+        LEAVE_BED,
+        SWING_OFF_HAND,
+        CRITICAL_EFFECT,
+        MAGIC_CRITICAL_EFFECT
     }
 }

@@ -1,4 +1,4 @@
-package me.lukas81298.flexmc.io.message.play.client;
+package me.lukas81298.flexmc.io.message.play.server;
 
 import io.netty.buffer.ByteBuf;
 import lombok.*;
@@ -15,10 +15,10 @@ import java.io.IOException;
 @Getter
 @Setter
 @EqualsAndHashCode( callSuper = false )
-public class MessageS34ResourcePackSend extends Message {
+public class MessageS33RemoveEntityEffect extends Message {
 
-    private String url;
-    private String hash;
+    private int entityId;
+    private byte effectId;
 
     @Override
     public void read( ByteBuf buf ) throws IOException {
@@ -27,7 +27,7 @@ public class MessageS34ResourcePackSend extends Message {
 
     @Override
     public void write( ByteBuf buf ) throws IOException {
-        writeString( url, buf );
-        writeString( hash, buf );
+        writeVarInt( entityId, buf );
+        buf.writeByte( effectId );
     }
 }

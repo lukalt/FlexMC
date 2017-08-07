@@ -3,7 +3,7 @@ package me.lukas81298.flexmc.io.listener.play;
 import me.lukas81298.flexmc.entity.Player;
 import me.lukas81298.flexmc.io.listener.MessageInboundListener;
 import me.lukas81298.flexmc.io.message.play.client.MessageC1DAnimation;
-import me.lukas81298.flexmc.io.message.play.client.MessageS06Animation;
+import me.lukas81298.flexmc.io.message.play.server.MessageS06Animation;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
 
 /**

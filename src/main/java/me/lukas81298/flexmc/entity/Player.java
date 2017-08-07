@@ -23,6 +23,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author lukas
@@ -48,6 +49,8 @@ public class Player extends LivingEntity implements CommandSender {
     private final Inventory inventory;
     @Getter
     private volatile int heldItemSlot = 0;
+    @Getter
+    private AtomicInteger foodLevel = new AtomicInteger( 20 );
 
     public Player( int entityId, Location position, String name, UUID uuid, ConnectionHandler connectionHandler, World world ) {
         super( entityId, position, world );
@@ -69,10 +72,6 @@ public class Player extends LivingEntity implements CommandSender {
     private void sendChunks() {
         for( ChunkColumn column : this.getWorld().getColumns() ) {
             this.connectionHandler.sendMessage( new MessageS20ChunkData( column ) );
-        }
-        for ( ChunkColumn column : this.getWorld().getColumns() ) {
-            this.connectionHandler.sendMessage( new MessageS0BBlockChange( new Vector3i( column.getX() * 16, 4, column.getZ() * 16 ), new BlockState( column.getSections()[0].getBlock( 0, 4, 0 ), 0 ) ) );
-
         }
     }
 
@@ -142,5 +141,23 @@ public class Player extends LivingEntity implements CommandSender {
     @Override
     public EntityType getType() {
         return EntityType.PLAYER;
+    }
+
+    @Override
+    protected void updateHealth( double health ) {
+        super.updateHealth( health );
+        if( health >= 0 ) {
+            connectionHandler.sendMessage( new MessageS41UpdateHealth( (float) health, foodLevel.get(), 0F ) );
+        }
+    }
+
+    public synchronized void respawn() {
+        alive = true;
+        foodLevel.set( 20 );
+        setHealth( 20D );
+        connectionHandler.sendMessage( new MessageS35Respawn( getWorld().getDimension(), getWorld().getDifficulty(), gameMode, "default" ) );
+        sendChunks();
+        location = getWorld().getSpawnLocation();
+        connectionHandler.sendMessage( new MessageS2FPlayerPositionAndLook( location.x(), location.y(), location.z(), location.yaw(), location.pitch(), (byte) 0,  0 ) );
     }
 }

@@ -10,15 +10,14 @@ import me.lukas81298.flexmc.entity.EntityObject;
 import me.lukas81298.flexmc.entity.Item;
 import me.lukas81298.flexmc.entity.Player;
 import me.lukas81298.flexmc.inventory.ItemStack;
-import me.lukas81298.flexmc.io.message.play.client.MessageS47TimeUpdate;
+import me.lukas81298.flexmc.io.message.play.server.MessageS47TimeUpdate;
 import me.lukas81298.flexmc.io.message.play.server.*;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
+import me.lukas81298.flexmc.util.Difficulty;
 import me.lukas81298.flexmc.util.Location;
 import me.lukas81298.flexmc.util.Vector3i;
 import me.lukas81298.flexmc.world.generator.ChunkGenerator;
 import me.lukas81298.flexmc.world.generator.FancyWorldGenerator;
-import me.lukas81298.flexmc.world.generator.FlatGenerator;
-import me.lukas81298.flexmc.world.generator.LayeredChunkGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,13 +53,18 @@ public class World {
 
     private final ChunkGenerator generator = new FancyWorldGenerator();
 
+    @Getter
+    private Difficulty difficulty = Difficulty.PEACEFUL;
+    @Getter
+    private final Dimension dimension = Dimension.OVER_WORLD;
+
     private byte timeCounter = 0;
 
     public World( String name ) {
         this.name = name;
         System.out.println( "Generating chunks for " + name );
-        for ( int x = -7; x < 7; x++ ) {
-            for ( int z = -7; z < 7; z++ ) {
+        for ( int x = -8; x < 8; x++ ) {
+            for ( int z = -8; z < 8; z++ ) {
                 this.generateColumn( x, z );
             }
         }
@@ -97,12 +101,37 @@ public class World {
                 }
             }
         } );
+        Flex.getServer().getExecutorService().execute( new Runnable() {
+            @Override
+            public void run() {
+                while ( Flex.getServer().isRunning() ) {
+                    long start = System.currentTimeMillis();
+                    tickPlayers();
+                    long diff = System.currentTimeMillis() - start;
+                    try {
+                        Thread.sleep( Math.max( 0, 50 - diff ) );
+                    } catch ( InterruptedException e ) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        } );
+    }
+
+    private void tickPlayers() {
+        for( Player player : this.players ) {
+            player.tick();
+            if( !player.isAlive() ) {
+                // tja er ist tot, aber eigentlich müssen wir hier nichts machen
+            }
+        }
     }
 
     private void tickEntities() {
         for( Entity entity : this.entities ) {
             entity.tick();
-            if( !entity.isAlive() ) {
+            if( !entity.isAlive() && !( entity instanceof Player ) ) { // repawning is handled differently for players
                 this.removeEntity( entity );
             }
         }
@@ -187,6 +216,10 @@ public class World {
                 return operand < Integer.MAX_VALUE ? ( operand + 1 ) : 0; // just in case :P
             }
         } );
+    }
+
+    public Location getSpawnLocation() {
+        return new Location( 0, 70, 0 );
     }
 
     public ChunkColumn getChunkAt( int x, int z ) {

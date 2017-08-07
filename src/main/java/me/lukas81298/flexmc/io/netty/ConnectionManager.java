@@ -48,6 +48,7 @@ public class ConnectionManager {
         this.listenerManager.registerListener( new EntityActionListener() );
         this.listenerManager.registerListener( new BlockPlaceListener() );
         this.listenerManager.registerListener( new HeldItemListener() );
+        this.listenerManager.registerListener( new ClientStatusListener() );
     }
 
     public MessageRegistry getRegistry( ConnectionHandler connectionHandler ) {
