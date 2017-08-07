@@ -32,15 +32,16 @@ public class Item extends Entity implements EntityObject {
         super.tick();
         if( ticksAlive > 20 * 60 ) {
             remove();
-        } else {
+        } else if( isAlive() ) {
             Location l = this.getLocation();
             for( Player player : this.getWorld().getPlayers() ) {
                 if( l.distanceSquared( player.getLocation() ) <= .25 ) {
-                    for( Player t : this.getWorld().getPlayers() ) {
-                        ItemStack itemStack = getItemStack();
-                        if( itemStack != null ) {
+                    ItemStack itemStack = getItemStack();
+                    if( itemStack != null ) {
+                        for( Player t : this.getWorld().getPlayers() ) {
                             t.getConnectionHandler().sendMessage( new MessageS4BCollectItem( getEntityId(), player.getEntityId(), itemStack.getAmount() ) );
                         }
+                        player.getInventory().addItem( itemStack );
                     }
                     remove();
                     break;

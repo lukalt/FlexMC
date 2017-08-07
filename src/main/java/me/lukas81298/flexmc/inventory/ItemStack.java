@@ -3,6 +3,7 @@ package me.lukas81298.flexmc.inventory;
 import com.evilco.mc.nbt.tag.TagCompound;
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -16,7 +17,10 @@ import me.lukas81298.flexmc.io.message.Message;
 @Getter
 @Setter
 @Accessors( chain = true )
+@EqualsAndHashCode
 public class ItemStack {
+
+    public static ItemStack AIR = new ItemStack( 0 );
 
     private int type;
     private int amount;
@@ -39,5 +43,9 @@ public class ItemStack {
             buf.writeShort( damage );
             Message.writeNbtTag( this.meta, buf );
         }
+    }
+
+    public boolean isSimilar( ItemStack other ) {
+        return other != null && ( other == this || ( other.type == type && other.damage == damage ) );
     }
 }

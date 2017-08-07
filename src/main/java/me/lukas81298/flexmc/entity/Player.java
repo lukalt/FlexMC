@@ -4,7 +4,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.lukas81298.flexmc.entity.metadata.EntityFlag;
+import me.lukas81298.flexmc.inventory.Inventory;
 import me.lukas81298.flexmc.inventory.ItemStack;
+import me.lukas81298.flexmc.inventory.PlayerInventory;
 import me.lukas81298.flexmc.io.message.play.server.*;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
 import me.lukas81298.flexmc.util.Difficulty;
@@ -41,26 +43,23 @@ public class Player extends LivingEntity implements CommandSender {
     @Getter
     private volatile GameMode gameMode = GameMode.SURVIVAL;
     private final AtomicBoolean online = new AtomicBoolean( true );
+    @Getter
+    private final Inventory inventory;
 
     public Player( int entityId, Location position, String name, UUID uuid, ConnectionHandler connectionHandler, World world ) {
         super( entityId, position, world );
         this.name = name;
         this.uuid = uuid;
         this.connectionHandler = connectionHandler;
+        this.inventory = new PlayerInventory( this );
     }
 
     public void spawnPlayer() {
-
-
         connectionHandler.sendMessage( new MessageS23JoinGame( this.getEntityId(), gameMode, Dimension.OVER_WORLD, Difficulty.PEACEFUL, "default", false ) );
         connectionHandler.sendMessage( new MessageS46SpawnPosition( new Vector3i( 0, 10, 0 ) ) );
         connectionHandler.sendMessage( new MessageS2CPlayerAbilities( (byte) 0, .2F, .2F ) );
         connectionHandler.sendMessage( new MessageS2FPlayerPositionAndLook( getLocation().x(), getLocation().y(), getLocation().z(), 0F, 0F, (byte) 0, 0 ) );
-
         this.sendChunks();
-
-        connectionHandler.sendMessage( new MessageS16SetSlot( (byte) 0, (short) 36, new ItemStack( 3, 1, (short) 0 ) ) );
-
     }
 
     private void sendChunks() {
