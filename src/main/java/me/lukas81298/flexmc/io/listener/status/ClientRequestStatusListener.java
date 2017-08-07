@@ -15,28 +15,23 @@ import me.lukas81298.flexmc.io.netty.ConnectionHandler;
  */
 public class ClientRequestStatusListener implements MessageInboundListener<MessageC00RequestStatus> {
 
-    private final Gson gson = new Gson();
-
     @Override
     public void handle( ConnectionHandler connectionHandler, MessageC00RequestStatus message ) {
-
         JsonObject version = new JsonObject();
         version.addProperty( "name", "1.12.1" );
         version.addProperty( "protocol", 338 );
         JsonObject players = new JsonObject();
         FlexServer server = Flex.getServer();
         players.addProperty( "max", server.getConfig().getMaxPlayers() );
-        players.addProperty( "online", 0 );
+        players.addProperty( "online", server.getPlayerManager().getOnlinePlayers().size() );
         JsonObject description = new JsonObject();
         description.addProperty( "text", server.getConfig().getServerName() );
         JsonObject o = new JsonObject();
         o.add( "version", version );
         o.add( "players", players );
         o.add( "description", description );
-        String s = gson.toJson( o );
-        System.out.println( s );
-        connectionHandler.sendMessage( new MessageS00ResponseStatus( s ) );
-        System.out.println( "sending response" );
+        connectionHandler.sendMessage( new MessageS00ResponseStatus( Flex.getGson().toJson( o ) ) );
+
     }
 
 }

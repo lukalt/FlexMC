@@ -4,6 +4,7 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import lombok.ToString;
 
 /**
  * @author lukas
@@ -12,7 +13,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 public abstract class MessageRegistry {
 
     private final TIntObjectMap<Class<? extends Message>> idToMessage = new TIntObjectHashMap<>();
-    private final TObjectIntMap<Class<? extends Message>> messageToId = new TObjectIntHashMap<>();
+    private final TObjectIntMap<Class<? extends Message>> messageToId = new TObjectIntHashMap<>( 10, .75F, -1 );
 
     public abstract void register();
 

@@ -22,7 +22,7 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
     protected void encode( ChannelHandlerContext channelHandlerContext, Message message, ByteBuf byteBuf ) throws Exception {
         ConnectionHandler connectionHandler = (ConnectionHandler) channelHandlerContext.pipeline().get( "connectionHandler" );
         int messageId = this.connectionManager.getRegistry( connectionHandler ).getMessageIdFromClass( message.getClass() );
-        if( messageId == Constants.DEFAULT_INT_NO_ENTRY_VALUE ) {
+        if( messageId == -1 ) {
             System.out.println( "message id  not found for " + message.getClass().getName() );
             return;
         }
