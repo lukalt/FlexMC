@@ -3,6 +3,7 @@ package me.lukas81298.flexmc.entity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import me.lukas81298.flexmc.Flex;
 import me.lukas81298.flexmc.entity.metadata.EntityFlag;
 import me.lukas81298.flexmc.inventory.Inventory;
 import me.lukas81298.flexmc.inventory.ItemStack;
@@ -62,6 +63,7 @@ public class Player extends LivingEntity implements CommandSender {
         connectionHandler.sendMessage( new MessageS2CPlayerAbilities( (byte) 0, .2F, .2F ) );
         connectionHandler.sendMessage( new MessageS2FPlayerPositionAndLook( getLocation().x(), getLocation().y(), getLocation().z(), 0F, 0F, (byte) 0, 0 ) );
         this.sendChunks();
+        inventory.addItem( new ItemStack( 278, 1 ) );
     }
 
     private void sendChunks() {
@@ -94,11 +96,6 @@ public class Player extends LivingEntity implements CommandSender {
     @Override
     public void sendMessage( BaseComponent... components ) {
         this.connectionHandler.sendMessage( new MessageS0FChatMessage( components, (byte) 0 ) );
-    }
-
-    @Override
-    public UUID getUniqueId() {
-        return uuid;
     }
 
     @Override
@@ -140,5 +137,10 @@ public class Player extends LivingEntity implements CommandSender {
 
     public ItemStack getItemInHand() {
         return this.inventory.getItem( heldItemSlot );
+    }
+
+    @Override
+    public EntityType getType() {
+        return EntityType.PLAYER;
     }
 }

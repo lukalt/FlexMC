@@ -16,7 +16,9 @@ import me.lukas81298.flexmc.io.netty.ConnectionHandler;
 import me.lukas81298.flexmc.util.Location;
 import me.lukas81298.flexmc.util.Vector3i;
 import me.lukas81298.flexmc.world.generator.ChunkGenerator;
+import me.lukas81298.flexmc.world.generator.FancyWorldGenerator;
 import me.lukas81298.flexmc.world.generator.FlatGenerator;
+import me.lukas81298.flexmc.world.generator.LayeredChunkGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +52,7 @@ public class World {
     private final AtomicInteger worldAge = new AtomicInteger( 0 );
     private final AtomicInteger entityIdCounter = new AtomicInteger( 0 );
 
-    private final ChunkGenerator generator = new FlatGenerator( 3, 1, new BlockState( 3, 0 ), new BlockState( 2, 0 ) );
+    private final ChunkGenerator generator = new FancyWorldGenerator();
 
     private byte timeCounter = 0;
 
@@ -210,7 +212,7 @@ public class World {
                 ChunkSection section = new ChunkSection();
                 chunkColumnColumn.getSections()[i] = section;
             }
-            this.generator.generate( chunkColumnColumn.getSections() );
+            this.generator.generate( chunkColumnColumn );
             TByteObjectMap<ChunkColumn> c = this.columns.get( (byte) x );
             if ( c == null ) {
                 this.columns.put( (byte) x, c = new TByteObjectHashMap<>() );

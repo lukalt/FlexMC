@@ -51,6 +51,11 @@ public class Item extends Entity implements EntityObject {
     }
 
     @Override
+    public EntityType getType() {
+        return EntityType.ITEM;
+    }
+
+    @Override
     public byte getObjectType() {
         return (byte) 2;
     }

@@ -1,6 +1,6 @@
 package me.lukas81298.flexmc.world.generator;
 
-import me.lukas81298.flexmc.world.ChunkSection;
+import me.lukas81298.flexmc.world.ChunkColumn;
 
 /**
  * @author lukas
@@ -8,5 +8,5 @@ import me.lukas81298.flexmc.world.ChunkSection;
  */
 public interface ChunkGenerator {
 
-    void generate( ChunkSection[] sections );
+    void generate( ChunkColumn column );
 }

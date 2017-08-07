@@ -14,7 +14,7 @@ public interface CommandSender {
 
     void sendMessage( BaseComponent... components );
 
-    UUID getUniqueId();
+    UUID getUuid();
 
     String getName();
 

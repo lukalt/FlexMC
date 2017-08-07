@@ -113,6 +113,7 @@ public abstract class Entity {
 
     public void remove() {
         alive = false;
-        // todo remove
     }
+
+    public abstract EntityType getType();
 }

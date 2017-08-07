@@ -5,5 +5,6 @@ package me.lukas81298.flexmc.entity;
  * @since 05.08.2017
  */
 public enum EntityType {
-    PLAYER
+    PLAYER,
+    ITEM;
 }

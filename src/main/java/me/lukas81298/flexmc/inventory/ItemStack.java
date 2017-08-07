@@ -23,7 +23,7 @@ public class ItemStack {
     public static ItemStack AIR = new ItemStack( 0 );
 
     private int type;
-    private int amount;
+    private int amount = 1;
     private short damage;
     private final TagCompound meta = new TagCompound( "ItemStack" );
 
