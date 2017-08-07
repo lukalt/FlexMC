@@ -35,7 +35,7 @@ public class Item extends Entity implements EntityObject {
         } else if( isAlive() ) {
             Location l = this.getLocation();
             for( Player player : this.getWorld().getPlayers() ) {
-                if( l.distanceSquared( player.getLocation() ) <= .25 ) {
+                if( l.distanceSquared( player.getLocation() ) <= .1 ) {
                     ItemStack itemStack = getItemStack();
                     if( itemStack != null ) {
                         for( Player t : this.getWorld().getPlayers() ) {

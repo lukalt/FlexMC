@@ -74,11 +74,27 @@ public class Inventory {
             if( this.items.length != items.length ) {
                 throw new IllegalArgumentException( "Invalid contents, array length must be " + items.length );
             }
+            int i = 0;
+            for ( ItemStack item : items ) {
+                setItem0( i, item );
+                i++;
+            }
         } finally {
             this.lock.writeLock().unlock();
         }
     }
 
+    public ItemStack getItem( int slot ) {
+        if( slot < 0 || slot >= items.length ) {
+            throw new IllegalArgumentException( "Invalid slot " + slot + ", expected [0;" + ( slot - 1 ) + "]" );
+        }
+        this.lock.readLock().lock();
+        try {
+            return items[ slot ];
+        } finally {
+            this.lock.readLock().unlock();
+        }
+    }
 
     public ItemStack[] getContents() {
         this.lock.readLock().lock();

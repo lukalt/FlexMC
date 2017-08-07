@@ -101,7 +101,6 @@ public class World {
         for( Entity entity : this.entities ) {
             entity.tick();
             if( !entity.isAlive() ) {
-                System.out.println( "removing entity " + entity.getEntityId() );
                 this.removeEntity( entity );
             }
         }

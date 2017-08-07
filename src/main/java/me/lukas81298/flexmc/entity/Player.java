@@ -45,6 +45,8 @@ public class Player extends LivingEntity implements CommandSender {
     private final AtomicBoolean online = new AtomicBoolean( true );
     @Getter
     private final Inventory inventory;
+    @Getter
+    private volatile int heldItemSlot = 0;
 
     public Player( int entityId, Location position, String name, UUID uuid, ConnectionHandler connectionHandler, World world ) {
         super( entityId, position, world );
@@ -130,5 +132,13 @@ public class Player extends LivingEntity implements CommandSender {
 
     public boolean isSprinting() {
         return this.getFlag( EntityFlag.SPRINTING );
+    }
+
+    public void handleSetHeldItemSlot( int slot ) {
+        this.heldItemSlot = slot; // todo update equipment to other players
+    }
+
+    public ItemStack getItemInHand() {
+        return this.inventory.getItem( heldItemSlot );
     }
 }
