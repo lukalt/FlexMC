@@ -1,8 +1,11 @@
 package me.lukas81298.flexmc.io.message;
 
+import com.evilco.mc.nbt.stream.NbtOutputStream;
+import com.evilco.mc.nbt.tag.TagCompound;
 import com.google.common.base.Charsets;
 import io.netty.buffer.ByteBuf;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -112,5 +115,16 @@ public abstract class Message {
 
     public static byte toAngle( float radian ) {
         return ( (byte) (int) ( radian * 256.0F / 360.0F ) );
+    }
+
+    public static void writeNbtTag( TagCompound tag, ByteBuf buf ) {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        try {
+            NbtOutputStream n = new NbtOutputStream( os );
+            n.write( tag );
+            buf.writeBytes( os.toByteArray() );
+        } catch ( IOException e ) {
+            e.printStackTrace();
+        }
     }
 }

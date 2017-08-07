@@ -1,9 +1,11 @@
 package me.lukas81298.flexmc.entity.metadata;
 
+import com.evilco.mc.nbt.tag.TagCompound;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import me.lukas81298.flexmc.Flex;
+import me.lukas81298.flexmc.inventory.ItemStack;
 import me.lukas81298.flexmc.io.message.Message;
 import me.lukas81298.flexmc.util.EnumDirection;
 import me.lukas81298.flexmc.util.Vector3f;
@@ -52,7 +54,8 @@ public enum MetaDataType {
     SLOT( new BiConsumer<ByteBuf, Object>() {
         @Override
         public void accept( ByteBuf buf, Object o ) {
-            // todo implement
+            ItemStack itemStack = (ItemStack) o;
+            itemStack.serialize( buf );
         }
     } ),
     BOOLEAN( new BiConsumer<ByteBuf, Object>() {
@@ -106,7 +109,8 @@ public enum MetaDataType {
     NBT_TAG( new BiConsumer<ByteBuf, Object>() {
         @Override
         public void accept( ByteBuf buf, Object o ) {
-            // todo implement
+            TagCompound tagCompound = (TagCompound) o;
+            Message.writeNbtTag( tagCompound, buf );
         }
     } );
 

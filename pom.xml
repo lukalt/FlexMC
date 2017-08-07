@@ -13,6 +13,10 @@
             <id>maven-central</id>
             <url>http://central.maven.org/maven2/</url>
         </repository>
+        <repository>
+            <id>evil-co</id>
+            <url>http://basket.cindyscats.com/content/repositories/releases/</url>
+        </repository>
     </repositories>
 
     <build>
@@ -70,9 +74,9 @@
             <version>1.12-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.flowpowered</groupId>
-            <artifactId>flow-nbt</artifactId>
-            <version>1.0.0</version>
+            <groupId>com.evilco.mc</groupId>
+            <artifactId>nbt</artifactId>
+            <version>1.0.2</version>
         </dependency>
     </dependencies>
 
