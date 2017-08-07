@@ -22,7 +22,18 @@ public class Vector3i {
 
     public long asLong() {
         return ( ( (long) x & 0x3FFFFFF ) << 38 | ( y & 0xFFF ) << 26 | z & 0x3FFFFFF );
+    }
 
+    public Vector3i clone() {
+        return new Vector3i( x, y, z );
+    }
+
+    public Location toLocation() {
+        return new Location( x, y, z );
+    }
+
+    public Location toMidLocation() {
+        return new Location( x + .5, y, z + .5 );
     }
 
 }

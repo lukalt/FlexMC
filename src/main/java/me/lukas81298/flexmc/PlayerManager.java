@@ -46,7 +46,7 @@ public class PlayerManager {
         player.getConnectionHandler().sendMessage( new MessageS2EPlayerList( MessageS2EPlayerList.Action.ADD_PLAYER, items ) );
         System.out.println( player.getName() + " (" + player.getUuid().toString() + ") logged in from " + player.getIpAddress() );
         player.spawnPlayer();
-        player.getWorld().addEntity( player );
+        player.getWorld().addEntity( player, true );
     }
 
     public void handlePlayerQuit( Player player ) {

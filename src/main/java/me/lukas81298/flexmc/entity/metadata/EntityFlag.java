@@ -7,8 +7,10 @@ package me.lukas81298.flexmc.entity.metadata;
 public enum EntityFlag {
     ON_FIRE,
     CROUCHED,
+    @Deprecated
     RIDING, /* unused */
     SPRINTING,
+    @Deprecated
     EATING, /* unused */
     INVISIBLE,
     GLOWING,

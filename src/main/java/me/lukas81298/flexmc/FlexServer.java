@@ -74,6 +74,8 @@ public class FlexServer {
                         } ).localAddress( config.getServerAddress(), config.getServerPort() ).bind().syncUninterruptibly(); // wait until started
 
 
+                running.set( true );
+
                 world = new World( "world" );
 
                 executorService.execute( new Runnable() {
@@ -93,7 +95,7 @@ public class FlexServer {
                         }
                     }
                 } );
-                running.set( true );
+
                 executorService.execute( new Runnable() {
                     @Override
                     public void run() {

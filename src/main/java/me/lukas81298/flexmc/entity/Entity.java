@@ -19,6 +19,10 @@ public abstract class Entity {
     @Getter private World world;
     @Getter protected EntityMetaData metaData = new EntityMetaData();
 
+    protected int ticksAlive = 0;
+
+    @Getter private volatile boolean alive = true;
+
     public Entity( int entityId, Location location, World world ) {
         this.entityId = entityId;
         this.location = location;
@@ -91,23 +95,23 @@ public abstract class Entity {
         }
     }
 
-    private boolean getFlag( EntityFlag flag ) {
+    protected boolean getFlag( EntityFlag flag ) {
         Byte b = this.metaData.get( (byte) 0 );
         return b != null && ( b & 1 << flag.ordinal() ) != 0;
     }
 
-    private void setFlag( EntityFlag flag, boolean value ) {
+    protected void setFlag( EntityFlag flag, boolean value ) {
         Byte b = this.metaData.get( (byte) 0 );
         byte k = b == null ? 0 : b;
         this.metaData.set( (byte) 0, MetaDataType.BYTE, (byte) ( value ? ( k | 1 << flag.ordinal() ) : ( k & ( ~1 << flag.ordinal() ) ) ) );
         this.updateMetaData();
     }
 
-    public void setSneaking( boolean flag ) {
-        this.setFlag( EntityFlag.CROUCHED, flag );
+    public void tick() {
+        ticksAlive++;
     }
 
-    public void setSprinting( boolean flag ) {
-        this.setFlag( EntityFlag.SPRINTING, false );
+    public void remove() {
+        // todo remove
     }
 }

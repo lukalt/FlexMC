@@ -13,6 +13,7 @@ public class MessageRegistryPlay extends MessageRegistry {
     @Override
     public void register() {
 
+        registerServerMessage( 0x00, MessageS00SpawnObject.class );
         registerServerMessage( 0x04, MessageS04SpawnPainting.class );
         registerServerMessage( 0x05, MessageS05SpawnPlayer.class );
         registerServerMessage( 0x06, MessageS06Animation.class );
@@ -42,6 +43,7 @@ public class MessageRegistryPlay extends MessageRegistry {
         registerServerMessage( 0x41, MessageS41UpdateHealth.class );
         registerServerMessage( 0x46, MessageS46SpawnPosition.class );
         registerServerMessage( 0x47, MessageS47TimeUpdate.class );
+        registerServerMessage( 0x4B, MessageS4BCollectItem.class );
         registerServerMessage( 0x4C, MessageS4CEntityTeleport.class );
 
         registerClientMessage( 0x00, MessageC00TeleportConfirm.class );

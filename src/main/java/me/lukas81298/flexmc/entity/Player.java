@@ -3,6 +3,7 @@ package me.lukas81298.flexmc.entity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import me.lukas81298.flexmc.entity.metadata.EntityFlag;
 import me.lukas81298.flexmc.inventory.ItemStack;
 import me.lukas81298.flexmc.io.message.play.server.*;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
@@ -114,5 +115,21 @@ public class Player extends LivingEntity implements CommandSender {
     }
     public String getIpAddress() {
         return this.connectionHandler.getChannelHandlerContext().channel().remoteAddress().toString();
+    }
+
+    public void setSneaking( boolean flag ) {
+        this.setFlag( EntityFlag.CROUCHED, flag );
+    }
+
+    public void setSprinting( boolean flag ) {
+        this.setFlag( EntityFlag.SPRINTING, false );
+    }
+
+    public boolean isSneaking() {
+        return this.getFlag( EntityFlag.CROUCHED );
+    }
+
+    public boolean isSprinting() {
+        return this.getFlag( EntityFlag.SPRINTING );
     }
 }

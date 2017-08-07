@@ -6,12 +6,12 @@ import gnu.trove.procedure.TObjectProcedure;
 import lombok.Getter;
 import me.lukas81298.flexmc.Flex;
 import me.lukas81298.flexmc.entity.Entity;
+import me.lukas81298.flexmc.entity.EntityObject;
+import me.lukas81298.flexmc.entity.Item;
 import me.lukas81298.flexmc.entity.Player;
+import me.lukas81298.flexmc.inventory.ItemStack;
 import me.lukas81298.flexmc.io.message.play.client.MessageS47TimeUpdate;
-import me.lukas81298.flexmc.io.message.play.server.MessageS05SpawnPlayer;
-import me.lukas81298.flexmc.io.message.play.server.MessageS0BBlockChange;
-import me.lukas81298.flexmc.io.message.play.server.MessageS32DestroyEntities;
-import me.lukas81298.flexmc.io.message.play.server.MessageS3CEntityMetaData;
+import me.lukas81298.flexmc.io.message.play.server.*;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
 import me.lukas81298.flexmc.util.Location;
 import me.lukas81298.flexmc.util.Vector3i;
@@ -21,6 +21,7 @@ import me.lukas81298.flexmc.world.generator.FlatGenerator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -55,11 +56,29 @@ public class World {
 
     public World( String name ) {
         this.name = name;
+        System.out.println( "Generating chunks for " + name );
         for ( int x = -7; x < 7; x++ ) {
             for ( int z = -7; z < 7; z++ ) {
                 this.generateColumn( x, z );
             }
         }
+        System.out.println( "Done" );
+        Flex.getServer().getExecutorService().execute( new Runnable() {
+            @Override
+            public void run() {
+                while ( Flex.getServer().isRunning() ) {
+                    long start = System.currentTimeMillis();
+                    tickEntities();
+                    long diff = System.currentTimeMillis() - start;
+                    try {
+                        Thread.sleep( Math.max( 0, 50 - diff ) );
+                    } catch ( InterruptedException e ) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        } );
         Flex.getServer().getExecutorService().execute( new Runnable() {
             @Override
             public void run() {
@@ -67,7 +86,6 @@ public class World {
                     long start = System.currentTimeMillis();
                     tick();
                     long diff = System.currentTimeMillis() - start;
-
                     try {
                         Thread.sleep( Math.max( 0, 50 - diff ) );
                     } catch ( InterruptedException e ) {
@@ -79,7 +97,17 @@ public class World {
         } );
     }
 
-    public void tick() {
+    private void tickEntities() {
+        for( Entity entity : this.entities ) {
+            entity.tick();
+            if( !entity.isAlive() ) {
+                System.out.println( "removing entity " + entity.getEntityId() );
+                this.removeEntity( entity );
+            }
+        }
+    }
+
+    private void tick() {
         int time = this.time.updateAndGet( new IntUnaryOperator() {
             @Override
             public int applyAsInt( int operand ) {
@@ -97,8 +125,17 @@ public class World {
         }
     }
 
-    public void addEntity( Entity entity ) {
-        entity.changeWorld( this, nextEntityId() );
+    public void spawnItem( Location location, ItemStack itemStack ) {
+
+        Item item = new Item( nextEntityId(), location, this );
+        item.setItemStack( itemStack );
+        this.addEntity( item, false );
+    }
+
+    public void addEntity( Entity entity, boolean changeWorld ) {
+        if( changeWorld ) {
+            entity.changeWorld( this, nextEntityId() );
+        }
         if ( entity instanceof Player ) {
             Player player = (Player) entity;
             for ( Player t : players ) {
@@ -111,6 +148,14 @@ public class World {
             }
         } else {
             this.entities.add( entity );
+            if( entity instanceof EntityObject ) {
+                byte t = ((EntityObject) entity).getObjectType();
+                Location l = entity.getLocation();
+                for( Player player : players ) {
+                    player.getConnectionHandler().sendMessage( new MessageS00SpawnObject( entity.getEntityId(), UUID.randomUUID(), t, l.x(), l.y(), l.z(), 3F, 3F ) );
+                    player.getConnectionHandler().sendMessage( new MessageS3CEntityMetaData( entity.getEntityId(), entity.getMetaData() ) );
+                }
+            }
         }
     }
 
@@ -161,7 +206,6 @@ public class World {
     private void generateColumn( int x, int z ) {
         this.chunkLock.writeLock().lock();
         try {
-            System.out.println( "Generating chunk column " + x + ", " );
             ChunkColumn chunkColumnColumn = new ChunkColumn( x, z );
             for ( int i = 0; i < chunkColumnColumn.getSections().length; i++ ) {
                 ChunkSection section = new ChunkSection();
@@ -193,6 +237,16 @@ public class World {
             this.chunkLock.readLock().unlock();
         }
         return list;
+    }
+
+    public BlockState getBlockAt( Vector3i position ) {
+        ChunkColumn column = this.getChunkAt( position.getX(), position.getZ() );
+        int sectionIndex = position.getY() / 16;
+        ChunkSection section = column.getSections()[sectionIndex];
+        int i = section.getBlock( fixIndex( position.getX() % 16 ), position.getY() % 16, fixIndex( position.getZ() % 16 ) );
+        int type = i >> 4;
+        int data = i & 15;
+        return new BlockState( type, data );
     }
 
     public void setBlock( Vector3i position, BlockState state ) {

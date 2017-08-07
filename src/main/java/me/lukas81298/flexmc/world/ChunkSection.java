@@ -29,7 +29,6 @@ public class ChunkSection {
         this.palette.add( 0 );
         this.blocks = new int[ 16 * 16 * 16 ];
         this.blockLight = new NibbleArray( 16 * 16 * 16 );
-
     }
 
     public void setBlock( Vector3i position, BlockState blockState ) {

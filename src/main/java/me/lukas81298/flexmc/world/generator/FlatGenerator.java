@@ -3,6 +3,7 @@ package me.lukas81298.flexmc.world.generator;
 import lombok.RequiredArgsConstructor;
 import me.lukas81298.flexmc.world.BlockState;
 import me.lukas81298.flexmc.world.ChunkSection;
+import me.lukas81298.flexmc.world.NibbleArray;
 
 /**
  * @author lukas
@@ -28,6 +29,9 @@ public class FlatGenerator implements ChunkGenerator {
                     } else {
                         section.setBlock( x, y, z, topType.getId(), topType.getData() );
                     }
+                    NibbleArray nibbleArray = new NibbleArray( 16 * 16 * 16 );
+                    nibbleArray.fill( (byte) 15 );
+                    section.setSkyLight( nibbleArray );
                     section.getBlockLight().set( x, y, z, 15 );
                 }
             }
