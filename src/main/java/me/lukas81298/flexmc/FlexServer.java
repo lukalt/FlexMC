@@ -49,6 +49,7 @@ public class FlexServer {
     }
 
     public ListenableFuture<Void> start() {
+        Runtime.getRuntime().addShutdownHook( new Thread( this::stop ) );
         return executorService.submit( new Callable<Void>() {
             public Void call() throws Exception {
 
@@ -84,7 +85,7 @@ public class FlexServer {
                         while( running.get() ) {
                             for ( Player player : playerManager.getOnlinePlayers() ) {
                                 if( ( System.currentTimeMillis() - player.getLastKeepAlive() ) > 30 * 1000L ) {
-                                    player.disconnect( "Timed out --- " );
+                                    player.disconnect( "Timed out (server)" );
                                 }
                             }
                             try {
@@ -123,7 +124,11 @@ public class FlexServer {
 
     public void stop() {
         if ( this.running.compareAndSet( false, true ) ) {
-
+            System.out.println( "Stopping server..." );
+            for( Player player : playerManager.getOnlinePlayers() ) {
+                player.disconnect( "Server stopped!" );
+            }
+            System.exit( 0 );
         } else {
             System.out.println( "Attempting to shut down server but already stopped or currently shutting down" );
         }

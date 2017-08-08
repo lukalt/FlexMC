@@ -25,7 +25,7 @@ public class ItemStack {
     private int type;
     private int amount = 1;
     private short damage;
-    private final TagCompound meta = new TagCompound( "ItemStack" );
+    private TagCompound meta = new TagCompound( "ItemStack" );
 
     public ItemStack( int type ) {
         this.type = type;
@@ -34,6 +34,12 @@ public class ItemStack {
     public ItemStack( int type, int amount ) {
         this.type = type;
         this.amount = amount;
+    }
+
+    public ItemStack( int type, int amount, short s ) {
+        this.type = type;
+        this.amount = amount;
+        this.damage = s;
     }
 
     public void serialize( ByteBuf buf ) {

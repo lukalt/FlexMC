@@ -1,7 +1,7 @@
 package me.lukas81298.flexmc.world.generator;
 
+import me.lukas81298.flexmc.inventory.Material;
 import me.lukas81298.flexmc.util.BiTuple;
-import me.lukas81298.flexmc.util.Location;
 import me.lukas81298.flexmc.world.BlockState;
 import me.lukas81298.flexmc.world.ChunkColumn;
 
@@ -17,12 +17,11 @@ public class OverWorldGenerator extends LayeredChunkGenerator {
 
     private final Random random = new Random();
 
-
     public OverWorldGenerator() {
-        this.addLayer( new BlockState( 7, 0 ) );
-        this.addLayer( new BlockState( 1, 0 ), 55 );
-        this.addLayer( new BlockState( 3, 0 ), 3 );
-        this.addLayer( new BlockState( 2, 0 ) );
+        this.addLayer( new BlockState( Material.BEDROCK ) );
+        this.addLayer( new BlockState( Material.STONE ), 55 );
+        this.addLayer( new BlockState( Material.DIRT ), 3 );
+        this.addLayer( new BlockState( Material.GRASS ) );
     }
 
     @Override
@@ -47,17 +46,17 @@ public class OverWorldGenerator extends LayeredChunkGenerator {
         double rand = Math.random();
         BlockState logType, leavesType;
         if( rand < .25 ) {
-            logType = new BlockState( 17, 0 );
-            leavesType = new BlockState( 18, 0 );
+            logType = new BlockState( Material.LOG );
+            leavesType = new BlockState( Material.LEAVES );
         } else if( rand < .5 ) {
-            logType = new BlockState( 17, 1 );
-            leavesType = new BlockState( 18, 1 );
+            logType = new BlockState( Material.LOG, 1 );
+            leavesType = new BlockState( Material.LEAVES, 1 );
         } else if ( rand < .75 ) {
-            logType = new BlockState( 17, 2 );
-            leavesType = new BlockState( 18, 2 );
+            logType = new BlockState( Material.LOG, 2 );
+            leavesType = new BlockState( Material.LEAVES, 2 );
         } else {
-            logType = new BlockState( 17, 3 );
-            leavesType = new BlockState( 18, 3 );
+            logType = new BlockState( Material.LOG, 3 );
+            leavesType = new BlockState( Material.LEAVES, 3 );
         }
         int y = column.getHighestYAt( x, z ) + 1;
         int height = (int) (Math.random() * 4 + 3);

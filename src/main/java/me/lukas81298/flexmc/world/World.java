@@ -287,7 +287,7 @@ public class World {
         ChunkColumn column = this.getChunkAt( position.getX(), position.getZ() );
         int sectionIndex = position.getY() / 16;
         ChunkSection section = column.getSections()[sectionIndex];
-        section.setBlock( fixIndex( position.getX() % 16 ), position.getY() % 16, fixIndex( position.getZ() % 16 ), state.getId(), state.getData() );
+        section.setBlock( fixIndex( position.getX() % 16 ), position.getY() % 16, fixIndex( position.getZ() % 16 ), state.getTypeId(), state.getData() );
         for( Player player : this.players ) {
             player.getConnectionHandler().sendMessage( new MessageS0BBlockChange( position, state ) );
         }

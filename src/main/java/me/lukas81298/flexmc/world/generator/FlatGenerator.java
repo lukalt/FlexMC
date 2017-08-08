@@ -1,5 +1,6 @@
 package me.lukas81298.flexmc.world.generator;
 
+import me.lukas81298.flexmc.inventory.Material;
 import me.lukas81298.flexmc.world.BlockState;
 
 /**
@@ -9,8 +10,8 @@ import me.lukas81298.flexmc.world.BlockState;
 public class FlatGenerator extends LayeredChunkGenerator {
 
     public FlatGenerator() {
-        this.addLayer( new BlockState( 7, 0 ) );
-        this.addLayer( new BlockState( 2, 0 ), 3 );
-        this.addLayer( new BlockState( 3, 0 ) );
+        this.addLayer( new BlockState( Material.BEDROCK, 0 ) );
+        this.addLayer( new BlockState( Material.DIRT, 0 ), 3 );
+        this.addLayer( new BlockState( Material.GRASS, 0 ) );
     }
 }

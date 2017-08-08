@@ -3,6 +3,7 @@ package me.lukas81298.flexmc.world;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import me.lukas81298.flexmc.inventory.Material;
 
 /**
  * @author lukas
@@ -13,6 +14,23 @@ import lombok.RequiredArgsConstructor;
 @EqualsAndHashCode( callSuper = false )
 public class BlockState {
 
-    private final int id, data;
+    private final Material type;
+    private final int data;
 
+    public BlockState( int typeId, int data ) {
+        this.type = Material.getById( typeId );
+        this.data = data;
+    }
+
+    public BlockState( int typeId ) {
+        this( typeId, 0 );
+    }
+
+    public BlockState( Material material ) {
+        this( material, 0 );
+    }
+
+    public int getTypeId() {
+        return this.type.getId();
+    }
 }

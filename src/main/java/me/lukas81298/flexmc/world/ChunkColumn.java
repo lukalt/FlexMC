@@ -3,7 +3,6 @@ package me.lukas81298.flexmc.world;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import org.yaml.snakeyaml.tokens.BlockEndToken;
 
 import java.util.Arrays;
 
@@ -32,7 +31,7 @@ public class ChunkColumn {
         }
         ChunkSection section = this.sections[ y / 16 ];
         y = y % 16;
-        section.setBlock( x, y, z, type.getId(), type.getData() );
+        section.setBlock( x, y, z, type.getTypeId(), type.getData() );
     }
 
     public BlockState getBlockAt( int x, int y, int z ) {
@@ -46,8 +45,7 @@ public class ChunkColumn {
 
     public int getHighestYAt( int x, int z ) {
         for( int i = 255; i > 0; i-- ) {
-            int id = getBlockAt( x, i, z ).getId();
-            if( id != 0 && id != 18) {
+            if( this.getBlockAt( x, i, z ).getType().isSolid() ) {
                 return i;
             }
         }

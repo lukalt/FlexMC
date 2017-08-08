@@ -15,6 +15,8 @@ import javax.annotation.Nullable;
  */
 public class Item extends Entity implements EntityObject {
 
+    private double fallSpeed = 0D; // no concurrency needed here, entity is ticked by the same thread every time
+
     public Item( int entityId, Location location, World world ) {
         super( entityId, location, world );
     }
@@ -31,7 +33,7 @@ public class Item extends Entity implements EntityObject {
     @Override
     public void tick() {
         super.tick();
-        if( ticksAlive > 20 * 60 ) {
+        if( ticksAlive > 20 * 60 * 5 ) {
             remove();
         } else if( isAlive() ) {
             Location l = this.getLocation();
@@ -49,10 +51,11 @@ public class Item extends Entity implements EntityObject {
                 }
             }
             boolean k = Math.ceil( l.y() ) != l.y();
-            boolean m = getWorld().getBlockAt( new Vector3i( (int) l.x(), ( (int) l.y() ) - 1, (int) l.z() ) ).getId() == 0;
+            boolean m = getWorld().getBlockAt( new Vector3i( (int) l.x(), ( (int) l.y() ) - 1, (int) l.z() ) ).getTypeId() == 0;
             if( m || k ){
                 if( m ) {
-                    location = new Location( l.x(), l.y() - 0.03999999910593033D, l.z() );
+                    fallSpeed -= 0.03999999910593033D;
+                    location = new Location( l.x(), l.y() , l.z() );
                 } else {
                     location = new Location( l.x(), Math.ceil( l.y() ), l.z() );
                 }

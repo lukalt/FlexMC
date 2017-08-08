@@ -1,6 +1,7 @@
 package me.lukas81298.flexmc.io.message.play;
 
 import me.lukas81298.flexmc.io.message.MessageRegistry;
+import me.lukas81298.flexmc.io.message.login.server.MessageS03SetCompression;
 import me.lukas81298.flexmc.io.message.play.client.*;
 import me.lukas81298.flexmc.io.message.play.server.*;
 
@@ -14,15 +15,30 @@ public class MessageRegistryPlay extends MessageRegistry {
     public void register() {
 
         registerServerMessage( 0x00, MessageS00SpawnObject.class );
+        registerServerMessage( 0x01, MessageS01SpawnExperienceOrb.class );
+        registerServerMessage( 0x02, MessageS02SpawnGlobalEntity.class );
+        registerServerMessage( 0x03, MessageS03SpawnMob.class );
         registerServerMessage( 0x04, MessageS04SpawnPainting.class );
         registerServerMessage( 0x05, MessageS05SpawnPlayer.class );
         registerServerMessage( 0x06, MessageS06Animation.class );
+        registerServerMessage( 0x07, MessageS07ClickWindow.class );
         registerServerMessage( 0x08, MessageS08BlockBreakAnimation.class );
+        registerServerMessage( 0x09, MessageS09UpdateBlockEntity.class );
+        registerServerMessage( 0x0A, MessageS0ABlockAction.class );
         registerServerMessage( 0x0B, MessageS0BBlockChange.class );
+        registerServerMessage( 0x0C, MessageS0CBossBar.class );
+        registerServerMessage( 0x0D, MessageS0DServerDifficulty.class );
         registerServerMessage( 0x0E, MessageS0ETabComeplete.class );
         registerServerMessage( 0x0F, MessageS0FChatMessage.class );
+        registerServerMessage( 0x11, MessageS11ConfirmTransaction.class );
+        registerServerMessage( 0x12, MessageS12CLoseWindow.class );
+        registerServerMessage( 0x13, MessageS13OpenWindow.class );
+        registerServerMessage( 0x14, MessageS14WindowItems.class );
+        registerServerMessage( 0x15, MessageS15WindowProperty.class );
         registerServerMessage( 0x16, MessageS16SetSlot.class );
+        registerServerMessage( 0x17, MessageS17SetCooldown.class );
         registerServerMessage( 0x18, MessageS18PluginMessage.class );
+        registerServerMessage( 0x19, MessageS19NamedSoundEffect.class );
         registerServerMessage( 0x1A, MessageS1ADisconnect.class );
         registerServerMessage( 0x1E, MessageS1EChangeGameState.class );
         registerServerMessage( 0x1F, MessageS1FKeepAlive.class );

@@ -33,7 +33,7 @@ public abstract class LivingEntity extends Entity {
                 return operand < 0 ? 0 : operand;
             }
         } );
-        updateHealth( health );
+        this.updateHealth( health );
     }
 
     public double getHealth() {
@@ -67,7 +67,7 @@ public abstract class LivingEntity extends Entity {
         if( previous.y() > l.y() ) {
             double tempFallDistance = Math.abs( l.y() - previous.y() );
             BlockState state = getWorld().getBlockAt( new Vector3i( (int) l.x(), ((int) l.y()) - 1, (int) l.z() ) );
-            if( state.getId() != 0 || getWorld().getBlockAt( new Vector3i( (int) l.x(), (int) l.y(), (int) l.z() ) ).getId() != 0 ) {
+            if( state.getTypeId() != 0 || getWorld().getBlockAt( new Vector3i( (int) l.x(), (int) l.y(), (int) l.z() ) ).getTypeId() != 0 ) {
                 fallDistance.updateAndGet( new DoubleUnaryOperator() {
                     @Override
                     public double applyAsDouble( double operand ) {

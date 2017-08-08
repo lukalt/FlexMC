@@ -7,19 +7,20 @@ import java.util.Arrays;
  * @since 06.08.2017
  */
 public class NibbleArray {
+
     private final byte[] handle;
 
-    public NibbleArray(int length) {
-        if (length == 0 || length % 2 != 0) {
-            throw new IllegalArgumentException("Length of nibble array must be a positive number dividable by 2!");
+    public NibbleArray( int length ) {
+        if ( length == 0 || length % 2 != 0 ) {
+            throw new IllegalArgumentException( "Length of nibble array must be a positive number dividable by 2!" );
         }
 
         this.handle = new byte[length / 2];
     }
 
-    public NibbleArray(byte[] handle) {
-        if (handle.length == 0 || handle.length % 2 != 0) {
-            throw new IllegalArgumentException("Length of nibble array must be a positive number dividable by 2!");
+    public NibbleArray( byte[] handle ) {
+        if ( handle.length == 0 || handle.length % 2 != 0 ) {
+            throw new IllegalArgumentException( "Length of nibble array must be a positive number dividable by 2!" );
         }
 
         this.handle = handle;
@@ -33,8 +34,8 @@ public class NibbleArray {
      * @param z Block Z
      * @return The value at the given XYZ
      */
-    public byte get(int x, int y, int z) {
-        return get(y << 8 | z << 4 | x);
+    public byte get( int x, int y, int z ) {
+        return get( y << 8 | z << 4 | x );
     }
 
     /**
@@ -43,12 +44,12 @@ public class NibbleArray {
      * @param index The index to lookup
      * @return The value at that index.
      */
-    public byte get(int index) {
+    public byte get( int index ) {
         byte value = handle[index / 2];
-        if (index % 2 == 0) {
-            return (byte) (value & 0xF);
+        if ( index % 2 == 0 ) {
+            return (byte) ( value & 0xF );
         } else {
-            return (byte) ((value >> 4) & 0xF);
+            return (byte) ( ( value >> 4 ) & 0xF );
         }
     }
 
@@ -60,8 +61,8 @@ public class NibbleArray {
      * @param z     Block Z
      * @param value Desired Value
      */
-    public void set(int x, int y, int z, int value) {
-        set(y << 8 | z << 4 | x, value);
+    public void set( int x, int y, int z, int value ) {
+        set( y << 8 | z << 4 | x, value );
     }
 
     /**
@@ -70,12 +71,12 @@ public class NibbleArray {
      * @param index The index to set the value at.
      * @param value The desired value
      */
-    public void set(int index, int value) {
+    public void set( int index, int value ) {
         index /= 2;
-        if (index % 2 == 0) {
-            handle[index] = (byte) (handle[index] & 0xF0 | value & 0xF);
+        if ( index % 2 == 0 ) {
+            handle[index] = (byte) ( handle[index] & 0xF0 | value & 0xF );
         } else {
-            handle[index] = (byte) (handle[index] & 0xF | (value & 0xF) << 4);
+            handle[index] = (byte) ( handle[index] & 0xF | ( value & 0xF ) << 4 );
         }
     }
 
@@ -102,9 +103,9 @@ public class NibbleArray {
      *
      * @param value Value to fill with
      */
-    public void fill(byte value) {
+    public void fill( byte value ) {
         value &= 0xF; // Max nibble size (= 16)
-        Arrays.fill(handle, (byte) ((value << 4) | value));
+        Arrays.fill( handle, (byte) ( ( value << 4 ) | value ) );
     }
 
     /**
@@ -121,11 +122,11 @@ public class NibbleArray {
      *
      * @param handle The byte array to copy in.
      */
-    public void setHandle(byte[] handle) {
-        if (handle.length != this.handle.length) {
-            throw new IllegalArgumentException("Length of handle must equal to size of nibble array!");
+    public void setHandle( byte[] handle ) {
+        if ( handle.length != this.handle.length ) {
+            throw new IllegalArgumentException( "Length of handle must equal to size of nibble array!" );
         }
 
-        System.arraycopy(handle, 0, this.handle, 0, handle.length);
+        System.arraycopy( handle, 0, this.handle, 0, handle.length );
     }
 }

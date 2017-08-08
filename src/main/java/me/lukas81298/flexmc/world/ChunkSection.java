@@ -35,7 +35,7 @@ public class ChunkSection {
     }
 
     public void setBlock( Vector3i position, BlockState blockState ) {
-        this.setBlock( position.getX(), position.getY(), position.getZ(), blockState.getId(), blockState.getData() );
+        this.setBlock( position.getX(), position.getY(), position.getZ(), blockState.getTypeId(), blockState.getData() );
     }
 
     public void setBlock( int x, int y, int z, int type, int data ) {
