@@ -21,7 +21,7 @@ public class ChunkColumn {
     private final byte[] biome;
 
     public ChunkColumn( int x, int z ) {
-        this( x, z,new ChunkSection[16], new byte[0x100] );
+        this( x, z, new ChunkSection[16], new byte[0x100] );
         Arrays.fill( biome, (byte) 127 ); // void biome
     }
 
@@ -35,4 +35,22 @@ public class ChunkColumn {
         section.setBlock( x, y, z, type.getId(), type.getData() );
     }
 
+    public BlockState getBlockAt( int x, int y, int z ) {
+        ChunkSection section = this.sections[ y / 16 ];
+        y = y % 16;
+        int j = section.getBlock( x, y, z );
+        int type = j >> 4;
+        int data = j & 15;
+        return new BlockState( type, data );
+    }
+
+    public int getHighestYAt( int x, int z ) {
+        for( int i = 255; i > 0; i-- ) {
+            int id = getBlockAt( x, i, z ).getId();
+            if( id != 0 && id != 18) {
+                return i;
+            }
+        }
+        return 0;
+    }
 }

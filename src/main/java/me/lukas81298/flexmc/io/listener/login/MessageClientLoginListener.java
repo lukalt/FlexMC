@@ -25,7 +25,7 @@ public class MessageClientLoginListener implements MessageInboundListener<Messag
         connectionHandler.sendMessage( new MessageS02LoginSuccess( message.getName(), UUID.randomUUID().toString() ) );
         connectionHandler.setProtocolState( ProtocolState.PLAY );
 
-        Player player = new Player( -1, Flex.getServer().getWorld().getSpawnLocation(), message.getName(), UUID.randomUUID(), connectionHandler, Flex.getServer().getWorld() );
+        Player player = new Player( -1, new Location( .5, Flex.getServer().getWorld().getChunkAt( 0, 0 ).getHighestYAt( 0, 0 ) + 1, .5 ), message.getName(), UUID.randomUUID(), connectionHandler, Flex.getServer().getWorld() );
         connectionHandler.setPlayer( player );
         Flex.getServer().getPlayerManager().handlePlayerJoin( player );
 

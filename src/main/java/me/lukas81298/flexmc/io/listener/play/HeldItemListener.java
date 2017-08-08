@@ -1,7 +1,10 @@
 package me.lukas81298.flexmc.io.listener.play;
 
+import me.lukas81298.flexmc.entity.Player;
+import me.lukas81298.flexmc.inventory.ItemStack;
 import me.lukas81298.flexmc.io.listener.MessageInboundListener;
 import me.lukas81298.flexmc.io.message.play.client.MessageC1AHeldItemChange;
+import me.lukas81298.flexmc.io.message.play.server.MessageS3FEntityEquipment;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
 
 /**
@@ -13,6 +16,12 @@ public class HeldItemListener implements MessageInboundListener<MessageC1AHeldIt
     @Override
     public void handle( ConnectionHandler connectionHandler, MessageC1AHeldItemChange message ) {
         connectionHandler.getPlayer().handleSetHeldItemSlot( message.getSlot() );
+        ItemStack stack = connectionHandler.getPlayer().getInventory().getItem( message.getSlot() );
+        for( Player player : connectionHandler.getPlayer().getWorld().getPlayers() ) {
+            if( !player.equals( connectionHandler.getPlayer() ) ) {
+                player.getConnectionHandler().sendMessage( new MessageS3FEntityEquipment( connectionHandler.getPlayer().getEntityId(), 0, stack ) );
+            }
+        }
     }
 
 }

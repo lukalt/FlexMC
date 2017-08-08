@@ -17,7 +17,7 @@ import me.lukas81298.flexmc.util.Difficulty;
 import me.lukas81298.flexmc.util.Location;
 import me.lukas81298.flexmc.util.Vector3i;
 import me.lukas81298.flexmc.world.generator.ChunkGenerator;
-import me.lukas81298.flexmc.world.generator.FancyWorldGenerator;
+import me.lukas81298.flexmc.world.generator.OverWorldGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ public class World {
     private final AtomicInteger worldAge = new AtomicInteger( 0 );
     private final AtomicInteger entityIdCounter = new AtomicInteger( 0 );
 
-    private final ChunkGenerator generator = new FancyWorldGenerator();
+    private final ChunkGenerator generator = new OverWorldGenerator();
 
     @Getter
     private Difficulty difficulty = Difficulty.PEACEFUL;

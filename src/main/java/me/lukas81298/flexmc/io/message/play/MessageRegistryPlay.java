@@ -40,6 +40,7 @@ public class MessageRegistryPlay extends MessageRegistry {
         registerServerMessage( 0x35, MessageS35Respawn.class );
         registerServerMessage( 0x36, MessageS36EntityHeadLook.class );
         registerServerMessage( 0x3C, MessageS3CEntityMetaData.class );
+        registerServerMessage( 0x3F, MessageS3FEntityEquipment.class );
         registerServerMessage( 0x41, MessageS41UpdateHealth.class );
         registerServerMessage( 0x46, MessageS46SpawnPosition.class );
         registerServerMessage( 0x47, MessageS47TimeUpdate.class );
