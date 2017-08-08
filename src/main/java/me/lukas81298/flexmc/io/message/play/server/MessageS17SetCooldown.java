@@ -3,25 +3,22 @@ package me.lukas81298.flexmc.io.message.play.server;
 import io.netty.buffer.ByteBuf;
 import lombok.*;
 import me.lukas81298.flexmc.io.message.Message;
-import me.lukas81298.flexmc.util.Vector3i;
-import me.lukas81298.flexmc.world.BlockState;
 
 import java.io.IOException;
 
 /**
  * @author lukas
- * @since 06.08.2017
+ * @since 08.08.2017
  */
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode( callSuper = false )
-@ToString
-public class MessageS0BBlockChange extends Message {
+public class MessageS17SetCooldown extends Message {
 
-    private Vector3i position;
-    private BlockState block;
+    private int itemId;
+    private int cooldownTicks;
 
     @Override
     public void read( ByteBuf buf ) throws IOException {
@@ -30,7 +27,7 @@ public class MessageS0BBlockChange extends Message {
 
     @Override
     public void write( ByteBuf buf ) throws IOException {
-        buf.writeLong( position.asLong() );
-        writeVarInt( block.getTypeId() << 4 | ( block.getData() & 15 ), buf );
+        writeVarInt( itemId, buf );
+        writeVarInt( cooldownTicks, buf );
     }
 }
