@@ -27,6 +27,21 @@ public class ItemStack {
     private short damage;
     private TagCompound meta = new TagCompound( "ItemStack" );
 
+    public ItemStack( Material material ) {
+        this.type = material.getId();
+    }
+
+    public ItemStack( Material material, int amount ) {
+        this.type = material.getId();
+        this.amount = amount;
+    }
+
+    public ItemStack( Material material, int amount, short data ) {
+        this.type = material.getId();
+        this.amount = amount;
+        this.damage = data;
+    }
+
     public ItemStack( int type ) {
         this.type = type;
     }

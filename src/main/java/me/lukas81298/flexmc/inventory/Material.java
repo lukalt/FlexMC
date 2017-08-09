@@ -38,7 +38,35 @@ public enum Material {
     LAPIS_BLOCK( 22 ),
     DISPENSER( 23 ),
     SANDSTONE( 24 ),
-    NOTE_BLOCK( 25 );
+    NOTE_BLOCK( 25 ),
+
+    DIAMOND_ORE( 46 ),
+    DIAMOND_BLOCK( 47 ),
+
+    IRON_SHOVEL( 256, false, true, true, false ),
+    IRON_PICK_AXE( 257, false, true, true, false ),
+    IRON_AXE( 258, false, true, true, false ),
+
+    COAL( 263, false, true, true, false ),
+    DIAMOND( 263, false, true, true, false ),
+    IRON_INGOT( 264, false, true, true, false ),
+    GOLD_INGOT( 265, false, true, true, false ),
+    IRON_SWORD( 267, false, true, true, false ),
+    WOOD_SWORD( 268, false, true, true, false ),
+    WOOD_SHOVEL( 269, false, true, true, false ),
+    WOOD_PICK_AXE( 270, false, true, true, false ),
+    WOOD_AXE( 271, false, true, true, false ),
+    STONE_SWORD( 272, false, true, true, false ),
+    STONE_SHOVEL( 273, false, true, true, false ),
+    STONE_PICK_AXE( 274, false, true, true, false ),
+    STONE_AXE( 275, false, true, true, false ),
+    DIAMOND_SWORD( 276, false, true, true, false ),
+    DIAMOND_SHOVEL( 277, false, true, true, false ),
+    DIAMOND_PICK_AXE( 278, false, true, true, false ),
+    DIAMOND_AXE( 279, false, true, true, false )
+
+
+    ;
 
     private final int id;
     private final boolean block;

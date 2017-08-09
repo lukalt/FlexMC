@@ -17,6 +17,7 @@ import me.lukas81298.flexmc.io.message.play.server.MessageS1FKeepAlive;
 import me.lukas81298.flexmc.io.netty.*;
 import me.lukas81298.flexmc.util.crypt.AuthHelper;
 import me.lukas81298.flexmc.world.World;
+import me.lukas81298.flexmc.world.block.Blocks;
 
 import java.io.File;
 import java.security.KeyPair;
@@ -88,6 +89,8 @@ public class FlexServer {
 
 
                 running.set( true );
+
+                Blocks.initBlocks(); // register all blocks
 
                 world = new World( "world" );
 

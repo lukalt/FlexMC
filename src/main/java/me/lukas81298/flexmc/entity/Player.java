@@ -65,9 +65,6 @@ public class Player extends LivingEntity implements CommandSender {
         connectionHandler.sendMessage( new MessageS2FPlayerPositionAndLook( getLocation().x(), getLocation().y(), getLocation().z(), 0F, 0F, (byte) 0, 0 ) );
         this.sendChunks();
         inventory.addItem( new ItemStack( 278, 1 ) );
-        inventory.addItem( new ItemStack( 18, 64 ) );
-        inventory.addItem( new ItemStack( 18, 64 ) );
-        inventory.addItem( new ItemStack( 18, 64 ) );
     }
 
     private void sendChunks() {
