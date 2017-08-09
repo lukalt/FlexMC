@@ -9,5 +9,5 @@ import me.lukas81298.flexmc.io.netty.ConnectionHandler;
  */
 public interface MessageInboundListener<K extends Message>  {
 
-    void handle( ConnectionHandler connectionHandler, K message );
+    void handle( ConnectionHandler connectionHandler, K message ) throws Exception;
 }

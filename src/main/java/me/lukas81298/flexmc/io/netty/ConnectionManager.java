@@ -3,6 +3,7 @@ package me.lukas81298.flexmc.io.netty;
 import lombok.Getter;
 import me.lukas81298.flexmc.io.listener.ListenerManager;
 import me.lukas81298.flexmc.io.listener.handshake.HandshakeListener;
+import me.lukas81298.flexmc.io.listener.login.EncryptionResponseListener;
 import me.lukas81298.flexmc.io.listener.login.MessageClientLoginListener;
 import me.lukas81298.flexmc.io.listener.play.*;
 import me.lukas81298.flexmc.io.listener.status.ClientPingListener;
@@ -49,6 +50,7 @@ public class ConnectionManager {
         this.listenerManager.registerListener( new BlockPlaceListener() );
         this.listenerManager.registerListener( new HeldItemListener() );
         this.listenerManager.registerListener( new ClientStatusListener() );
+        this.listenerManager.registerListener( new EncryptionResponseListener() );
     }
 
     public MessageRegistry getRegistry( ConnectionHandler connectionHandler ) {

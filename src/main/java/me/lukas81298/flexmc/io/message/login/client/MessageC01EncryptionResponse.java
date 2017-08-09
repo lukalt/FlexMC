@@ -24,12 +24,19 @@ public class MessageC01EncryptionResponse extends Message {
 
     @Override
     public void read( ByteBuf buf ) throws IOException {
-        writeVarInt( sharedSecret.length, buf );
-        buf.writeBytes( sharedSecret );
+        sharedSecret = new byte[ readVarInt( buf ) ];
+        for ( int i = 0; i < sharedSecret.length; i++ ) {
+            sharedSecret[i] = buf.readByte();
+        }
+        verifyToken = new byte[ readVarInt( buf ) ];
+        for ( int i = 0; i < verifyToken.length; i++ ) {
+            verifyToken[i] = buf.readByte();
+        }
     }
 
     @Override
     public void write( ByteBuf buf ) throws IOException {
 
     }
+
 }

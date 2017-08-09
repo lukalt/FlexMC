@@ -4,7 +4,9 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -13,9 +15,11 @@ import me.lukas81298.flexmc.config.MainConfig;
 import me.lukas81298.flexmc.entity.Player;
 import me.lukas81298.flexmc.io.message.play.server.MessageS1FKeepAlive;
 import me.lukas81298.flexmc.io.netty.*;
+import me.lukas81298.flexmc.util.crypt.AuthHelper;
 import me.lukas81298.flexmc.world.World;
 
 import java.io.File;
+import java.security.KeyPair;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,6 +47,9 @@ public class FlexServer {
     @Getter
     private PlayerManager playerManager = new PlayerManager();
 
+    @Getter
+    private KeyPair keyPair;
+
     public FlexServer( MainConfig config, File configFolder ) {
         this.config = config;
         this.configFolder = configFolder;
@@ -52,6 +59,11 @@ public class FlexServer {
         Runtime.getRuntime().addShutdownHook( new Thread( this::stop ) );
         return executorService.submit( new Callable<Void>() {
             public Void call() throws Exception {
+
+                System.out.println( "Generating keypair with 1024 bit length" );
+                long start = System.currentTimeMillis();
+                keyPair = AuthHelper.generateServerKeyPair();
+                System.out.println( "Took " + ( System.currentTimeMillis() - start ) + "ms" );
 
                 NioEventLoopGroup acceptorGroup = new NioEventLoopGroup( config.getAcceptorThreads() );
                 NioEventLoopGroup handlerGroup = new NioEventLoopGroup( config.getHandlerThreads() );

@@ -3,7 +3,6 @@ package me.lukas81298.flexmc.entity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import me.lukas81298.flexmc.Flex;
 import me.lukas81298.flexmc.entity.metadata.EntityFlag;
 import me.lukas81298.flexmc.inventory.Inventory;
 import me.lukas81298.flexmc.inventory.ItemStack;
@@ -14,7 +13,6 @@ import me.lukas81298.flexmc.util.Difficulty;
 import me.lukas81298.flexmc.util.GameMode;
 import me.lukas81298.flexmc.util.Location;
 import me.lukas81298.flexmc.util.Vector3i;
-import me.lukas81298.flexmc.world.BlockState;
 import me.lukas81298.flexmc.world.ChunkColumn;
 import me.lukas81298.flexmc.world.Dimension;
 import me.lukas81298.flexmc.world.World;
@@ -113,8 +111,9 @@ public class Player extends LivingEntity implements CommandSender {
             }
         }
     }
+
     public String getIpAddress() {
-        return this.connectionHandler.getChannelHandlerContext().channel().remoteAddress().toString();
+        return connectionHandler.getIpAddress();
     }
 
     public void setSneaking( boolean flag ) {

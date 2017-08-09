@@ -45,12 +45,24 @@ public class ListenerManager {
                 Flex.getServer().getPacketThreadExecutor().execute( new Runnable() {
                     @Override
                     public void run() {
-                        list.forEach( ( listener ) -> listener.handle( connectionHandler, message ) );
+                        list.forEach( ( listener ) -> {
+                            try {
+                                listener.handle( connectionHandler, message );
+                            } catch ( Exception e ) {
+                                e.printStackTrace();
+                            }
+                        } );
 
                     }
                 } );
             } else {
-                list.forEach( ( listener ) -> listener.handle( connectionHandler, message ) );
+                list.forEach( ( listener ) -> {
+                    try {
+                        listener.handle( connectionHandler, message );
+                    } catch ( Exception e ) {
+                        e.printStackTrace();
+                    }
+                } );
             }
         }
     }
