@@ -40,8 +40,8 @@ public enum Material {
     SANDSTONE( 24 ),
     NOTE_BLOCK( 25 ),
 
-    DIAMOND_ORE( 46 ),
-    DIAMOND_BLOCK( 47 ),
+    DIAMOND_ORE( 56 ),
+    DIAMOND_BLOCK( 57 ),
 
     IRON_SHOVEL( 256, false, true, true, false ),
     IRON_PICK_AXE( 257, false, true, true, false ),

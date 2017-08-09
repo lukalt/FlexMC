@@ -4,7 +4,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.lukas81298.flexmc.entity.metadata.EntityFlag;
-import me.lukas81298.flexmc.inventory.Inventory;
 import me.lukas81298.flexmc.inventory.ItemStack;
 import me.lukas81298.flexmc.inventory.PlayerInventory;
 import me.lukas81298.flexmc.io.message.play.server.*;
@@ -44,7 +43,7 @@ public class Player extends LivingEntity implements CommandSender {
     private volatile GameMode gameMode = GameMode.SURVIVAL;
     private final AtomicBoolean online = new AtomicBoolean( true );
     @Getter
-    private final Inventory inventory;
+    private final PlayerInventory inventory;
     @Getter
     private volatile int heldItemSlot = 0;
     @Getter

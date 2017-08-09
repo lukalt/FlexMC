@@ -69,4 +69,14 @@ public class ItemStack {
     public boolean isSimilar( ItemStack other ) {
         return other != null && ( other == this || ( other.type == type && other.damage == damage ) );
     }
+
+    public boolean isEmpty() {
+        return this.amount <= 0;
+    }
+
+    public static boolean isEqual( ItemStack a, ItemStack b ) {
+        return a == b || a == null && b.type <= 0 || b == null && a.type <= 0 || b != null &&
+                a != null && ( b.type <= 0 && a.type <= 0 || a.type == b.type &&
+                a.amount == b.amount && a.damage == b.damage );
+    }
 }

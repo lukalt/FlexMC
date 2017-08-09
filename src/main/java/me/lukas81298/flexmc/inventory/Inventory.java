@@ -13,7 +13,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author lukas
  * @since 07.08.2017
  */
-public class Inventory {
+public abstract class Inventory {
 
     private ItemStack[] items;
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
@@ -119,4 +119,6 @@ public class Inventory {
     protected int getRawSlow( int virtualSlot ) {
         return virtualSlot;
     }
+
+    public abstract void click( short slot, byte button, short action, int mode, ItemStack itemStack );
 }

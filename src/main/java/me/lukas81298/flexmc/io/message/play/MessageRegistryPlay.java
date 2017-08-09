@@ -1,7 +1,6 @@
 package me.lukas81298.flexmc.io.message.play;
 
 import me.lukas81298.flexmc.io.message.MessageRegistry;
-import me.lukas81298.flexmc.io.message.login.server.MessageS03SetCompression;
 import me.lukas81298.flexmc.io.message.play.client.*;
 import me.lukas81298.flexmc.io.message.play.server.*;
 
@@ -21,7 +20,7 @@ public class MessageRegistryPlay extends MessageRegistry {
         registerServerMessage( 0x04, MessageS04SpawnPainting.class );
         registerServerMessage( 0x05, MessageS05SpawnPlayer.class );
         registerServerMessage( 0x06, MessageS06Animation.class );
-        registerServerMessage( 0x07, MessageS07ClickWindow.class );
+        registerServerMessage( 0x07, MessageS07Statistics.class );
         registerServerMessage( 0x08, MessageS08BlockBreakAnimation.class );
         registerServerMessage( 0x09, MessageS09UpdateBlockEntity.class );
         registerServerMessage( 0x0A, MessageS0ABlockAction.class );
@@ -70,15 +69,15 @@ public class MessageRegistryPlay extends MessageRegistry {
         registerClientMessage( 0x04, MessageC04ClientSettings.class );
         registerClientMessage( 0x05, MessageC05ConfirmTransaction.class );
         registerClientMessage( 0x06, MessageC06EnchantItem.class );
-
-        registerServerMessage( 0x08, MessageC08CloseWindow.class );
+        registerClientMessage( 0x07, MessageC07ClickWindow.class );
+        registerClientMessage( 0x08, MessageC08CloseWindow.class );
         registerClientMessage( 0x09, MessageC09PluginMessage.class );
         registerClientMessage( 0x0B, MessageC0BKeepAlive.class );
         registerClientMessage( 0x0C, MessageC0CPlayer.class );
         registerClientMessage( 0x0D, MessageC0DPlayerPosition.class );
         registerClientMessage( 0x0E, MessageC0EPPlayerPosAndLook.class );
         registerClientMessage( 0x0F, MessageC0FPlayerLook.class );
-        registerServerMessage( 0x13, MessageC13PlayerAbilities.class );
+        registerClientMessage( 0x13, MessageC13PlayerAbilities.class );
         registerClientMessage( 0x14, MessageC14PlayerDigging.class );
         registerClientMessage( 0x15, MessageC15EntityAction.class );
 

@@ -5,6 +5,7 @@ import com.evilco.mc.nbt.stream.NbtOutputStream;
 import com.evilco.mc.nbt.tag.TagCompound;
 import com.google.common.base.Charsets;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import me.lukas81298.flexmc.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;
@@ -166,7 +167,7 @@ public abstract class Message {
     }
 
     public static TagCompound readNbtTag( ByteBuf buf ) {
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( buf.array() );
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( Unpooled.buffer().writeBytes( buf ).array() );
         try {
             NbtInputStream in = new NbtInputStream( byteArrayInputStream );
             return (TagCompound) in.readTag();

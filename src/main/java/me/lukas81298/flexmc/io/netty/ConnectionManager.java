@@ -51,6 +51,7 @@ public class ConnectionManager {
         this.listenerManager.registerListener( new HeldItemListener() );
         this.listenerManager.registerListener( new ClientStatusListener() );
         this.listenerManager.registerListener( new EncryptionResponseListener() );
+        this.listenerManager.registerListener( new InventoryClickListener() );
     }
 
     public MessageRegistry getRegistry( ConnectionHandler connectionHandler ) {

@@ -1,4 +1,4 @@
-package me.lukas81298.flexmc.io.message.play.server;
+package me.lukas81298.flexmc.io.message.play.client;
 
 import io.netty.buffer.ByteBuf;
 import lombok.*;
@@ -16,12 +16,12 @@ import java.io.IOException;
 @Getter
 @Setter
 @EqualsAndHashCode( callSuper = false )
-public class MessageS07ClickWindow extends Message {
+public class MessageC07ClickWindow extends Message {
 
     private int windowId;
     private short slot;
     private byte button;
-    private int action;
+    private short action;
     private int mode;
     private ItemStack itemStack;
 
