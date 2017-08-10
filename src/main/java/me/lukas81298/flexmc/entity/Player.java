@@ -5,13 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 import me.lukas81298.flexmc.entity.metadata.EntityFlag;
 import me.lukas81298.flexmc.inventory.ItemStack;
+import me.lukas81298.flexmc.inventory.Material;
 import me.lukas81298.flexmc.inventory.PlayerInventory;
 import me.lukas81298.flexmc.io.message.play.server.*;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
-import me.lukas81298.flexmc.util.Difficulty;
-import me.lukas81298.flexmc.util.GameMode;
-import me.lukas81298.flexmc.util.Location;
-import me.lukas81298.flexmc.util.Vector3i;
+import me.lukas81298.flexmc.util.*;
 import me.lukas81298.flexmc.world.ChunkColumn;
 import me.lukas81298.flexmc.world.Dimension;
 import me.lukas81298.flexmc.world.World;
@@ -64,6 +62,10 @@ public class Player extends LivingEntity implements CommandSender {
         connectionHandler.sendMessage( new MessageS2FPlayerPositionAndLook( getLocation().x(), getLocation().y(), getLocation().z(), 0F, 0F, (byte) 0, 0 ) );
         this.sendChunks();
         inventory.addItem( new ItemStack( 278, 1 ) );
+        for( int i = 310; i <= 313; i++ ) {
+            inventory.addItem( new ItemStack( i ) );
+        }
+        inventory.addItem( new ItemStack( Material.LOG ) );
     }
 
     private void sendChunks() {
@@ -158,4 +160,14 @@ public class Player extends LivingEntity implements CommandSender {
         location = getWorld().getSpawnLocation();
         connectionHandler.sendMessage( new MessageS2FPlayerPositionAndLook( location.x(), location.y(), location.z(), location.yaw(), location.pitch(), (byte) 0,  0 ) );
     }
+
+    public void dropItem( ItemStack itemStack ) {
+        float yaw = location.yaw(), pitch = location.pitch();
+        Vector3d vector = new Vector3d( -Math.cos( pitch ) * Math.sin( yaw ), 0D, Math.cos( pitch ) * Math.sin( yaw ) ).multiply( 3D );
+        System.out.println( "vector " + vector );
+        vector.vz( Math.min( 2, vector.vz() ) );
+        vector.vx( Math.min( 2, vector.vx() ) );
+        this.getWorld().spawnItem( new Location( location.x() + vector.vx(), location.y(), location.z() + vector.vz() ), itemStack );
+    }
+
 }

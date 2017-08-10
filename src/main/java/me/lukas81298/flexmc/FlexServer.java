@@ -15,6 +15,7 @@ import me.lukas81298.flexmc.config.MainConfig;
 import me.lukas81298.flexmc.entity.Player;
 import me.lukas81298.flexmc.io.message.play.server.MessageS1FKeepAlive;
 import me.lukas81298.flexmc.io.netty.*;
+import me.lukas81298.flexmc.util.crafting.RecipeManager;
 import me.lukas81298.flexmc.util.crypt.AuthHelper;
 import me.lukas81298.flexmc.world.World;
 import me.lukas81298.flexmc.world.block.Blocks;
@@ -50,6 +51,8 @@ public class FlexServer {
 
     @Getter
     private KeyPair keyPair;
+    @Getter
+    private RecipeManager recipeManager = new RecipeManager();
 
     public FlexServer( MainConfig config, File configFolder ) {
         this.config = config;
@@ -61,10 +64,15 @@ public class FlexServer {
         return executorService.submit( new Callable<Void>() {
             public Void call() throws Exception {
 
-                System.out.println( "Generating keypair with 1024 bit length" );
-                long start = System.currentTimeMillis();
-                keyPair = AuthHelper.generateServerKeyPair();
-                System.out.println( "Took " + ( System.currentTimeMillis() - start ) + "ms" );
+                if( config.isVerifyUsers() ) {
+                    System.out.println( "Generating keypair with 1024 bit length" );
+                    long start = System.currentTimeMillis();
+                    keyPair = AuthHelper.generateServerKeyPair();
+                    System.out.println( "Took " + ( System.currentTimeMillis() - start ) + "ms" );
+                } else {
+                    System.out.println( "Server will not verify names. Use this option wisely, everyone could log in with any account" );
+                }
+
 
                 NioEventLoopGroup acceptorGroup = new NioEventLoopGroup( config.getAcceptorThreads() );
                 NioEventLoopGroup handlerGroup = new NioEventLoopGroup( config.getHandlerThreads() );

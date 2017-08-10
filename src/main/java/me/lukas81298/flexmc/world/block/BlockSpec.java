@@ -25,4 +25,8 @@ public class BlockSpec {
     public Collection<ItemStack> getDrops( Player player, int data ) {
         return Collections.singletonList( new ItemStack( type, 1, (short) data ) );
     }
+
+    public void click( Player player ) {
+
+    }
 }

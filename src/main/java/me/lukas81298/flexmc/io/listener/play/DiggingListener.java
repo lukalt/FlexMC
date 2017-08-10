@@ -37,6 +37,30 @@ public class DiggingListener implements MessageInboundListener<MessageC14PlayerD
                 for( Player t : world.getPlayers() ) {
                     t.getConnectionHandler().sendMessage( new MessageS08BlockBreakAnimation( player.getEntityId(), message.getPosition(), (byte) -1 ) );
                 }
+            } else if( message.getStatus() == 4 ) {
+                ItemStack itemStack = player.getItemInHand();
+                if ( itemStack != null && !itemStack.isEmpty() ) {
+                    synchronized ( connectionHandler.getPlayer() ) {
+                        itemStack.setAmount( itemStack.getAmount() - 1 );
+                        int type = itemStack.getType();
+                        int data = itemStack.getDamage();
+                        player.dropItem( new ItemStack( type, 1, (short) data ) );
+                        if( itemStack.getAmount() <= 1 ) {
+                            itemStack = null;
+                        }
+                        player.getInventory().setItem( player.getHeldItemSlot(), itemStack );
+                    }
+                }
+            } else if( message.getStatus() == 4 ) {
+                ItemStack itemStack = player.getItemInHand();
+                if ( itemStack != null && !itemStack.isEmpty() ) {
+                    synchronized ( connectionHandler.getPlayer() ) {
+                        int type = itemStack.getType();
+                        int data = itemStack.getDamage();
+                        player.dropItem( new ItemStack( type, itemStack.getAmount(), (short) data ) );
+                        player.getInventory().setItem( player.getHeldItemSlot(), null );
+                    }
+                }
             }
         }
     }

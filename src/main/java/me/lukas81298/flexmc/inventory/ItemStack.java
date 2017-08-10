@@ -2,12 +2,10 @@ package me.lukas81298.flexmc.inventory;
 
 import com.evilco.mc.nbt.tag.TagCompound;
 import io.netty.buffer.ByteBuf;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 import me.lukas81298.flexmc.io.message.Message;
+import net.cubespace.Yamler.Config.YamlConfig;
 
 /**
  * @author lukas
@@ -17,15 +15,17 @@ import me.lukas81298.flexmc.io.message.Message;
 @Getter
 @Setter
 @Accessors( chain = true )
-@EqualsAndHashCode
-public class ItemStack {
+@EqualsAndHashCode( callSuper = false )
+@ToString( of = { "type","amount","damage" } )
+@NoArgsConstructor
+public class ItemStack extends YamlConfig {
 
     public static ItemStack AIR = new ItemStack( 0 );
 
     private int type;
     private int amount = 1;
     private short damage;
-    private TagCompound meta = new TagCompound( "ItemStack" );
+    private transient TagCompound meta = new TagCompound( "ItemStack" );
 
     public ItemStack( Material material ) {
         this.type = material.getId();

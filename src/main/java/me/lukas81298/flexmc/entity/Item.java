@@ -16,7 +16,6 @@ import javax.annotation.Nullable;
 public class Item extends Entity implements EntityObject {
 
     private double fallSpeed = 0D; // no concurrency needed here, entity is ticked by the same thread every time
-
     public Item( int entityId, Location location, World world ) {
         super( entityId, location, world );
     }
@@ -37,28 +36,32 @@ public class Item extends Entity implements EntityObject {
             remove();
         } else if( isAlive() ) {
             Location l = this.getLocation();
-            for( Player player : this.getWorld().getPlayers() ) {
-                if( l.distanceSquared( player.getLocation() ) <= 2 ) {
-                    ItemStack itemStack = getItemStack();
-                    if( itemStack != null ) {
-                        for( Player t : this.getWorld().getPlayers() ) {
-                            t.getConnectionHandler().sendMessage( new MessageS4BCollectItem( getEntityId(), player.getEntityId(), itemStack.getAmount() ) );
+            if( ticksAlive > 10 ) {
+                for( Player player : this.getWorld().getPlayers() ) {
+                    if( l.distanceSquared( player.getLocation() ) <= 2 ) {
+                        ItemStack itemStack = getItemStack();
+                        if( itemStack != null ) {
+                            for( Player t : this.getWorld().getPlayers() ) {
+                                t.getConnectionHandler().sendMessage( new MessageS4BCollectItem( getEntityId(), player.getEntityId(), itemStack.getAmount() ) );
+                            }
+                            player.getInventory().addItem( itemStack );
                         }
-                        player.getInventory().addItem( itemStack );
+                        remove();
+                        return;
                     }
-                    remove();
-                    return;
                 }
             }
             boolean k = Math.ceil( l.y() ) != l.y();
             boolean m = getWorld().getBlockAt( new Vector3i( (int) l.x(), ( (int) l.y() ) - 1, (int) l.z() ) ).getTypeId() == 0;
             if( m || k ){
                 if( m ) {
-                    fallSpeed -= 0.03999999910593033D;
-                    location = new Location( l.x(), l.y() , l.z() );
+                    fallSpeed += 0.03999999910593033D;
+                    location = new Location( l.x(), l.y() - fallSpeed, l.z() );
                 } else {
                     location = new Location( l.x(), Math.ceil( l.y() ), l.z() );
                 }
+            } else {
+                fallSpeed = 0D;
             }
         }
     }

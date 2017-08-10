@@ -120,5 +120,5 @@ public abstract class Inventory {
         return virtualSlot;
     }
 
-    public abstract void click( short slot, byte button, short action, int mode, ItemStack itemStack );
+    public abstract boolean click( Player player, short slot, byte button, int mode, ItemStack itemStack );
 }

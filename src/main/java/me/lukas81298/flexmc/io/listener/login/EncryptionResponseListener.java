@@ -34,23 +34,33 @@ public class EncryptionResponseListener implements MessageInboundListener<Messag
         VerifySession verifySession = connectionHandler.getVerifySession();
         if ( verifySession != null ) {
             if ( verifySession.getState().compareAndSet( 1, 2 ) ) {
-                Cipher cipher = AuthHelper.createDecryptCipher();
-                SecretKey secretKey = new SecretKeySpec( cipher.doFinal( message.getSharedSecret() ), "AES" );
-                AuthHelper.reInitCipher( cipher );
-                byte[] decryptedToken = cipher.doFinal( message.getVerifyToken() );
+                Flex.getServer().getExecutorService().execute( new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Cipher cipher = AuthHelper.createDecryptCipher();
+                            SecretKey secretKey = new SecretKeySpec( cipher.doFinal( message.getSharedSecret() ), "AES" );
+                            AuthHelper.reInitCipher( cipher );
+                            byte[] decryptedToken = cipher.doFinal( message.getVerifyToken() );
 
-                if ( !Arrays.equals( decryptedToken, verifySession.getToken() ) ) {
-                    connectionHandler.sendMessage( new MessageS00Disconnect( "{\"text\":\"Failed to verify username\"}" ) );
-                    return;
-                }
+                            if ( !Arrays.equals( decryptedToken, verifySession.getToken() ) ) {
+                                connectionHandler.sendMessage( new MessageS00Disconnect( "{\"text\":\"Failed to verify username\"}" ) );
+                                return;
+                            }
 
-                connectionHandler.startProtocolEncryption( secretKey ); // finally enable encryption
-                JsonObject jsonElement = verifyToken( connectionHandler, createVerifyHash( secretKey ) );
-                if( jsonElement == null ) {
-                    connectionHandler.sendMessage( new MessageS00Disconnect( "{\"text\":\"Failed to verify username\"}" ) );
-                    return;
-                }
-                connectionHandler.loginSuccess( jsonElement.get( "name" ).getAsString(), UUIDUtil.convertUUID( jsonElement.get( "id" ).getAsString() ) );
+                            connectionHandler.startProtocolEncryption( secretKey ); // finally enable encryption
+                            JsonObject jsonElement = verifyToken( connectionHandler, createVerifyHash( secretKey ) );
+                            if( jsonElement == null ) {
+                                connectionHandler.sendMessage( new MessageS00Disconnect( "{\"text\":\"Failed to verify username\"}" ) );
+                                return;
+                            }
+                            connectionHandler.loginSuccess( jsonElement.get( "name" ).getAsString(), UUIDUtil.convertUUID( jsonElement.get( "id" ).getAsString() ) );
+                        } catch ( Exception e ) {
+                            e.printStackTrace();
+                        }
+                    }
+                } );
+
             }
         }
     }
