@@ -48,9 +48,9 @@ public enum Material {
     IRON_AXE( 258, false, true, true, false ),
 
     COAL( 263, false, true, true, false ),
-    DIAMOND( 263, false, true, true, false ),
-    IRON_INGOT( 264, false, true, true, false ),
-    GOLD_INGOT( 265, false, true, true, false ),
+    DIAMOND( 264, false, true, true, false ),
+    IRON_INGOT( 265, false, true, true, false ),
+    GOLD_INGOT( 266, false, true, true, false ),
     IRON_SWORD( 267, false, true, true, false ),
     WOOD_SWORD( 268, false, true, true, false ),
     WOOD_SHOVEL( 269, false, true, true, false ),
@@ -64,8 +64,6 @@ public enum Material {
     DIAMOND_SHOVEL( 277, false, true, true, false ),
     DIAMOND_PICK_AXE( 278, false, true, true, false ),
     DIAMOND_AXE( 279, false, true, true, false )
-
-
     ;
 
     private final int id;

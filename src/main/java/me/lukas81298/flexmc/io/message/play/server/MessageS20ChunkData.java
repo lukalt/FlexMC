@@ -49,6 +49,7 @@ public class MessageS20ChunkData extends Message {
             }
         }
         writeVarInt( mask, buf );
+        data.writeBytes( chunkColumnColumn.getBiome() );
         writeVarInt( data.readableBytes(), buf );
         buf.writeBytes( data );
         writeVarInt( 0, buf );

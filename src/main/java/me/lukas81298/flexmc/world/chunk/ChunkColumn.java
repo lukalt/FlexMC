@@ -26,7 +26,7 @@ public class ChunkColumn {
 
     public ChunkColumn( int x, int z ) {
         this( x, z, new ChunkSection[16], new byte[0x100] );
-        Arrays.fill( biome, (byte) 127 ); // void biome
+        Arrays.fill( biome, (byte) 1 ); // void biome
     }
 
     public void setBlock( int x, int y, int z, BlockState type ) {
