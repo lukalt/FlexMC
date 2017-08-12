@@ -1,11 +1,13 @@
 package me.lukas81298.flexmc.world.chunk;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import me.lukas81298.flexmc.world.BlockState;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 /**
  * @author lukas
@@ -14,11 +16,13 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 @Getter
 @ToString
+@EqualsAndHashCode( of = { "x", "z" } )
 public class ChunkColumn {
 
     private final int x, z;
     private final ChunkSection[] sections;
     private final byte[] biome;
+    private final UUID uuid = UUID.randomUUID();
 
     public ChunkColumn( int x, int z ) {
         this( x, z, new ChunkSection[16], new byte[0x100] );

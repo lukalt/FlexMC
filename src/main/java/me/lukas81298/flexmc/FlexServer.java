@@ -13,6 +13,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.Getter;
 import me.lukas81298.flexmc.config.MainConfig;
 import me.lukas81298.flexmc.entity.Player;
+import me.lukas81298.flexmc.inventory.item.Items;
 import me.lukas81298.flexmc.io.message.play.server.MessageS1FKeepAlive;
 import me.lukas81298.flexmc.io.netty.*;
 import me.lukas81298.flexmc.util.crafting.RecipeManager;
@@ -96,9 +97,12 @@ public class FlexServer {
                         } ).localAddress( config.getServerAddress(), config.getServerPort() ).bind().syncUninterruptibly(); // wait until started
 
 
-                running.set( true );
+
 
                 Blocks.initBlocks(); // register all blocks
+                Items.initItems();
+
+                running.set( true );
 
                 world = new World( "world" );
 

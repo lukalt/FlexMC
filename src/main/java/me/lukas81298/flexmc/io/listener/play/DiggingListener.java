@@ -2,6 +2,8 @@ package me.lukas81298.flexmc.io.listener.play;
 
 import me.lukas81298.flexmc.entity.Player;
 import me.lukas81298.flexmc.inventory.ItemStack;
+import me.lukas81298.flexmc.inventory.item.ItemSpec;
+import me.lukas81298.flexmc.inventory.item.Items;
 import me.lukas81298.flexmc.io.listener.MessageInboundListener;
 import me.lukas81298.flexmc.io.message.play.client.MessageC14PlayerDigging;
 import me.lukas81298.flexmc.io.message.play.server.MessageS08BlockBreakAnimation;
@@ -29,6 +31,17 @@ public class DiggingListener implements MessageInboundListener<MessageC14PlayerD
                 BlockState previous = world.getBlockAt( message.getPosition() );
                 world.setBlock( message.getPosition(), new BlockState( 0, 0 ) );
                 spawnItems( player, message.getPosition().toMidLocation(), previous );
+                ItemStack itemStack = player.getItemInHand();
+                if( itemStack != null && !itemStack.isEmpty() ) {
+                    ItemSpec spec = Items.getItemSpec( itemStack.getType() );
+                    if( spec != null ) {
+                        short d = itemStack.getDamage();
+                        ItemStack changed = spec.breakBlock( player, itemStack );
+                        if( changed != itemStack || changed.getDamage() != d ) {
+                            player.getInventory().setItem( player.getHeldItemSlot(), changed );
+                        }
+                    }
+                }
             } else if( message.getStatus() ==  0 ) {
                 for( Player t : world.getPlayers() ) {
                     t.getConnectionHandler().sendMessage( new MessageS08BlockBreakAnimation( player.getEntityId(), message.getPosition(), (byte) 1 ) );

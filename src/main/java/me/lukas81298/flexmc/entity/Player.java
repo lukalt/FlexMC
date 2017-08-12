@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import me.lukas81298.flexmc.entity.metadata.EntityFlag;
 import me.lukas81298.flexmc.inventory.ItemStack;
-import me.lukas81298.flexmc.inventory.Material;
 import me.lukas81298.flexmc.inventory.PlayerInventory;
 import me.lukas81298.flexmc.io.message.play.server.*;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
@@ -16,7 +15,9 @@ import me.lukas81298.flexmc.world.chunk.ChunkColumn;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -46,6 +47,9 @@ public class Player extends LivingEntity implements CommandSender {
     private volatile int heldItemSlot = 0;
     @Getter
     private AtomicInteger foodLevel = new AtomicInteger( 20 );
+    private final Set<ChunkColumn> shownChunks = ConcurrentHashMap.newKeySet();
+
+    private byte healthCounter = 0;
 
     public Player( int entityId, Location position, String name, UUID uuid, ConnectionHandler connectionHandler, World world ) {
         super( entityId, position, world );
@@ -61,17 +65,27 @@ public class Player extends LivingEntity implements CommandSender {
         connectionHandler.sendMessage( new MessageS46SpawnPosition( new Vector3i( 0, 10, 0 ) ) );
         connectionHandler.sendMessage( new MessageS2CPlayerAbilities( (byte) 0, .2F, .2F ) );
         connectionHandler.sendMessage( new MessageS2FPlayerPositionAndLook( getLocation().x(), getLocation().y(), getLocation().z(), 0F, 0F, (byte) 0, 0 ) );
-        this.sendChunks();
+        this.refreshShownChunks();
         inventory.addItem( new ItemStack( 278, 1 ) );
-        for( int i = 310; i <= 313; i++ ) {
-            inventory.addItem( new ItemStack( i ) );
-        }
-        inventory.addItem( new ItemStack( Material.LOG ) );
+        inventory.addItem( new ItemStack( 279, 1 ) );
+        inventory.addItem( new ItemStack( 277, 1 ) );
+        inventory.addItem( new ItemStack( 276, 1 ) );
     }
 
-    private void sendChunks() {
+    public void refreshShownChunks() {
+        Location location = this.getLocation();
+        int viewDistance = 7;
+        int x = (int) (location.x() / 16), z = (int) (location.z() / 16);
         for( ChunkColumn column : this.getWorld().getColumns() ) {
-            this.connectionHandler.sendMessage( new MessageS20ChunkData( column ) );
+            if( Math.abs( x - column.getX() ) <= viewDistance && Math.abs( z - column.getZ() ) <= viewDistance ) {
+                if( shownChunks.add( column ) ) {
+                    this.connectionHandler.sendMessage( new MessageS20ChunkData( column ) );
+                }
+            } else {
+                if( shownChunks.remove( column ) ) {
+                    this.connectionHandler.sendMessage( new MessageS1DUnloadChunk( column.getX(), column.getZ() ) );
+                }
+            }
         }
     }
 
@@ -152,12 +166,25 @@ public class Player extends LivingEntity implements CommandSender {
         }
     }
 
+    @Override
+    public void teleport( Location l, boolean onGround ) {
+        Location k = this.getLocation();
+        if( (int)l.x()/16 != (int)k.x()/16 ) {
+            if( (int)l.z()/16 != (int)k.z()/16 ) {
+                this.refreshShownChunks();
+            }
+        }
+        super.teleport( l, onGround );
+
+    }
+
     public synchronized void respawn() {
         alive = true;
         foodLevel.set( 20 );
         setHealth( 20D );
         connectionHandler.sendMessage( new MessageS35Respawn( getWorld().getDimension(), getWorld().getDifficulty(), gameMode, "default" ) );
-        sendChunks();
+        shownChunks.clear();
+        refreshShownChunks();
         location = getWorld().getSpawnLocation();
         connectionHandler.sendMessage( new MessageS2FPlayerPositionAndLook( location.x(), location.y(), location.z(), location.yaw(), location.pitch(), (byte) 0,  0 ) );
     }
@@ -165,10 +192,22 @@ public class Player extends LivingEntity implements CommandSender {
     public void dropItem( ItemStack itemStack ) {
         float yaw = location.yaw(), pitch = location.pitch();
         Vector3d vector = new Vector3d( -Math.cos( pitch ) * Math.sin( yaw ), 0D, Math.cos( pitch ) * Math.sin( yaw ) ).multiply( 3D );
-        System.out.println( "vector " + vector );
         vector.vz( Math.min( 2, vector.vz() ) );
         vector.vx( Math.min( 2, vector.vx() ) );
         this.getWorld().spawnItem( new Location( location.x() + vector.vx(), location.y(), location.z() + vector.vz() ), itemStack );
     }
 
+    @Override
+    public void tick() {
+        super.tick();
+        healthCounter++;
+        if( healthCounter == 80 ) {
+            healthCounter = 0;
+            double health = getHealth();
+            double maxHealth = getMaxHealth();
+            if( health < maxHealth ) {
+                setHealth( Math.min( health + 1, maxHealth ) );
+            }
+        }
+    }
 }

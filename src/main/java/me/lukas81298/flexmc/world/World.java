@@ -18,7 +18,7 @@ import me.lukas81298.flexmc.util.Vector3i;
 import me.lukas81298.flexmc.world.chunk.ChunkColumn;
 import me.lukas81298.flexmc.world.chunk.ChunkSection;
 import me.lukas81298.flexmc.world.generator.ChunkGenerator;
-import me.lukas81298.flexmc.world.generator.OverWorldGenerator;
+import me.lukas81298.flexmc.world.generator.ExperimentalChunkGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,24 +52,34 @@ public class World {
     private final AtomicInteger worldAge = new AtomicInteger( 0 );
     private final AtomicInteger entityIdCounter = new AtomicInteger( 0 );
 
-    private final ChunkGenerator generator = new OverWorldGenerator();
+    private final ChunkGenerator generator = new ExperimentalChunkGenerator();
 
     @Getter
     private Difficulty difficulty = Difficulty.PEACEFUL;
     @Getter
     private final Dimension dimension = Dimension.OVER_WORLD;
 
+    @Getter
+    private volatile boolean generated = false;
+
     private byte timeCounter = 0;
 
     public World( String name ) {
         this.name = name;
-        System.out.println( "Generating chunks for " + name );
-        for ( int x = -8; x < 8; x++ ) {
-            for ( int z = -8; z < 8; z++ ) {
-                this.generateColumn( x, z );
+        Flex.getServer().getExecutorService().execute( new Runnable() {
+            @Override
+            public void run() {
+                System.out.println( "Generating chunks for " + name );
+                for ( int x = -32; x < 32; x++ ) {
+                    for ( int z = -32; z < 32; z++ ) {
+                        generateColumn( x, z );
+                    }
+                }
+                System.out.println( "Done" );
+                generated = true;
             }
-        }
-        System.out.println( "Done" );
+        } );
+
         Flex.getServer().getExecutorService().execute( new Runnable() {
             @Override
             public void run() {
@@ -123,9 +133,6 @@ public class World {
     private void tickPlayers() {
         for( Player player : this.players ) {
             player.tick();
-            if( !player.isAlive() ) {
-                // tja er ist tot, aber eigentlich müssen wir hier nichts machen
-            }
         }
     }
 

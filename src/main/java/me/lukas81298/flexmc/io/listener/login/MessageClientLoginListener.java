@@ -3,6 +3,7 @@ package me.lukas81298.flexmc.io.listener.login;
 import me.lukas81298.flexmc.Flex;
 import me.lukas81298.flexmc.io.listener.MessageInboundListener;
 import me.lukas81298.flexmc.io.message.login.client.MessageC00LoginStart;
+import me.lukas81298.flexmc.io.message.login.server.MessageS00Disconnect;
 import me.lukas81298.flexmc.io.message.login.server.MessageS01EncryptionRequest;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
 import me.lukas81298.flexmc.util.VerifySession;
@@ -19,10 +20,14 @@ public class MessageClientLoginListener implements MessageInboundListener<Messag
     @Override
     public void handle( ConnectionHandler connectionHandler, MessageC00LoginStart message ) {
         if( connectionHandler.getVerifySession() != null ) {
-            System.out.println( "Already authenticating" );
+            connectionHandler.sendMessage( new MessageS00Disconnect( "{\"text\":\"Already logging in\"}" ) );
             return;
         }
 
+        if( !Flex.getServer().isRunning() || Flex.getServer().getWorld() == null || !Flex.getServer().getWorld().isGenerated() ) {
+            connectionHandler.sendMessage( new MessageS00Disconnect( "{\"text\":\"Server ist still starting up\"}" ) );
+            return;
+        }
         if( Flex.getServer().getConfig().isVerifyUsers() ) {
             VerifySession verifySession = new VerifySession( AuthHelper.nextToken(), message.getName() );
             connectionHandler.setVerifySession( verifySession );
