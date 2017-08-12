@@ -187,6 +187,7 @@ public class Player extends LivingEntity implements CommandSender {
         refreshShownChunks();
         location = getWorld().getSpawnLocation();
         connectionHandler.sendMessage( new MessageS2FPlayerPositionAndLook( location.x(), location.y(), location.z(), location.yaw(), location.pitch(), (byte) 0,  0 ) );
+        getInventory().setContents( new ItemStack[ 36 ] );
     }
 
     public void dropItem( ItemStack itemStack ) {

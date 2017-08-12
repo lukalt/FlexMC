@@ -15,7 +15,9 @@ public class ClientStatusListener implements MessageInboundListener<MessageC03Cl
     public void handle( ConnectionHandler connectionHandler, MessageC03ClientStatus message ) {
         Player player = connectionHandler.getPlayer();
         if( message.getAction() == 0 ) {
-            player.respawn();
+            if( !player.isAlive() ) {
+                player.respawn();
+            }
         } else {
             player.sendMessage( "Keine Stats für dich, gibts nicht ;D" );
         }

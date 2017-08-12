@@ -64,6 +64,11 @@ public abstract class LivingEntity extends Entity {
     @Override
     public void teleport( Location l, boolean onGround ) {
         Location previous = this.location;
+        if( l.y() < 0 ) {
+            damage( 2D );
+
+            return;
+        }
         if( previous.y() > l.y() ) {
             double tempFallDistance = Math.abs( l.y() - previous.y() );
             BlockState state = getWorld().getBlockAt( new Vector3i( (int) l.x(), ((int) l.y()) - 1, (int) l.z() ) );
@@ -85,9 +90,6 @@ public abstract class LivingEntity extends Entity {
             fallDistance.set( 0D );
         }
         super.teleport( l, onGround );
-        if( l.y() < 0 ) {
-            damage( 2D );
-        }
     }
 
 }

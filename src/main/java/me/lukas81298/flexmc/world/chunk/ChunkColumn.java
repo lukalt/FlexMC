@@ -29,6 +29,18 @@ public class ChunkColumn {
         Arrays.fill( biome, (byte) 1 ); // void biome
     }
 
+    public void changeBiomeBulk( byte biomeId ) {
+        Arrays.fill( biome, (byte) biomeId );
+    }
+
+    public byte getBiome( int x, int z ) {
+        return biome[ z * 16 | x ];
+    }
+
+    public void setBiome( int x, int z, byte biome ) {
+        this.biome[ z * 16 | x ] = biome;
+    }
+
     public void setBlock( int x, int y, int z, BlockState type ) {
         if( y > 255 ) {
             System.out.println( "y to high " + y );

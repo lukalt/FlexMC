@@ -31,7 +31,7 @@ public enum Material {
     IRON_ORE( 15 ),
     COAL_ORE( 16 ),
     LOG( 17 ),
-    LEAVES( 18 ),
+    LEAVES( 18, true, false, false, false ),
     SPONGE( 19 ),
     GLASS( 20, true, false, true, true ),
     LAPIS_ORE( 21 ),
@@ -40,8 +40,12 @@ public enum Material {
     SANDSTONE( 24 ),
     NOTE_BLOCK( 25 ),
 
+    DEAD_BUSH( 31, false, false, true, false ),
+
     DIAMOND_ORE( 56 ),
     DIAMOND_BLOCK( 57 ),
+
+    CACTUS( 81 ),
 
     IRON_SHOVEL( 256, false, true, true, false ),
     IRON_PICK_AXE( 257, false, true, true, false ),

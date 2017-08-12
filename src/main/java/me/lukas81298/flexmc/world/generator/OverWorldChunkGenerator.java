@@ -5,9 +5,12 @@ import com.github.czyzby.noise4j.map.generator.noise.NoiseGenerator;
 import com.github.czyzby.noise4j.map.generator.util.Generators;
 import me.lukas81298.flexmc.inventory.Material;
 import me.lukas81298.flexmc.util.BiTuple;
+import me.lukas81298.flexmc.world.Biome;
 import me.lukas81298.flexmc.world.BlockState;
 import me.lukas81298.flexmc.world.chunk.ChunkColumn;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -17,17 +20,44 @@ import java.util.Random;
  * @since 12.08.2017
  */
 @SuppressWarnings( "Duplicates" )
-public class ExperimentalChunkGenerator extends LayeredChunkGenerator {
+public class OverWorldChunkGenerator extends LayeredChunkGenerator {
 
     private final int size = 64 * 16;
     private final Random random = new Random();
     private final Grid grid = new Grid( size );
     private final NoiseGenerator noiseGenerator = new NoiseGenerator();
+    private final BufferedImage biomeGrid;
 
-    public ExperimentalChunkGenerator() {
+    public OverWorldChunkGenerator() {
+
+        System.out.println( "Generating biome map" );
+        biomeGrid = new BufferedImage( size, size, BufferedImage.TYPE_3BYTE_BGR );
+        Graphics graphics = biomeGrid.getGraphics();
+        graphics.setColor( new Color( 1 ) );
+        graphics.fillRect( 0, 0, size, size );
+        int specialBiomes = 10 + random.nextInt( 6 );
+        List<Biome> biomes = new ArrayList<>();
+        for ( Biome biome : Biome.values() ) {
+            if ( biome.isGenerated() ) {
+                biomes.add( biome );
+            }
+        }
+        for ( int i = 0; i < specialBiomes; i++ ) {
+            graphics.setColor( new Color( biomes.get( random.nextInt( biomes.size() ) ).getId() ) );
+            int x = random.nextInt( size );
+            int z = random.nextInt( size );
+            int tx = 8 * 16 + random.nextInt( 3 * 16 );
+            int tz = 8 * 16 + random.nextInt( 3 * 16 );
+            System.out.println( x + "," + z + "," + tx + "," + tz );
+            graphics.fillOval( x, z, tx, tz );
+        }
+        /*try {
+            ImageIO.write( biomeGrid, "png", new File( "biomeGrid.png" ) );
+        } catch ( IOException e ) {
+            e.printStackTrace();
+        }*/
         this.addLayer( new BlockState( Material.BEDROCK ), 1 );
-        this.addLayer( new BlockState( Material.STONE ), 50 );
-        this.addLayer( new BlockState( Material.DIRT ), 1 );
+        this.addLayer( new BlockState( Material.STONE ), 51 );
 
         System.out.println( "Generating height map" );
         setupStage( 32, .7F );
@@ -52,11 +82,23 @@ public class ExperimentalChunkGenerator extends LayeredChunkGenerator {
         int cz = column.getZ() * 16 + size / 2;
         for ( int x = 0; x < 16; x++ ) {
             for ( int z = 0; z < 16; z++ ) {
+                byte biome = (byte) biomeGrid.getRGB( x + cx, z + cz );
+                column.setBiome( x, z, biome );
                 float height = Math.max( 0F, grid.get( x + cx, z + cz ) - .5F );
                 int v = (int) ( 50 * height );
                 for ( int i = 0; i < v; i++ ) {
-                    boolean last = v - 1 == i;
-                    column.setBlock( x, i + 52, z, new BlockState( last ? Material.GRASS : Material.DIRT ) );
+
+                    BlockState type;
+                    switch ( biome ) {
+                        case 2:
+                            type = new BlockState( i > v - 6 ? Material.SAND : Material.SANDSTONE );
+                            break;
+                        default:
+                            type = new BlockState( v - 1 == i ? Material.GRASS : Material.DIRT );
+                            break;
+                    }
+
+                    column.setBlock( x, i + 52, z, type );
                 }
             }
         }
@@ -75,7 +117,7 @@ public class ExperimentalChunkGenerator extends LayeredChunkGenerator {
             list.add( new BiTuple<>( x, z ) );
         }
         generateOres( column, Material.COAL_ORE, 17, 54, 20, 24 );
-        generateOres( column, Material.IRON_ORE, 1, 54, 9,11 );
+        generateOres( column, Material.IRON_ORE, 1, 54, 9, 11 );
         generateOres( column, Material.GOLD_ORE, 1, 30, 8, 10 );
         generateOres( column, Material.DIAMOND_ORE, 1, 16, 7, 9 ); // todo lower
     }
@@ -97,21 +139,43 @@ public class ExperimentalChunkGenerator extends LayeredChunkGenerator {
     }
 
     private void generateTree( ChunkColumn column, int x, int z ) {
-        int l = random.nextInt( 4 );
-        BlockState logType = new BlockState( Material.LOG, l ), leavesType = new BlockState( Material.LEAVES, l );
+        byte biome = column.getBiome( x, z );
+        switch ( biome ) {
+            case 1:
+                column.setBlock( x, column.getHighestYAt( x, z ) + 1, z, new BlockState( 31, 1 ) );
+                break;
+            case 2:
+                int y = column.getHighestYAt( x, z ) + 1;
+                int height = 1 + random.nextInt( 3 );
+                for ( int i = 0; i < height; i++ ) {
+                    column.setBlock( x, y + i, z, new BlockState( Material.CACTUS ) );
+                }
+                break;
+            case 3:
+                generateTree0( column, x, z, 0, 3, 4 );
+                break;
+            case 5:
+                generateTree0( column, x, z, 1, 4, 5 );
+                break;
+
+        }
+
+    }
+
+    private void generateTree0( ChunkColumn column, int x, int z, int id, int minHeight, int maxHeight ) {
         int y = column.getHighestYAt( x, z ) + 1;
-        int height = (int) ( Math.random() * 4 + 3 );
+        int height = minHeight + random.nextInt( maxHeight - minHeight );
         for ( int i = 0; i < height; i++ ) {
-            column.setBlock( x, y + i, z, logType );
+            column.setBlock( x, y + i, z, new BlockState( Material.LOG, id ) );
         }
         for ( int i = -2; i <= 2; i++ ) {
             for ( int j = -2; j <= 2; j++ ) {
-                column.setBlock( x + i, y + height, z + j, leavesType );
+                column.setBlock( x + i, y + height, z + j, new BlockState( Material.LEAVES, id ) );
             }
         }
         for ( int i = -1; i <= 1; i++ ) {
             for ( int j = -1; j <= 1; j++ ) {
-                column.setBlock( x + i, y + height + 1, z + j, leavesType );
+                column.setBlock( x + i, y + height + 1, z + j, new BlockState( Material.LEAVES, id ) );
             }
         }
     }
