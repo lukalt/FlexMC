@@ -47,7 +47,6 @@ public class Flex {
             e.printStackTrace();
         }
 
-        System.out.println( "Server has started! Took " + Math.round( ( System.nanoTime() - start ) / 1000 ) / 1000 + "ms" );
         while ( server.isRunning() ) {
             try {
                 Thread.sleep( 1000L );

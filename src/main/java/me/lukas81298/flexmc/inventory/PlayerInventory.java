@@ -68,6 +68,18 @@ public class PlayerInventory extends Inventory implements CraftingInput {
                     } else if ( currentlyInSlot != null && !currentlyInSlot.isEmpty() && itemOnCursor == null ) {
                         itemOnCursor = currentlyInSlot;
                         setRawSlot( slot, null );
+                        if( slot == 0 ) {
+                            for ( int i = 1; i < craftingSlots.length; i++ ) {
+                                ItemStack stack = craftingSlots[ i ];
+                                if( stack != null && !stack.isEmpty() ) {
+                                    stack.setAmount( stack.getAmount() - 1 );
+                                    if( stack.getAmount() <= 0 ) {
+                                        stack = null;
+                                    }
+                                    setRawSlot( (short) i, stack );
+                                }
+                            }
+                        }
                         System.out.println( "Picked up " + itemOnCursor );
                         return true;
                     } else {
@@ -178,6 +190,7 @@ public class PlayerInventory extends Inventory implements CraftingInput {
                     setRawSlot( (short) 0, recipe.getResult() );
                     System.out.println( "Recipe found" );
                 } else {
+                    setRawSlot( (short) 0, null );
                     System.out.println( "no recipe found" );
                 }
             }

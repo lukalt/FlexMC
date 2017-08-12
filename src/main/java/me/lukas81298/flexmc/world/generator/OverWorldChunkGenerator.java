@@ -48,7 +48,7 @@ public class OverWorldChunkGenerator extends LayeredChunkGenerator {
             int z = random.nextInt( size );
             int tx = 8 * 16 + random.nextInt( 3 * 16 );
             int tz = 8 * 16 + random.nextInt( 3 * 16 );
-            System.out.println( x + "," + z + "," + tx + "," + tz );
+          //  System.out.println( x + "," + z + "," + tx + "," + tz );
             graphics.fillOval( x, z, tx, tz );
         }
         /*try {

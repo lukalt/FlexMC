@@ -69,13 +69,24 @@ public class World {
         Flex.getServer().getExecutorService().execute( new Runnable() {
             @Override
             public void run() {
-                System.out.println( "Generating chunks for " + name );
+                System.out.print( "Generating chunks for " + name + " [" );
+                float count = 64 * 64;
+                int k = 0;
+                int f = (int) (count / 30);
                 for ( int x = -32; x < 32; x++ ) {
                     for ( int z = -32; z < 32; z++ ) {
                         generateColumn( x, z );
+                        if( k % f == 0 ) {
+                            System.out.print( "." );
+                        }
+
+                        k++;
+
                     }
                 }
-                System.out.println( "Done" );
+                System.out.println( "]" );
+                //         System.out.println( "Server has started! Took " + Math.round( ( System.nanoTime() - start ) / 1000 ) / 1000 + "ms" );
+
                 generated = true;
             }
         } );

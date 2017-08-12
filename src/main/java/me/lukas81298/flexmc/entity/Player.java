@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.lukas81298.flexmc.entity.metadata.EntityFlag;
 import me.lukas81298.flexmc.inventory.ItemStack;
+import me.lukas81298.flexmc.inventory.Material;
 import me.lukas81298.flexmc.inventory.PlayerInventory;
 import me.lukas81298.flexmc.io.message.play.server.*;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
@@ -70,6 +71,9 @@ public class Player extends LivingEntity implements CommandSender {
         inventory.addItem( new ItemStack( 279, 1 ) );
         inventory.addItem( new ItemStack( 277, 1 ) );
         inventory.addItem( new ItemStack( 276, 1 ) );
+        for( int i = 4; i < 10; i++ ) {
+            getInventory().setItem( i, new ItemStack( Material.LOG ) );
+        }
     }
 
     public void refreshShownChunks() {
@@ -188,6 +192,7 @@ public class Player extends LivingEntity implements CommandSender {
         location = getWorld().getSpawnLocation();
         connectionHandler.sendMessage( new MessageS2FPlayerPositionAndLook( location.x(), location.y(), location.z(), location.yaw(), location.pitch(), (byte) 0,  0 ) );
         getInventory().setContents( new ItemStack[ 36 ] );
+
     }
 
     public void dropItem( ItemStack itemStack ) {
