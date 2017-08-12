@@ -3,7 +3,7 @@ package me.lukas81298.flexmc.world.generator;
 import me.lukas81298.flexmc.inventory.Material;
 import me.lukas81298.flexmc.util.BiTuple;
 import me.lukas81298.flexmc.world.BlockState;
-import me.lukas81298.flexmc.world.ChunkColumn;
+import me.lukas81298.flexmc.world.chunk.ChunkColumn;
 
 import java.util.ArrayList;
 import java.util.List;

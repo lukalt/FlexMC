@@ -1,4 +1,4 @@
-package me.lukas81298.flexmc.world;
+package me.lukas81298.flexmc.world.chunk;
 
 import java.util.Arrays;
 

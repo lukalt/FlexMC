@@ -4,8 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.*;
 import me.lukas81298.flexmc.io.message.Message;
-import me.lukas81298.flexmc.world.ChunkColumn;
-import me.lukas81298.flexmc.world.ChunkSection;
+import me.lukas81298.flexmc.world.chunk.ChunkColumn;
+import me.lukas81298.flexmc.world.chunk.ChunkSection;
 
 import java.io.IOException;
 

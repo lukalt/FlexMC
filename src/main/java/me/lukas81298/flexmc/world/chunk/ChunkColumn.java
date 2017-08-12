@@ -1,8 +1,9 @@
-package me.lukas81298.flexmc.world;
+package me.lukas81298.flexmc.world.chunk;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import me.lukas81298.flexmc.world.BlockState;
 
 import java.util.Arrays;
 

@@ -69,7 +69,7 @@ public class DiggingListener implements MessageInboundListener<MessageC14PlayerD
         Iterable<ItemStack> s;
         BlockSpec spec = Blocks.getBlockSpec( state.getTypeId() );
         if( spec == null ) { // fallback normal behavior
-            s = Collections.singletonList( new ItemStack( state.getType(), 1, (short) state.getData() ) );
+            s = Collections.singletonList( new ItemStack( state.getTypeId(), 1, (short) state.getData() ) );
         } else {
             s = spec.getDrops( player, state.getData() );
         }

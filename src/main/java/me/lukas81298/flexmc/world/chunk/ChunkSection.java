@@ -1,4 +1,4 @@
-package me.lukas81298.flexmc.world;
+package me.lukas81298.flexmc.world.chunk;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.lukas81298.flexmc.io.message.Message;
 import me.lukas81298.flexmc.util.Vector3i;
+import me.lukas81298.flexmc.world.BlockState;
 
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -29,7 +30,7 @@ public class ChunkSection {
         this.palette.add( 0 );
         this.blocks = new int[ 16 * 16 * 16 ];
         this.blockLight = new NibbleArray( 16 * 16 * 16 );
-        this.blockLight.fill( (byte) 15 );
+//        this.blockLight.fill( (byte) 15 );
         this.skyLight  = new NibbleArray( 16 * 16 * 16 );
         this.skyLight.fill( (byte) 15 );
     }
@@ -40,6 +41,8 @@ public class ChunkSection {
 
     public void setBlock( int x, int y, int z, int type, int data ) {
         setBlock( calArrayIndex( x, y, z ), type, data );
+        blockLight.set( x, y, z, 15 );
+      //  skyLight.set( x, y, z, 15 );
     }
 
     public int getBlockType( int x, int y, int z ) {

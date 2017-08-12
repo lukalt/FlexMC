@@ -1,6 +1,6 @@
 package me.lukas81298.flexmc.world.generator;
 
-import me.lukas81298.flexmc.world.ChunkColumn;
+import me.lukas81298.flexmc.world.chunk.ChunkColumn;
 
 /**
  * @author lukas

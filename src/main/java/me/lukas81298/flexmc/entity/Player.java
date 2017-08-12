@@ -10,9 +10,9 @@ import me.lukas81298.flexmc.inventory.PlayerInventory;
 import me.lukas81298.flexmc.io.message.play.server.*;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
 import me.lukas81298.flexmc.util.*;
-import me.lukas81298.flexmc.world.ChunkColumn;
 import me.lukas81298.flexmc.world.Dimension;
 import me.lukas81298.flexmc.world.World;
+import me.lukas81298.flexmc.world.chunk.ChunkColumn;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -57,6 +57,7 @@ public class Player extends LivingEntity implements CommandSender {
 
     public void spawnPlayer() {
         connectionHandler.sendMessage( new MessageS23JoinGame( this.getEntityId(), gameMode, Dimension.OVER_WORLD, Difficulty.PEACEFUL, "default", false ) );
+        connectionHandler.sendMessage( new MessageS0DServerDifficulty( Difficulty.PEACEFUL ) );
         connectionHandler.sendMessage( new MessageS46SpawnPosition( new Vector3i( 0, 10, 0 ) ) );
         connectionHandler.sendMessage( new MessageS2CPlayerAbilities( (byte) 0, .2F, .2F ) );
         connectionHandler.sendMessage( new MessageS2FPlayerPositionAndLook( getLocation().x(), getLocation().y(), getLocation().z(), 0F, 0F, (byte) 0, 0 ) );

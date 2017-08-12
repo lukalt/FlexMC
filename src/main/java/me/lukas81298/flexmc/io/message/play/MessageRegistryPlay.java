@@ -39,6 +39,7 @@ public class MessageRegistryPlay extends MessageRegistry {
         registerServerMessage( 0x18, MessageS18PluginMessage.class );
         registerServerMessage( 0x19, MessageS19NamedSoundEffect.class );
         registerServerMessage( 0x1A, MessageS1ADisconnect.class );
+        registerServerMessage( 0x1D, MessageS1DUnloadChunk.class );
         registerServerMessage( 0x1E, MessageS1EChangeGameState.class );
         registerServerMessage( 0x1F, MessageS1FKeepAlive.class );
         registerServerMessage( 0x20, MessageS20ChunkData.class );
