@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import me.lukas81298.flexmc.config.MainConfig;
+import me.lukas81298.flexmc.util.lib.LibraryManager;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 
 import java.io.File;
@@ -22,6 +23,12 @@ public class Flex {
     public static void main( String[] args ) {
 
         System.out.println( "Loading flex... Please wait" );
+
+        System.out.println( "Loading libraries..." );
+
+        LibraryManager libraryManager = new LibraryManager();
+        libraryManager.init();
+
         File configFolder = new File( "config" );
         if( !configFolder.exists() ) {
             if( !configFolder.mkdir() ) {
@@ -37,8 +44,6 @@ public class Flex {
             return;
         }
 
-
-        long start = System.nanoTime();
         server = new FlexServer( config, configFolder );
         ListenableFuture<Void> future = server.start();
         try {
