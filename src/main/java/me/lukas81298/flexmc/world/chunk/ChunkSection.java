@@ -23,10 +23,12 @@ public class ChunkSection {
     private final int[] blocks;
     @Getter private final NibbleArray blockLight;
     @Setter private NibbleArray skyLight;
+    @Getter private final ChunkColumn column;
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public ChunkSection() {
+    public ChunkSection( ChunkColumn column  ) {
+        this.column = column;
         this.palette.add( 0 );
         this.blocks = new int[ 16 * 16 * 16 ];
         this.blockLight = new NibbleArray( 16 * 16 * 16 );

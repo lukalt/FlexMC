@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import me.lukas81298.flexmc.world.BlockState;
+import me.lukas81298.flexmc.world.FlexWorld;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Material;
@@ -29,9 +30,10 @@ public class ChunkColumn implements Chunk {
     private final ChunkSection[] sections;
     private final byte[] biome;
     private final UUID uuid = UUID.randomUUID();
+    private final FlexWorld world;
 
-    public ChunkColumn( int x, int z ) {
-        this( x, z, new ChunkSection[16], new byte[0x100] );
+    public ChunkColumn( int x, int z, FlexWorld world ) {
+        this( x, z, new ChunkSection[16], new byte[0x100], world );
         Arrays.fill( biome, (byte) 1 ); // void biome
     }
 

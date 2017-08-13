@@ -56,9 +56,7 @@ public class DiggingListener implements MessageInboundListener<MessageC14PlayerD
                 if ( itemStack != null && itemStack.getType() != Material.AIR ) {
                     synchronized ( connectionHandler.getPlayer() ) {
                         itemStack.setAmount( itemStack.getAmount() - 1 );
-                        int type = itemStack.getTypeId();
-                        int data = itemStack.getDurability();
-                        player.dropItem( new ItemStack( type, 1, (short) data ) );
+                        player.dropItem( itemStack );
                         if( itemStack.getAmount() <= 1 ) {
                             itemStack = null;
                         }
@@ -69,9 +67,7 @@ public class DiggingListener implements MessageInboundListener<MessageC14PlayerD
                 ItemStack itemStack = player.getItemInHand();
                 if ( itemStack != null && itemStack.getType() != Material.AIR ) {
                     synchronized ( connectionHandler.getPlayer() ) {
-                        int type = itemStack.getTypeId();
-                        int data = itemStack.getDurability();
-                        player.dropItem( new ItemStack( type, itemStack.getAmount(), (short) data ) );
+                        player.dropItem( itemStack );
                         player.getInventory().setItem( player.getHeldItemSlot(), null );
                     }
                 }

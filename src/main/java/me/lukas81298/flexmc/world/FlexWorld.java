@@ -13,6 +13,7 @@ import me.lukas81298.flexmc.io.message.play.server.*;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
 import me.lukas81298.flexmc.util.EventFactory;
 import me.lukas81298.flexmc.util.Vector3i;
+import me.lukas81298.flexmc.world.block.FlexBlock;
 import me.lukas81298.flexmc.world.chunk.ChunkColumn;
 import me.lukas81298.flexmc.world.chunk.ChunkSection;
 import me.lukas81298.flexmc.world.generator.ChunkGenerator;
@@ -72,6 +73,8 @@ public class FlexWorld implements World {
     private volatile boolean generated = false;
 
     private byte timeCounter = 0;
+
+    private final UUID uid = UUID.randomUUID();
 
     public FlexWorld( String name ) {
         this.name = name;
@@ -498,7 +501,7 @@ public class FlexWorld implements World {
 
     @Override
     public File getWorldFolder() {
-        return null;
+        return new File( Flex.getServer().getWorldManager().getConfig().getWorldContainer(), getName() );
     }
 
     @Override
@@ -678,22 +681,24 @@ public class FlexWorld implements World {
 
     @Override
     public Block getBlockAt( int i, int i1, int i2 ) {
-        return null;
+        Vector3i position = new Vector3i( i, i1, i2 );
+        BlockState state = this.getBlockAt( position );
+        return new FlexBlock( this, position, state );
     }
 
     @Override
     public Block getBlockAt( Location location ) {
-        return null;
+        return getBlockAt( location.getBlockX(), location.getBlockY(), location.getBlockZ() );
     }
 
     @Override
     public int getBlockTypeIdAt( int i, int i1, int i2 ) {
-        return 0;
+        return getBlockAt( i, i1, i2 ).getTypeId();
     }
 
     @Override
     public int getBlockTypeIdAt( Location location ) {
-        return 0;
+        return getBlockAt( location ).getTypeId();
     }
 
     @Override
@@ -868,7 +873,13 @@ public class FlexWorld implements World {
 
     @Override
     public List<LivingEntity> getLivingEntities() {
-        return null;
+        List<LivingEntity> livingEntities = new ArrayList<>();
+        for ( FlexEntity flexEntity : entitySet ) {
+            if( flexEntity instanceof LivingEntity ) {
+                livingEntities.add( (LivingEntity) flexEntity );
+            }
+        }
+        return livingEntities;
     }
 
     @Override
@@ -878,7 +889,13 @@ public class FlexWorld implements World {
 
     @Override
     public <T extends Entity> Collection<T> getEntitiesByClass( Class<T> aClass ) {
-        return null;
+        List<T> filteredEnties = new ArrayList<>();
+        for ( FlexEntity flexEntity : entitySet ) {
+            if( aClass.isAssignableFrom( flexEntity.getClass() ) ) {
+                filteredEnties.add( (T) flexEntity );
+            }
+        }
+        return filteredEnties;
     }
 
     @Override
@@ -893,20 +910,28 @@ public class FlexWorld implements World {
 
     @Override
     public Collection<Entity> getNearbyEntities( Location location, double v, double v1, double v2 ) {
-        return null;
+        List<Entity> nearbyEntities = new ArrayList<>();
+        for ( FlexEntity flexEntity : entitySet ) {
+            if( Math.abs( flexEntity.getLocation().getX() - location.getX() ) < v
+                    && Math.abs( flexEntity.getLocation().getY() - location.getY() ) < v1
+                    && Math.abs( flexEntity.getLocation().getZ() - location.getZ() ) < v2 ) {
+                nearbyEntities.add( flexEntity );
+            }
+        }
+        return nearbyEntities;
     }
 
     @Override
     public UUID getUID() {
-        return null;
+        return uid;
     }
 
     private void generateColumn( int x, int z ) {
         this.chunkLock.writeLock().lock();
         try {
-            ChunkColumn chunkColumnColumn = new ChunkColumn( x, z );
+            ChunkColumn chunkColumnColumn = new ChunkColumn( x, z, this );
             for ( int i = 0; i < chunkColumnColumn.getSections().length; i++ ) {
-                ChunkSection section = new ChunkSection();
+                ChunkSection section = new ChunkSection(  chunkColumnColumn );
                 chunkColumnColumn.getSections()[i] = section;
             }
             this.generator.generate( chunkColumnColumn );
@@ -971,7 +996,7 @@ public class FlexWorld implements World {
 
     @Override
     public List<MetadataValue> getMetadata( String s ) {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
@@ -987,10 +1012,14 @@ public class FlexWorld implements World {
     @Override
     public void sendPluginMessage( Plugin plugin, String s, byte[] bytes ) {
 
+        for ( FlexPlayer flexPlayer : getPlayerSet() ) {
+            flexPlayer.sendPluginMessage( plugin, s, bytes );
+        }
+
     }
 
     @Override
     public Set<String> getListeningPluginChannels() {
-        return null;
+        return Collections.emptySet();
     }
 }
