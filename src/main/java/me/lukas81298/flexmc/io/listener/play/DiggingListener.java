@@ -1,7 +1,6 @@
 package me.lukas81298.flexmc.io.listener.play;
 
-import me.lukas81298.flexmc.entity.Player;
-import me.lukas81298.flexmc.inventory.ItemStack;
+import me.lukas81298.flexmc.entity.FlexPlayer;
 import me.lukas81298.flexmc.inventory.item.ItemSpec;
 import me.lukas81298.flexmc.inventory.item.Items;
 import me.lukas81298.flexmc.io.listener.MessageInboundListener;
@@ -9,10 +8,12 @@ import me.lukas81298.flexmc.io.message.play.client.MessageC14PlayerDigging;
 import me.lukas81298.flexmc.io.message.play.server.MessageS08BlockBreakAnimation;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
 import me.lukas81298.flexmc.world.BlockState;
-import me.lukas81298.flexmc.world.World;
+import me.lukas81298.flexmc.world.FlexWorld;
 import me.lukas81298.flexmc.world.block.BlockSpec;
 import me.lukas81298.flexmc.world.block.Blocks;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
 
@@ -24,39 +25,39 @@ public class DiggingListener implements MessageInboundListener<MessageC14PlayerD
 
     @Override
     public void handle( ConnectionHandler connectionHandler, MessageC14PlayerDigging message ) {
-        Player player = connectionHandler.getPlayer();
+        FlexPlayer player = connectionHandler.getPlayer();
         if( player != null ) {
-            World world = player.getWorld();
+            FlexWorld world = player.getWorld();
             if( message.getStatus() == 2 ) {
                 BlockState previous = world.getBlockAt( message.getPosition() );
                 world.setBlock( message.getPosition(), new BlockState( 0, 0 ) );
                 spawnItems( player, message.getPosition().toMidLocation(), previous );
                 ItemStack itemStack = player.getItemInHand();
-                if( itemStack != null && !itemStack.isEmpty() ) {
-                    ItemSpec spec = Items.getItemSpec( itemStack.getType() );
+                if( itemStack != null && itemStack.getType() != Material.AIR ) {
+                    ItemSpec spec = Items.getItemSpec( itemStack.getTypeId() );
                     if( spec != null ) {
-                        short d = itemStack.getDamage();
+                        short d = itemStack.getDurability();
                         ItemStack changed = spec.breakBlock( player, itemStack );
-                        if( changed != itemStack || changed.getDamage() != d ) {
+                        if( changed != itemStack || changed.getDurability() != d ) {
                             player.getInventory().setItem( player.getHeldItemSlot(), changed );
                         }
                     }
                 }
             } else if( message.getStatus() ==  0 ) {
-                for( Player t : world.getPlayers() ) {
+                for( FlexPlayer t : world.getPlayerSet() ) {
                     t.getConnectionHandler().sendMessage( new MessageS08BlockBreakAnimation( player.getEntityId(), message.getPosition(), (byte) 1 ) );
                 }
             } else if ( message.getStatus() == 0 ) {
-                for( Player t : world.getPlayers() ) {
+                for( FlexPlayer t : world.getPlayerSet() ) {
                     t.getConnectionHandler().sendMessage( new MessageS08BlockBreakAnimation( player.getEntityId(), message.getPosition(), (byte) -1 ) );
                 }
             } else if( message.getStatus() == 4 ) {
                 ItemStack itemStack = player.getItemInHand();
-                if ( itemStack != null && !itemStack.isEmpty() ) {
+                if ( itemStack != null && itemStack.getType() != Material.AIR ) {
                     synchronized ( connectionHandler.getPlayer() ) {
                         itemStack.setAmount( itemStack.getAmount() - 1 );
-                        int type = itemStack.getType();
-                        int data = itemStack.getDamage();
+                        int type = itemStack.getTypeId();
+                        int data = itemStack.getDurability();
                         player.dropItem( new ItemStack( type, 1, (short) data ) );
                         if( itemStack.getAmount() <= 1 ) {
                             itemStack = null;
@@ -66,10 +67,10 @@ public class DiggingListener implements MessageInboundListener<MessageC14PlayerD
                 }
             } else if( message.getStatus() == 4 ) {
                 ItemStack itemStack = player.getItemInHand();
-                if ( itemStack != null && !itemStack.isEmpty() ) {
+                if ( itemStack != null && itemStack.getType() != Material.AIR ) {
                     synchronized ( connectionHandler.getPlayer() ) {
-                        int type = itemStack.getType();
-                        int data = itemStack.getDamage();
+                        int type = itemStack.getTypeId();
+                        int data = itemStack.getDurability();
                         player.dropItem( new ItemStack( type, itemStack.getAmount(), (short) data ) );
                         player.getInventory().setItem( player.getHeldItemSlot(), null );
                     }
@@ -78,7 +79,7 @@ public class DiggingListener implements MessageInboundListener<MessageC14PlayerD
         }
     }
 
-    private void spawnItems( Player player, Location location, BlockState state ) {
+    private void spawnItems( FlexPlayer player, Location location, BlockState state ) {
         Iterable<ItemStack> s;
         BlockSpec spec = Blocks.getBlockSpec( state.getTypeId() );
         if( spec == null ) { // fallback normal behavior

@@ -1,6 +1,6 @@
 package me.lukas81298.flexmc.io.listener.play;
 
-import me.lukas81298.flexmc.entity.Player;
+import me.lukas81298.flexmc.entity.FlexPlayer;
 import me.lukas81298.flexmc.io.listener.MessageInboundListener;
 import me.lukas81298.flexmc.io.message.play.client.MessageC1DAnimation;
 import me.lukas81298.flexmc.io.message.play.server.MessageS06Animation;
@@ -14,7 +14,7 @@ public class AnimationListener implements MessageInboundListener<MessageC1DAnima
 
     @Override
     public void handle( ConnectionHandler connectionHandler, MessageC1DAnimation message ) {
-        for( Player player : connectionHandler.getPlayer().getWorld().getPlayers() ) {
+        for( FlexPlayer player : connectionHandler.getPlayer().getWorld().getPlayerSet() ) {
             if( !player.equals( connectionHandler.getPlayer() ) ) {
                 player.getConnectionHandler().sendMessage( new MessageS06Animation( connectionHandler.getPlayer().getEntityId(), message.getHand() == 0 ? MessageS06Animation.AnimationType.SWING_MAIN_ARM : MessageS06Animation.AnimationType.SWING_OFF_HAND ) );
             }

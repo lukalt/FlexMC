@@ -18,6 +18,12 @@ public class Vector3i {
 
     private int x, y, z;
 
+    public Vector3i( Location location ) {
+        this.x = location.getBlockX();
+        this.y = location.getBlockY();
+        this.z = location.getBlockZ();
+    }
+
     public static Vector3i fromLong( long val ) {
         return new Vector3i( (int) ( val >> 38 ), (int) ( ( val >> 26 ) & 0xFFF ), (int) ( val << 38 >> 38 ) );
     }
@@ -45,7 +51,6 @@ public class Vector3i {
     public Location toMidLocation() {
         return this.toMidLocation( null );
     }
-
 
 
 }

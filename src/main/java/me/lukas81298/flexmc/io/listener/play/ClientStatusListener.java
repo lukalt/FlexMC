@@ -1,6 +1,6 @@
 package me.lukas81298.flexmc.io.listener.play;
 
-import me.lukas81298.flexmc.entity.Player;
+import me.lukas81298.flexmc.entity.FlexPlayer;
 import me.lukas81298.flexmc.io.listener.MessageInboundListener;
 import me.lukas81298.flexmc.io.message.play.client.MessageC03ClientStatus;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
@@ -13,7 +13,7 @@ public class ClientStatusListener implements MessageInboundListener<MessageC03Cl
 
     @Override
     public void handle( ConnectionHandler connectionHandler, MessageC03ClientStatus message ) {
-        Player player = connectionHandler.getPlayer();
+        FlexPlayer player = connectionHandler.getPlayer();
         if( message.getAction() == 0 ) {
             if( !player.isAlive() ) {
                 player.respawn();

@@ -3,13 +3,17 @@ package me.lukas81298.flexmc.inventory;
 import lombok.Getter;
 import lombok.Setter;
 import me.lukas81298.flexmc.Flex;
-import me.lukas81298.flexmc.entity.Player;
+import me.lukas81298.flexmc.entity.FlexPlayer;
 import me.lukas81298.flexmc.io.message.play.server.MessageS16SetSlot;
 import me.lukas81298.flexmc.io.message.play.server.MessageS3FEntityEquipment;
 import me.lukas81298.flexmc.util.crafting.CraftingInput;
 import me.lukas81298.flexmc.util.crafting.Recipe;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,7 +23,7 @@ import java.util.List;
  * @author lukas
  * @since 07.08.2017
  */
-public class PlayerInventory extends Inventory implements CraftingInput {
+public class PlayerInventory extends FlexInventory implements CraftingInput, org.bukkit.inventory.PlayerInventory {
 
     private final ItemStack[] armor = new ItemStack[4];
 
@@ -31,7 +35,7 @@ public class PlayerInventory extends Inventory implements CraftingInput {
     private volatile ItemStack itemOffHand = null;
     private ItemStack[] craftingSlots = new ItemStack[5];
 
-    public PlayerInventory( Player player ) {
+    public PlayerInventory( FlexPlayer player ) {
         super( 36, (byte) 0, "Inventory" );
         this.viewers.add( player );
     }
@@ -45,33 +49,33 @@ public class PlayerInventory extends Inventory implements CraftingInput {
     }
 
     @Override
-    public synchronized boolean click( Player player, short slot, byte button, int mode, ItemStack itemStack ) {
+    public synchronized boolean click( FlexPlayer player, short slot, byte button, int mode, ItemStack itemStack ) {
         if ( slot < 0 ) { // todo handle -999
             return false;
         }
         ItemStack currentlyInSlot = this.getItemFromRawSlot( slot );
         if ( mode != 2 && ( mode != 4 && !( button == 1 || button == 2 ) ) ) {
-            if ( !ItemStack.isEqual( currentlyInSlot, itemStack ) ) {
+            /*if ( !ItemStack.( currentlyInSlot, itemStack ) ) {
                 System.out.println( "Slots did not match: " + currentlyInSlot + " " + itemStack );
                 return false;
-            }
+            }*/
         }
 
         switch ( mode ) {
             case 0:
                 if ( button == 0 || ( button == 1 && currentlyInSlot != null && currentlyInSlot.getAmount() == 1 ) ) {
-                    if ( currentlyInSlot == null && itemOnCursor != null && !itemStack.isEmpty() ) {
+                    if ( currentlyInSlot == null && itemOnCursor != null && currentlyInSlot.getType() != Material.AIR ) {
                         setRawSlot( slot, itemOnCursor );
                         System.out.println( "dropped item " + itemOnCursor );
                         itemOnCursor = null;
                         return true;
-                    } else if ( currentlyInSlot != null && !currentlyInSlot.isEmpty() && itemOnCursor == null ) {
+                    } else if ( currentlyInSlot != null && currentlyInSlot.getType() != Material.AIR && itemOnCursor == null ) {
                         itemOnCursor = currentlyInSlot;
                         setRawSlot( slot, null );
                         if( slot == 0 ) {
                             for ( int i = 1; i < craftingSlots.length; i++ ) {
                                 ItemStack stack = craftingSlots[ i ];
-                                if( stack != null && !stack.isEmpty() ) {
+                                if( stack != null && stack.getType() != Material.AIR ) {
                                     stack.setAmount( stack.getAmount() - 1 );
                                     if( stack.getAmount() <= 0 ) {
                                         stack = null;
@@ -87,7 +91,7 @@ public class PlayerInventory extends Inventory implements CraftingInput {
                     }
                     // left click
                 } else if ( button == 2 ) {
-                    if ( itemOnCursor != null && !itemOnCursor.isEmpty() ) {
+                    if ( itemOnCursor != null && itemOnCursor.getType() != Material.AIR ) {
                         // todo i gave up here
                     }
                 }
@@ -117,9 +121,9 @@ public class PlayerInventory extends Inventory implements CraftingInput {
             case 4:
                 switch ( button ) {
                     case 0:
-                        if ( currentlyInSlot != null && !currentlyInSlot.isEmpty() ) {
+                        if ( currentlyInSlot != null && currentlyInSlot.getType() != Material.AIR ) {
                             currentlyInSlot.setAmount( currentlyInSlot.getAmount() - 1 );
-                            player.dropItem( new ItemStack( currentlyInSlot.getType(), 1, currentlyInSlot.getDamage() ) );
+                            player.dropItem( new ItemStack( currentlyInSlot.getType(), 1, currentlyInSlot.getDurability() ) );
                             if ( currentlyInSlot.getAmount() <= 0 ) {
                                 currentlyInSlot = null;
                             }
@@ -128,8 +132,8 @@ public class PlayerInventory extends Inventory implements CraftingInput {
                         }
                         break;
                     case 1:
-                        if ( currentlyInSlot != null && !currentlyInSlot.isEmpty() ) {
-                            player.dropItem( new ItemStack( currentlyInSlot.getType(), currentlyInSlot.getAmount(), currentlyInSlot.getDamage() ) );
+                        if ( currentlyInSlot != null && currentlyInSlot.getType() != Material.AIR ) {
+                            player.dropItem( new ItemStack( currentlyInSlot.getType(), currentlyInSlot.getAmount(), currentlyInSlot.getDurability() ) );
                             setRawSlot( slot, null );
                             return true;
                         }
@@ -196,8 +200,8 @@ public class PlayerInventory extends Inventory implements CraftingInput {
             }
         } else if ( slot < 9 ) {
             armor[slot - 5] = itemStack;
-            for ( Player viewer : viewers ) {
-                for ( Player player : viewer.getWorld().getPlayers() ) {
+            for ( FlexPlayer viewer : viewers ) {
+                for ( FlexPlayer player : viewer.getWorld().getPlayerSet() ) {
                     if ( !player.equals( viewer ) ) {
                         player.getConnectionHandler().sendMessage( new MessageS3FEntityEquipment( viewer.getEntityId(), convertArmorToEquipmentIndex( slot ), itemStack ) );
                     }
@@ -216,8 +220,8 @@ public class PlayerInventory extends Inventory implements CraftingInput {
             setItem( virtualSlot, itemStack );
             return;
         }
-        for ( Player viewer : viewers ) {
-            viewer.getConnectionHandler().sendMessage( new MessageS16SetSlot( (byte) 0, slot, itemStack == null ? ItemStack.AIR : itemStack ) );
+        for ( FlexPlayer viewer : viewers ) {
+            viewer.getConnectionHandler().sendMessage( new MessageS16SetSlot( (byte) 0, slot, itemStack == null ? ItemStackConstants.AIR : itemStack ) );
         }
     }
 
@@ -228,12 +232,117 @@ public class PlayerInventory extends Inventory implements CraftingInput {
     }
 
     @Override
+    public ItemStack[] getExtraContents() {
+        return new ItemStack[0];
+    }
+
+    @Override
+    public ItemStack getHelmet() {
+        return null;
+    }
+
+    @Override
+    public ItemStack getChestplate() {
+        return null;
+    }
+
+    @Override
+    public ItemStack getLeggings() {
+        return null;
+    }
+
+    @Override
+    public ItemStack getBoots() {
+        return null;
+    }
+
+    @Override
+    public void setArmorContents( ItemStack[] itemStacks ) {
+
+    }
+
+    @Override
+    public void setExtraContents( ItemStack[] itemStacks ) {
+
+    }
+
+    @Override
+    public void setHelmet( ItemStack itemStack ) {
+
+    }
+
+    @Override
+    public void setChestplate( ItemStack itemStack ) {
+
+    }
+
+    @Override
+    public void setLeggings( ItemStack itemStack ) {
+
+    }
+
+    @Override
+    public void setBoots( ItemStack itemStack ) {
+
+    }
+
+    @Override
+    public ItemStack getItemInMainHand() {
+        return null;
+    }
+
+    @Override
+    public void setItemInMainHand( ItemStack itemStack ) {
+
+    }
+
+    @Override
+    public ItemStack getItemInOffHand() {
+        return null;
+    }
+
+    @Override
+    public void setItemInOffHand( ItemStack itemStack ) {
+
+    }
+
+    @Override
+    public ItemStack getItemInHand() {
+        return null;
+    }
+
+    @Override
+    public void setItemInHand( ItemStack itemStack ) {
+
+    }
+
+    @Override
+    public int getHeldItemSlot() {
+        return 0;
+    }
+
+    @Override
+    public void setHeldItemSlot( int i ) {
+
+    }
+
+    @Override
+    public int clear( int i, int i1 ) {
+        return 0;
+    }
+
+    @Override
+    public HumanEntity getHolder() {
+        return null;
+    }
+
+    @Override
     public boolean hasInputItems( ItemStack itemStack, int amount ) {
         int count = 0;
         int i = 0;
         for ( ItemStack craftingSlot : craftingSlots ) {
             if( i != 0 ) {
-                if ( craftingSlot != null && !craftingSlot.isEmpty() ) {
+                if ( craftingSlot != null && craftingSlot.getType() != Material.AIR ) {
                     if ( craftingSlot.isSimilar( itemStack ) ) {
                         count++;
                     }
@@ -250,7 +359,7 @@ public class PlayerInventory extends Inventory implements CraftingInput {
         int i = 0;
         for ( ItemStack craftingSlot : craftingSlots ) {
             if( i != 0 ) {
-                if ( craftingSlot != null && !craftingSlot.isEmpty() ) {
+                if ( craftingSlot != null && craftingSlot.getType() != Material.AIR ) {
                     items.add( craftingSlot );
                 }
             }
@@ -263,4 +372,10 @@ public class PlayerInventory extends Inventory implements CraftingInput {
     public int getInputSize() {
         return 4;
     }
+
+    @Override
+    public InventoryType getType() {
+        return InventoryType.PLAYER;
+    }
+
 }

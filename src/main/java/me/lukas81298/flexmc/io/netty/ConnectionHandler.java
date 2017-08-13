@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import me.lukas81298.flexmc.Flex;
-import me.lukas81298.flexmc.entity.Player;
+import me.lukas81298.flexmc.entity.FlexPlayer;
 import me.lukas81298.flexmc.io.message.Message;
 import me.lukas81298.flexmc.io.message.login.server.MessageS02LoginSuccess;
 import me.lukas81298.flexmc.io.protocol.ProtocolState;
@@ -53,7 +53,7 @@ public class ConnectionHandler extends SimpleChannelInboundHandler<Message> {
     private VerifySession verifySession;
 
     @Getter
-    private Player player;
+    private FlexPlayer player;
 
     private final AtomicBoolean encrypted = new AtomicBoolean( false );
 
@@ -89,9 +89,12 @@ public class ConnectionHandler extends SimpleChannelInboundHandler<Message> {
         }
     }
 
+    public InetSocketAddress getSocketAddress() {
+        return (InetSocketAddress) channelHandlerContext.channel().remoteAddress();
+    }
+
     public String getIpAddress() {
-        InetSocketAddress socketAddress = (InetSocketAddress) channelHandlerContext.channel().remoteAddress();
-        return socketAddress.getAddress().getHostAddress();
+        return this.getSocketAddress().getAddress().getHostAddress();
     }
 
     public void sendMessage( Message message ) {
@@ -118,7 +121,7 @@ public class ConnectionHandler extends SimpleChannelInboundHandler<Message> {
         System.out.println( name + " logged in with uuid " + uuid.toString() );
         setProtocolState( ProtocolState.PLAY );
 
-        this.player = new Player( -1, new Location( null, .5, Flex.getServer().getWorld().getChunkAt( 0, 0 ).getHighestYAt( 0, 0 ) + 1, .5 ), name, uuid, this, Flex.getServer().getWorld() );
+        this.player = new FlexPlayer( -1, new Location( null, .5, Flex.getServer().getWorld().getChunkAt( 0, 0 ).getHighestYAt( 0, 0 ) + 1, .5 ), name, uuid, this, Flex.getServer().getWorld() );
         Flex.getServer().getPlayerManager().handlePlayerJoin( player );
     }
 

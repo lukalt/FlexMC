@@ -5,6 +5,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import me.lukas81298.flexmc.world.BlockState;
+import org.bukkit.Chunk;
+import org.bukkit.ChunkSnapshot;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -17,7 +23,7 @@ import java.util.UUID;
 @Getter
 @ToString
 @EqualsAndHashCode( of = { "x", "z" } )
-public class ChunkColumn  {
+public class ChunkColumn implements Chunk {
 
     private final int x, z;
     private final ChunkSection[] sections;
@@ -62,10 +68,76 @@ public class ChunkColumn  {
 
     public int getHighestYAt( int x, int z ) {
         for( int i = 255; i > 0; i-- ) {
-            if( this.getBlockAt( x, i, z ).getType().isSolid() ) {
+            Material type = this.getBlockAt( x, i, z ).getType();
+            if( type == Material.AIR || type == Material.LEAVES ) {
                 return i;
             }
         }
         return 0;
+    }
+
+    @Override
+    public World getWorld() {
+        return null;
+    }
+
+    @Override
+    public Block getBlock( int i, int i1, int i2 ) {
+        return null;
+    }
+
+    @Override
+    public ChunkSnapshot getChunkSnapshot() {
+        return null;
+    }
+
+    @Override
+    public ChunkSnapshot getChunkSnapshot( boolean b, boolean b1, boolean b2 ) {
+        return null;
+    }
+
+    @Override
+    public Entity[] getEntities() {
+        return new Entity[0];
+    }
+
+    @Override
+    public org.bukkit.block.BlockState[] getTileEntities() {
+        return new org.bukkit.block.BlockState[0];
+    }
+
+    @Override
+    public boolean isLoaded() {
+        return false;
+    }
+
+    @Override
+    public boolean load( boolean b ) {
+        return false;
+    }
+
+    @Override
+    public boolean load() {
+        return false;
+    }
+
+    @Override
+    public boolean unload( boolean b, boolean b1 ) {
+        return false;
+    }
+
+    @Override
+    public boolean unload( boolean b ) {
+        return false;
+    }
+
+    @Override
+    public boolean unload() {
+        return false;
+    }
+
+    @Override
+    public boolean isSlimeChunk() {
+        return false;
     }
 }

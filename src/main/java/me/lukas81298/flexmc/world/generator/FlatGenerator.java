@@ -1,7 +1,7 @@
 package me.lukas81298.flexmc.world.generator;
 
-import me.lukas81298.flexmc.inventory.Material;
 import me.lukas81298.flexmc.world.BlockState;
+import org.bukkit.Material;
 
 /**
  * @author lukas

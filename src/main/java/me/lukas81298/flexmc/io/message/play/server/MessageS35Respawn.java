@@ -33,7 +33,7 @@ public class MessageS35Respawn extends Message {
     public void write( ByteBuf buf ) throws IOException {
         buf.writeInt( dimension.getId() );
         buf.writeByte( difficulty.ordinal() );
-        buf.writeByte( gameMode.ordinal() );
+        buf.writeByte( gameMode.getValue() );
         writeString( levelType, buf );
     }
 }

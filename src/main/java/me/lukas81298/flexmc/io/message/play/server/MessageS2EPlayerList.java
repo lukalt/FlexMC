@@ -49,7 +49,7 @@ public class MessageS2EPlayerList extends Message {
                 case ADD_PLAYER:
                     writeString( player.name, buf );
                     writeVarInt( 0, buf );
-                    writeVarInt( player.gameMode.ordinal(), buf );
+                    writeVarInt( player.gameMode.getValue(), buf );
                     writeVarInt( player.ping, buf );
                     buf.writeBoolean( player.displayName != null );
                     if ( player.displayName != null ) {
@@ -57,7 +57,7 @@ public class MessageS2EPlayerList extends Message {
                     }
                     break;
                 case UPDATE_GAMEMODE:
-                    writeVarInt( player.gameMode.ordinal(), buf );
+                    writeVarInt( player.gameMode.getValue(), buf );
                     break;
                 case UPDATE_PING:
                     writeVarInt( player.ping, buf );

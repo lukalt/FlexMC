@@ -4,7 +4,8 @@ import com.google.common.base.Charsets;
 import io.gomint.taglib.NBTTagCompound;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import me.lukas81298.flexmc.inventory.ItemStack;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -154,12 +155,24 @@ public abstract class Message {
         }
     }
 
+    public static void writeItemStack( ItemStack itemStack, ByteBuf buf ) {
+        if( itemStack == null || itemStack.getType() == Material.AIR ) {
+            buf.writeShort( -1 );
+        } else {
+            buf.writeShort( itemStack.getTypeId() );
+            buf.writeByte( itemStack.getAmount() );
+            buf.writeShort( itemStack.getDurability() );
+            writeNbtTag( new NBTTagCompound( "ItemStack" ), buf ); // todo change
+        }
+    }
+
     public static ItemStack readItemStack( ByteBuf buf ) {
         short blockId = buf.readShort();
         if ( blockId != -1 ) {
             byte count = buf.readByte();
             short damage = buf.readShort();
-            return new ItemStack( (int) blockId, count, damage, readNbtTag( buf ) );
+            readNbtTag( buf );
+            return new ItemStack( blockId, count, damage );
         }
         return new ItemStack( blockId );
     }

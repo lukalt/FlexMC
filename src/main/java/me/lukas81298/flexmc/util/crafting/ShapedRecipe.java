@@ -1,6 +1,6 @@
 package me.lukas81298.flexmc.util.crafting;
 
-import me.lukas81298.flexmc.inventory.ItemStack;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * @author lukas

@@ -12,13 +12,14 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.Getter;
 import me.lukas81298.flexmc.config.MainConfig;
-import me.lukas81298.flexmc.entity.Player;
+import me.lukas81298.flexmc.entity.FlexPlayer;
 import me.lukas81298.flexmc.inventory.item.Items;
 import me.lukas81298.flexmc.io.message.play.server.MessageS1FKeepAlive;
 import me.lukas81298.flexmc.io.netty.*;
 import me.lukas81298.flexmc.util.crafting.RecipeManager;
 import me.lukas81298.flexmc.util.crypt.AuthHelper;
-import me.lukas81298.flexmc.world.World;
+import me.lukas81298.flexmc.world.FlexWorld;
+import me.lukas81298.flexmc.world.WorldManager;
 import me.lukas81298.flexmc.world.block.Blocks;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.plugin.Plugin;
@@ -48,7 +49,7 @@ public class FlexServer{
 
     private final ConnectionManager connectionManager = new ConnectionManager();
     private ServerBootstrap serverBootstrap;
-    @Getter private World world;
+    @Getter private FlexWorld world;
 
     @Getter
     private PlayerManager playerManager = new PlayerManager();
@@ -59,7 +60,10 @@ public class FlexServer{
     private RecipeManager recipeManager = new RecipeManager();
 
     private final SimpleCommandMap commandMap = new SimpleCommandMap( null );
+    @Getter
     private final SimplePluginManager pluginManager = new SimplePluginManager( null, this.commandMap );
+    @Getter
+    private final WorldManager worldManager = new WorldManager();
 
     public FlexServer( MainConfig config, File configFolder ) {
         this.config = config;
@@ -114,15 +118,15 @@ public class FlexServer{
 
                 running.set( true );
 
-                world = new World( "world" );
+                world = new FlexWorld( "world" );
 
                 executorService.execute( new Runnable() {
                     @Override
                     public void run() {
                         while( running.get() ) {
-                            for ( Player player : playerManager.getOnlinePlayers() ) {
+                            for ( FlexPlayer player : playerManager.getOnlinePlayers() ) {
                                 if( ( System.currentTimeMillis() - player.getLastKeepAlive() ) > 30 * 1000L ) {
-                                    player.disconnect( "Timed out (server)" );
+                                    player.kickPlayer( "Timed out (server)" );
                                 }
                             }
                             try {
@@ -139,7 +143,7 @@ public class FlexServer{
                     public void run() {
                         while ( running.get() ) {
                             int i = (int) ( Math.random() * Integer.MAX_VALUE );
-                            for ( Player player : playerManager.getOnlinePlayers() ) {
+                            for ( FlexPlayer player : playerManager.getOnlinePlayers() ) {
                                 player.getConnectionHandler().sendMessage( new MessageS1FKeepAlive( i ) );
                             }
                             try {
@@ -164,8 +168,8 @@ public class FlexServer{
         pluginManager.disablePlugins();
         if ( this.running.compareAndSet( false, true ) ) {
             System.out.println( "Stopping server..." );
-            for( Player player : playerManager.getOnlinePlayers() ) {
-                player.disconnect( "Server stopped!" );
+            for( FlexPlayer player : playerManager.getOnlinePlayers() ) {
+                player.kickPlayer( "Server stopped!" );
             }
             System.exit( 0 );
         } else {

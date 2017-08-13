@@ -5,11 +5,11 @@ import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import me.lukas81298.flexmc.Flex;
-import me.lukas81298.flexmc.inventory.ItemStack;
 import me.lukas81298.flexmc.io.message.Message;
 import me.lukas81298.flexmc.util.EnumDirection;
 import me.lukas81298.flexmc.util.Vector3f;
 import me.lukas81298.flexmc.util.Vector3i;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -55,7 +55,7 @@ public enum MetaDataType {
         @Override
         public void accept( ByteBuf buf, Object o ) {
             ItemStack itemStack = (ItemStack) o;
-            itemStack.serialize( buf );
+            Message.writeItemStack( itemStack, buf );
         }
     } ),
     BOOLEAN( new BiConsumer<ByteBuf, Object>() {

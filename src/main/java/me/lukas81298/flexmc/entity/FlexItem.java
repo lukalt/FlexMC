@@ -1,21 +1,26 @@
 package me.lukas81298.flexmc.entity;
 
+import lombok.Getter;
+import lombok.Setter;
 import me.lukas81298.flexmc.entity.metadata.MetaDataType;
-import me.lukas81298.flexmc.inventory.ItemStack;
 import me.lukas81298.flexmc.io.message.play.server.MessageS4BCollectItem;
 import me.lukas81298.flexmc.util.Vector3i;
-import me.lukas81298.flexmc.world.World;
+import me.lukas81298.flexmc.world.FlexWorld;
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
+import org.bukkit.inventory.ItemStack;
 
 
 /**
  * @author lukas
  * @since 07.08.2017
  */
-public class Item extends FlexEntity implements EntityObject {
+public class FlexItem extends FlexEntity implements EntityObject, Item {
 
     private double fallSpeed = 0D; // no concurrency needed here, entity is ticked by the same thread every time
-    public Item( int entityId, Location location, World world ) {
+    @Getter @Setter private int pickupDelay = 10;
+    public FlexItem( int entityId, Location location, FlexWorld world ) {
         super( entityId, location, world );
     }
 
@@ -35,11 +40,11 @@ public class Item extends FlexEntity implements EntityObject {
         } else if( isAlive() ) {
             Location l = this.getLocation();
             if( ticksAlive > 10 ) {
-                for( Player player : this.getWorld().getPlayers() ) {
+                for( FlexPlayer player : this.getWorld().getPlayerSet() ) {
                     if( l.distanceSquared( player.getLocation() ) <= 2 ) {
                         ItemStack itemStack = getItemStack();
                         if( itemStack != null ) {
-                            for( Player t : this.getWorld().getPlayers() ) {
+                            for( FlexPlayer t : this.getWorld().getPlayerSet() ) {
                                 t.getConnectionHandler().sendMessage( new MessageS4BCollectItem( getEntityId(), player.getEntityId(), itemStack.getAmount() ) );
                             }
                             player.getInventory().addItem( itemStack );
@@ -67,5 +72,10 @@ public class Item extends FlexEntity implements EntityObject {
     @Override
     public byte getObjectType() {
         return (byte) 2;
+    }
+
+    @Override
+    public EntityType getType() {
+        return EntityType.DROPPED_ITEM;
     }
 }

@@ -2,9 +2,9 @@ package me.lukas81298.flexmc.inventory.item;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import me.lukas81298.flexmc.entity.Player;
-import me.lukas81298.flexmc.inventory.ItemStack;
-import me.lukas81298.flexmc.inventory.Material;
+import me.lukas81298.flexmc.entity.FlexPlayer;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * @author lukas
@@ -20,7 +20,7 @@ public abstract class ItemSpec {
         this.type = type.getId();
     }
 
-    public ItemStack breakBlock( Player player, ItemStack itemStack ) {
+    public ItemStack breakBlock( FlexPlayer player, ItemStack itemStack ) {
         return itemStack;
     }
 }

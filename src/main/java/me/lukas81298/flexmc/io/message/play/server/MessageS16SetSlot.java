@@ -2,8 +2,8 @@ package me.lukas81298.flexmc.io.message.play.server;
 
 import io.netty.buffer.ByteBuf;
 import lombok.*;
-import me.lukas81298.flexmc.inventory.ItemStack;
 import me.lukas81298.flexmc.io.message.Message;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
 
@@ -31,6 +31,6 @@ public class MessageS16SetSlot extends Message {
     public void write( ByteBuf buf ) throws IOException {
         buf.writeByte( window );
         buf.writeShort( slot );
-        itemStack.serialize( buf );
+        Message.writeItemStack( itemStack, buf );
     }
 }

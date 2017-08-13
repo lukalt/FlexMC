@@ -1,9 +1,8 @@
 package me.lukas81298.flexmc.io.listener.play;
 
-import me.lukas81298.flexmc.entity.Player;
+import me.lukas81298.flexmc.entity.FlexPlayer;
 import me.lukas81298.flexmc.io.listener.MessageInboundListener;
 import me.lukas81298.flexmc.io.message.play.client.MessageC0BKeepAlive;
-import me.lukas81298.flexmc.io.message.play.server.MessageS1FKeepAlive;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
 
 /**
@@ -14,7 +13,7 @@ public class KeepAliveListener implements MessageInboundListener<MessageC0BKeepA
 
     @Override
     public void handle( ConnectionHandler connectionHandler, MessageC0BKeepAlive message ) {
-        Player player = connectionHandler.getPlayer();
+        FlexPlayer player = connectionHandler.getPlayer();
         if( player != null ) {
             player.setLastKeepAlive( System.currentTimeMillis() );
         }

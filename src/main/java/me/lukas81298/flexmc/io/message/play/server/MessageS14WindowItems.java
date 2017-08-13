@@ -2,8 +2,9 @@ package me.lukas81298.flexmc.io.message.play.server;
 
 import io.netty.buffer.ByteBuf;
 import lombok.*;
-import me.lukas81298.flexmc.inventory.ItemStack;
+import me.lukas81298.flexmc.inventory.ItemStackConstants;
 import me.lukas81298.flexmc.io.message.Message;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
 
@@ -32,9 +33,9 @@ public class MessageS14WindowItems extends Message {
         buf.writeShort( slots.length );
         for ( ItemStack slot : slots ) {
             if( slot == null ) {
-                ItemStack.AIR.serialize( buf );
+                Message.writeItemStack( ItemStackConstants.AIR, buf );
             } else {
-                slot.serialize( buf );
+                Message.writeItemStack( slot, buf );
             }
         }
     }

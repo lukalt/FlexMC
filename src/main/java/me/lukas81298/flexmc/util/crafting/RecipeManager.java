@@ -1,10 +1,10 @@
 package me.lukas81298.flexmc.util.crafting;
 
-import me.lukas81298.flexmc.inventory.ItemStack;
-import me.lukas81298.flexmc.inventory.Material;
 import me.lukas81298.flexmc.util.crafting.config.RecipeConfig;
 import me.lukas81298.flexmc.util.crafting.config.ShapelessRecipeConfig;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class RecipeManager {
         RecipeConfig recipeConfig = new RecipeConfig( new File( "config" ) );
 
         for( short i = 0; i < 4; i++ ) {
-            recipeConfig.getShapelessRecipes().add( new ShapelessRecipeConfig( new ItemStack( Material.WOOD_PLANK, 4, i ), new ItemStack( Material.LOG, 1, i ) ) );
+            recipeConfig.getShapelessRecipes().add( new ShapelessRecipeConfig( new ItemStack( Material.WOOD, 4, i ), new ItemStack( Material.LOG, 1, i ) ) );
         }
 
         try {

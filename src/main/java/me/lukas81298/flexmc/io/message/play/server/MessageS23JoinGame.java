@@ -36,7 +36,7 @@ public class MessageS23JoinGame extends Message {
     @Override
     public void write( ByteBuf buf ) throws IOException {
         buf.writeInt( entityId );
-        buf.writeByte( gameMode.ordinal() );
+        buf.writeByte( gameMode.getValue() );
         buf.writeInt( dimension.getId() );
         buf.writeByte( difficulty.ordinal() );
         buf.writeByte( 0 ); // not used anymore

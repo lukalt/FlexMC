@@ -2,8 +2,9 @@ package me.lukas81298.flexmc.io.message.play.server;
 
 import io.netty.buffer.ByteBuf;
 import lombok.*;
-import me.lukas81298.flexmc.inventory.ItemStack;
+import me.lukas81298.flexmc.inventory.ItemStackConstants;
 import me.lukas81298.flexmc.io.message.Message;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
 
@@ -31,10 +32,6 @@ public class MessageS3FEntityEquipment extends Message {
     public void write( ByteBuf buf ) throws IOException {
         writeVarInt( entityId, buf );
         writeVarInt( slot, buf );
-        if( itemStack == null ) {
-            ItemStack.AIR.serialize( buf );
-        } else {
-            itemStack.serialize( buf );
-        }
+        Message.writeItemStack( itemStack == null ? ItemStackConstants.AIR : itemStack, buf );
     }
 }

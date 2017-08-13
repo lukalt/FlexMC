@@ -2,8 +2,8 @@ package me.lukas81298.flexmc.io.message.play.client;
 
 import io.netty.buffer.ByteBuf;
 import lombok.*;
-import me.lukas81298.flexmc.inventory.ItemStack;
 import me.lukas81298.flexmc.io.message.Message;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
 

@@ -1,8 +1,8 @@
 package me.lukas81298.flexmc.world.block;
 
-import me.lukas81298.flexmc.entity.Player;
-import me.lukas81298.flexmc.inventory.ItemStack;
-import me.lukas81298.flexmc.inventory.Material;
+import me.lukas81298.flexmc.entity.FlexPlayer;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -18,9 +18,9 @@ public class BlockStone extends BlockSpec {
     }
 
     @Override
-    public Collection<ItemStack> getDrops( Player player, int data ) {
+    public Collection<ItemStack> getDrops( FlexPlayer player, int data ) {
         ItemStack itemInHand = player.getItemInHand();
-        if( itemInHand == null || itemInHand.getType() == 0 ) {
+        if( itemInHand == null || itemInHand.getType() == Material.AIR ) {
             return Collections.emptyList();
         }
         if( data == 0 ) {

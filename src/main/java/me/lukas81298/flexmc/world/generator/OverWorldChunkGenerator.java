@@ -3,11 +3,11 @@ package me.lukas81298.flexmc.world.generator;
 import com.github.czyzby.noise4j.map.Grid;
 import com.github.czyzby.noise4j.map.generator.noise.NoiseGenerator;
 import com.github.czyzby.noise4j.map.generator.util.Generators;
-import me.lukas81298.flexmc.inventory.Material;
 import me.lukas81298.flexmc.util.BiTuple;
-import me.lukas81298.flexmc.world.Biome;
 import me.lukas81298.flexmc.world.BlockState;
 import me.lukas81298.flexmc.world.chunk.ChunkColumn;
+import org.bukkit.Material;
+import org.bukkit.block.Biome;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -37,13 +37,11 @@ public class OverWorldChunkGenerator extends LayeredChunkGenerator {
         graphics.fillRect( 0, 0, size, size );
         int specialBiomes = 10 + random.nextInt( 6 );
         List<Biome> biomes = new ArrayList<>();
-        for ( Biome biome : Biome.values() ) {
-            if ( biome.isGenerated() ) {
-                biomes.add( biome );
-            }
-        }
+        biomes.add( Biome.FOREST );
+        biomes.add( Biome.DESERT );
+        biomes.add( Biome.TAIGA );
         for ( int i = 0; i < specialBiomes; i++ ) {
-            graphics.setColor( new Color( biomes.get( random.nextInt( biomes.size() ) ).getId() ) );
+            graphics.setColor( new Color( biomes.get( random.nextInt( biomes.size() ) ).ordinal() ) );
             int x = random.nextInt( size );
             int z = random.nextInt( size );
             int tx = 8 * 16 + random.nextInt( 3 * 16 );

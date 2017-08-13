@@ -1,6 +1,6 @@
 package me.lukas81298.flexmc.util.crafting;
 
-import me.lukas81298.flexmc.inventory.ItemStack;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * @author lukas
@@ -26,10 +26,7 @@ public class ShapelessRecipe implements Recipe {
                 return false;
             }
         }
-        if( s != expected ) {
-            return false;
-        }
-        return true;
+        return s == expected;
     }
 
     @Override

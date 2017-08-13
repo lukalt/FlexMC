@@ -1,7 +1,7 @@
 package me.lukas81298.flexmc.inventory.item;
 
-import me.lukas81298.flexmc.entity.Player;
-import me.lukas81298.flexmc.inventory.ItemStack;
+import me.lukas81298.flexmc.entity.FlexPlayer;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * @author lukas
@@ -21,12 +21,12 @@ public class ItemSpecDurability extends ItemSpec {
     }
 
     @Override
-    public ItemStack breakBlock( Player player, ItemStack itemStack ) {
+    public ItemStack breakBlock( FlexPlayer player, ItemStack itemStack ) {
         if( itemStack == null ) {
             return null;
         }
-        itemStack.setDamage( (short) (itemStack.getDamage() + 1) );
-        if( itemStack.getDamage() >= maxDurability ) {
+        itemStack.setDurability( (short) (itemStack.getDurability() + 1) );
+        if( itemStack.getDurability() >= maxDurability ) {
             return null;
         }
         return itemStack;
