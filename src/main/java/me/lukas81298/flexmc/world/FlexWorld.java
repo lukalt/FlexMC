@@ -245,7 +245,7 @@ public class FlexWorld implements World {
     }
 
     public Location getSpawnLocation() {
-        return new Location( null, 0, 70, 0 );
+        return new Location( this, 0, 70, 0 );
     }
 
     @Override

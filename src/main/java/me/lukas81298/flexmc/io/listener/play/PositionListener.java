@@ -15,6 +15,6 @@ public class PositionListener implements MessageInboundListener<MessageC0DPlayer
     @Override
     public void handle( ConnectionHandler connectionHandler, MessageC0DPlayerPosition message ) {
         FlexPlayer player = connectionHandler.getPlayer();
-        player.teleport( new Location( null, message.getX(), message.getY(), message.getZ(), player.getLocation().getYaw(), player.getLocation().getPitch() ), message.isOnGround() );
+        player.teleport( new Location( player.getWorld(), message.getX(), message.getY(), message.getZ(), player.getLocation().getYaw(), player.getLocation().getPitch() ), message.isOnGround() );
     }
 }

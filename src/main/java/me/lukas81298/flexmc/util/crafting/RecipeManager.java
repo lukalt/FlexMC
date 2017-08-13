@@ -1,5 +1,6 @@
 package me.lukas81298.flexmc.util.crafting;
 
+import me.lukas81298.flexmc.config.ItemStackConfig;
 import me.lukas81298.flexmc.util.crafting.config.RecipeConfig;
 import me.lukas81298.flexmc.util.crafting.config.ShapelessRecipeConfig;
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
@@ -22,7 +23,7 @@ public class RecipeManager {
         RecipeConfig recipeConfig = new RecipeConfig( new File( "config" ) );
 
         for( short i = 0; i < 4; i++ ) {
-            recipeConfig.getShapelessRecipes().add( new ShapelessRecipeConfig( new ItemStack( Material.WOOD, 4, i ), new ItemStack( Material.LOG, 1, i ) ) );
+            recipeConfig.getShapelessRecipes().add( new ShapelessRecipeConfig( new ItemStackConfig( Material.WOOD.getId(), 4, i ), new ItemStackConfig( Material.LOG.getId(), 1, i ) ) );
         }
 
         try {
@@ -32,7 +33,13 @@ public class RecipeManager {
         }
 
         for( ShapelessRecipeConfig c : recipeConfig.getShapelessRecipes() ) {
-            this.recipes.add( new ShapelessRecipe( c.getResult(), c.getInput().toArray( new ItemStack[ c.getInput().size() ] ) ) );
+            ItemStack[] ingredients = new ItemStack[c.getInput().size()];
+            int i = 0;
+            for ( ItemStackConfig itemStackConfig : c.getInput() ) {
+                ingredients[ i ] = itemStackConfig.getItemStack();
+                i++;
+            }
+            this.recipes.add( new ShapelessRecipe( c.getResult().getItemStack(), ingredients ) );
         }
 
     }

@@ -21,6 +21,7 @@ import me.lukas81298.flexmc.util.crypt.AuthHelper;
 import me.lukas81298.flexmc.world.FlexWorld;
 import me.lukas81298.flexmc.world.WorldManager;
 import me.lukas81298.flexmc.world.block.Blocks;
+import org.bukkit.Bukkit;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.SimplePluginManager;
@@ -64,6 +65,8 @@ public class FlexServer{
     private final SimplePluginManager pluginManager = new SimplePluginManager( null, this.commandMap );
     @Getter
     private final WorldManager worldManager = new WorldManager();
+    @Getter
+    private FlexServerImpl server;
 
     public FlexServer( MainConfig config, File configFolder ) {
         this.config = config;
@@ -108,16 +111,21 @@ public class FlexServer{
 
 
 
-
+                server = new FlexServerImpl( FlexServer.this );
+                Bukkit.setServer( server );
+                System.out.println( "Loading plugins..." );
                 pluginManager.loadPlugin( new File( "plugins" ) );
+                System.out.println( "Enabling plugins" );
                 for ( Plugin plugin : pluginManager.getPlugins() ) {
                     pluginManager.enablePlugin( plugin );
                 }
+                System.out.println( "Loading blocks" );
                 Blocks.initBlocks(); // register all blocks
+                System.out.println( "Loading items" );
                 Items.initItems();
 
                 running.set( true );
-
+                System.out.println( "Server started! Generating worlds..." );
                 world = new FlexWorld( "world" );
 
                 executorService.execute( new Runnable() {

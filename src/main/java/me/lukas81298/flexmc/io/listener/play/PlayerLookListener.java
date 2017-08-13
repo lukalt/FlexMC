@@ -14,7 +14,7 @@ public class PlayerLookListener implements MessageInboundListener<MessageC0FPlay
     @Override
     public void handle( ConnectionHandler connectionHandler, MessageC0FPlayerLook message ) {
         Location l = connectionHandler.getPlayer().getLocation();
-        connectionHandler.getPlayer().teleport( new Location( null, l.getX(), l.getY(), l.getZ(), message.getYaw(),message.getPitch() ), message.isOnGround() );
+        connectionHandler.getPlayer().teleport( new Location( connectionHandler.getPlayer().getWorld(), l.getX(), l.getY(), l.getZ(), message.getYaw(),message.getPitch() ), message.isOnGround() );
     }
 
 }

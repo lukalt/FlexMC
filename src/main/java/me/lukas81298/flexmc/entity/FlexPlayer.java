@@ -176,9 +176,16 @@ public class FlexPlayer extends FlexLivingEntity implements CommandSender, Playe
 
     }
 
+
     @Override
     public void sendRawMessage( String s ) {
         this.connectionHandler.sendMessage( new MessageS0FChatMessage( s, (byte) 0 ) );
+    }
+
+
+    @Override
+    public void sendMessage( String message  ) {
+        this.sendMessage( new String[] { message } );
     }
 
     public void kickPlayer( String reason ) {
@@ -999,7 +1006,7 @@ public class FlexPlayer extends FlexLivingEntity implements CommandSender, Playe
         Vector vector = new Vector( -Math.cos( pitch ) * Math.sin( yaw ), 0D, Math.cos( pitch ) * Math.sin( yaw ) ).multiply( 3D );
         vector.setX( Math.min( 2, vector.getX() ) );
         vector.setZ( Math.min( 2, vector.getZ() ) );
-        this.getWorld().spawnItem( new Location( null,location.getX() + vector.getX(), location.getY(), location.getZ() + vector.getZ() ), itemStack );
+        this.getWorld().spawnItem( new Location( getWorld(),location.getX() + vector.getX(), location.getY(), location.getZ() + vector.getZ() ), itemStack );
     }
 
     @Override

@@ -50,7 +50,7 @@ public class ChunkColumn implements Chunk {
     public void setBlock( int x, int y, int z, BlockState type ) {
         if( y > 255 ) {
             System.out.println( "y to high " + y );
-            return;
+            throw new IllegalArgumentException( "y too high " + y );
         }
         ChunkSection section = this.sections[ y / 16 ];
         y = y % 16;
@@ -69,7 +69,7 @@ public class ChunkColumn implements Chunk {
     public int getHighestYAt( int x, int z ) {
         for( int i = 255; i > 0; i-- ) {
             Material type = this.getBlockAt( x, i, z ).getType();
-            if( type == Material.AIR || type == Material.LEAVES ) {
+            if( type != Material.AIR && type != Material.LEAVES ) {
                 return i;
             }
         }

@@ -44,7 +44,7 @@ public abstract class FlexInventory implements Inventory {
                 if( t == null ) {
                     setItem0( i, itemStack );
                     return;
-                } else if( t.isSimilar( itemStack ) && t.getAmount() + itemStack.getAmount() <= 64 ) {
+                } else if( t.getType() == itemStack.getType() && t.getDurability() == itemStack.getDurability() && t.getAmount() + itemStack.getAmount() <= 64 ) {
                     t.setAmount( t.getAmount() + itemStack.getAmount() );
                     setItem0( i, t );
                     return;

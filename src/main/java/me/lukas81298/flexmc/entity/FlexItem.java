@@ -59,9 +59,9 @@ public class FlexItem extends FlexEntity implements EntityObject, Item {
             if( m || k ){
                 if( m ) {
                     fallSpeed += 0.03999999910593033D;
-                    location = new Location( null, l.getBlockX(), l.getY() - fallSpeed, l.getZ() );
+                    location = new Location( getWorld(), l.getBlockX(), l.getY() - fallSpeed, l.getZ() );
                 } else {
-                    location = new Location( null, l.getX(), Math.ceil( l.getY() ), l.getZ() );
+                    location = new Location( getWorld(), l.getX(), Math.ceil( l.getY() ), l.getZ() );
                 }
             } else {
                 fallSpeed = 0D;

@@ -64,7 +64,7 @@ public class PlayerInventory extends FlexInventory implements CraftingInput, org
         switch ( mode ) {
             case 0:
                 if ( button == 0 || ( button == 1 && currentlyInSlot != null && currentlyInSlot.getAmount() == 1 ) ) {
-                    if ( currentlyInSlot == null && itemOnCursor != null && currentlyInSlot.getType() != Material.AIR ) {
+                    if ( currentlyInSlot == null && itemOnCursor != null && itemOnCursor.getType() != Material.AIR ) {
                         setRawSlot( slot, itemOnCursor );
                         System.out.println( "dropped item " + itemOnCursor );
                         itemOnCursor = null;

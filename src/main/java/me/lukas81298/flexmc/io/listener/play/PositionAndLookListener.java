@@ -15,7 +15,7 @@ public class PositionAndLookListener implements MessageInboundListener<MessageC0
     @Override
     public void handle( ConnectionHandler connectionHandler, MessageC0EPPlayerPosAndLook message ) {
         FlexPlayer player = connectionHandler.getPlayer();
-        player.teleport( new Location( null, message.getX(), message.getY(), message.getZ(), message.getYaw(), message.getPitch() ), message.isOnGround() );
+        player.teleport( new Location( player.getWorld(), message.getX(), message.getY(), message.getZ(), message.getYaw(), message.getPitch() ), message.isOnGround() );
     }
 
 }

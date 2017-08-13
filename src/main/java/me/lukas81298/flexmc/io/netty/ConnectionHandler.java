@@ -121,7 +121,7 @@ public class ConnectionHandler extends SimpleChannelInboundHandler<Message> {
         System.out.println( name + " logged in with uuid " + uuid.toString() );
         setProtocolState( ProtocolState.PLAY );
 
-        this.player = new FlexPlayer( -1, new Location( null, .5, Flex.getServer().getWorld().getChunkAt( 0, 0 ).getHighestYAt( 0, 0 ) + 1, .5 ), name, uuid, this, Flex.getServer().getWorld() );
+        this.player = new FlexPlayer( -1, new Location( Flex.getServer().getWorld(), .5, Flex.getServer().getWorld().getChunkAt( 0, 0 ).getHighestYAt( 0, 0 ) + 1, .5 ), name, uuid, this, Flex.getServer().getWorld() );
         Flex.getServer().getPlayerManager().handlePlayerJoin( player );
     }
 

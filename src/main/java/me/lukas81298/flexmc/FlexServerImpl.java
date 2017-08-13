@@ -18,6 +18,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.help.HelpMap;
 import org.bukkit.inventory.*;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -40,7 +41,7 @@ public class FlexServerImpl implements Server {
 
     private final FlexServer flex;
     private final FlexScheduler scheduler;
-
+    private final Logger logger = Logger.getLogger( "Server" );
     private volatile GameMode defaultGameMode = GameMode.SURVIVAL;
 
     public FlexServerImpl( FlexServer flex ) {
@@ -50,7 +51,7 @@ public class FlexServerImpl implements Server {
 
     @Override
     public String getName() {
-        return null;
+        return "FlexMC";
     }
 
     @Override
@@ -266,7 +267,7 @@ public class FlexServerImpl implements Server {
 
     @Override
     public Logger getLogger() {
-        return null;
+        return logger;
     }
 
     @Override
@@ -492,7 +493,42 @@ public class FlexServerImpl implements Server {
 
     @Override
     public ItemFactory getItemFactory() {
-        throw new UnsupportedOperationException();
+        return new ItemFactory() {
+            @Override
+            public ItemMeta getItemMeta( Material material ) {
+                return null;
+            }
+
+            @Override
+            public boolean isApplicable( ItemMeta itemMeta, ItemStack itemStack ) throws IllegalArgumentException {
+                return false;
+            }
+
+            @Override
+            public boolean isApplicable( ItemMeta itemMeta, Material material ) throws IllegalArgumentException {
+                return false;
+            }
+
+            @Override
+            public boolean equals( ItemMeta itemMeta, ItemMeta itemMeta1 ) throws IllegalArgumentException {
+                return false;
+            }
+
+            @Override
+            public ItemMeta asMetaFor( ItemMeta itemMeta, ItemStack itemStack ) throws IllegalArgumentException {
+                return itemMeta;
+            }
+
+            @Override
+            public ItemMeta asMetaFor( ItemMeta itemMeta, Material material ) throws IllegalArgumentException {
+                return itemMeta;
+            }
+
+            @Override
+            public Color getDefaultLeatherColor() {
+                return Color.GRAY;
+            }
+        };
     }
 
     @Override

@@ -31,7 +31,7 @@ public class DiggingListener implements MessageInboundListener<MessageC14PlayerD
             if( message.getStatus() == 2 ) {
                 BlockState previous = world.getBlockAt( message.getPosition() );
                 world.setBlock( message.getPosition(), new BlockState( 0, 0 ) );
-                spawnItems( player, message.getPosition().toMidLocation(), previous );
+                spawnItems( player, message.getPosition().toMidLocation( player.getWorld() ), previous );
                 ItemStack itemStack = player.getItemInHand();
                 if( itemStack != null && itemStack.getType() != Material.AIR ) {
                     ItemSpec spec = Items.getItemSpec( itemStack.getTypeId() );
