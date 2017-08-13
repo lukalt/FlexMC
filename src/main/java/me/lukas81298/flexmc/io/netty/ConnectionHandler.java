@@ -13,9 +13,9 @@ import me.lukas81298.flexmc.io.message.Message;
 import me.lukas81298.flexmc.io.message.login.server.MessageS02LoginSuccess;
 import me.lukas81298.flexmc.io.protocol.ProtocolState;
 import me.lukas81298.flexmc.util.ConnectionInfo;
-import me.lukas81298.flexmc.util.Location;
 import me.lukas81298.flexmc.util.VerifySession;
 import me.lukas81298.flexmc.util.crypt.AuthHelper;
+import org.bukkit.Location;
 
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
@@ -118,7 +118,7 @@ public class ConnectionHandler extends SimpleChannelInboundHandler<Message> {
         System.out.println( name + " logged in with uuid " + uuid.toString() );
         setProtocolState( ProtocolState.PLAY );
 
-        this.player = new Player( -1, new Location( .5, Flex.getServer().getWorld().getChunkAt( 0, 0 ).getHighestYAt( 0, 0 ) + 1, .5 ), name, uuid, this, Flex.getServer().getWorld() );
+        this.player = new Player( -1, new Location( null, .5, Flex.getServer().getWorld().getChunkAt( 0, 0 ).getHighestYAt( 0, 0 ) + 1, .5 ), name, uuid, this, Flex.getServer().getWorld() );
         Flex.getServer().getPlayerManager().handlePlayerJoin( player );
     }
 

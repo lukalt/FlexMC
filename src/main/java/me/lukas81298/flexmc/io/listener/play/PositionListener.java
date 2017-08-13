@@ -4,7 +4,7 @@ import me.lukas81298.flexmc.entity.Player;
 import me.lukas81298.flexmc.io.listener.MessageInboundListener;
 import me.lukas81298.flexmc.io.message.play.client.MessageC0DPlayerPosition;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
-import me.lukas81298.flexmc.util.Location;
+import org.bukkit.Location;
 
 /**
  * @author lukas
@@ -15,6 +15,6 @@ public class PositionListener implements MessageInboundListener<MessageC0DPlayer
     @Override
     public void handle( ConnectionHandler connectionHandler, MessageC0DPlayerPosition message ) {
         Player player = connectionHandler.getPlayer();
-        player.teleport( new Location( message.getX(), message.getY(), message.getZ(), player.getLocation().yaw(), player.getLocation().pitch() ), message.isOnGround() );
+        player.teleport( new Location( null, message.getX(), message.getY(), message.getZ(), player.getLocation().getYaw(), player.getLocation().getPitch() ), message.isOnGround() );
     }
 }

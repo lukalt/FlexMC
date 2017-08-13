@@ -5,14 +5,14 @@ import me.lukas81298.flexmc.entity.metadata.EntityFlag;
 import me.lukas81298.flexmc.entity.metadata.EntityMetaData;
 import me.lukas81298.flexmc.entity.metadata.MetaDataType;
 import me.lukas81298.flexmc.io.message.play.server.*;
-import me.lukas81298.flexmc.util.Location;
 import me.lukas81298.flexmc.world.World;
+import org.bukkit.Location;
 
 /**
  * @author lukas
  * @since 04.08.2017
  */
-public abstract class Entity {
+public abstract class FlexEntity {
 
     @Getter private int entityId;
     @Getter protected volatile Location location;
@@ -23,7 +23,7 @@ public abstract class Entity {
 
     @Getter protected volatile boolean alive = true;
 
-    public Entity( int entityId, Location location, World world ) {
+    public FlexEntity( int entityId, Location location, World world ) {
         this.entityId = entityId;
         this.location = location;
         this.world = world;
@@ -36,32 +36,32 @@ public abstract class Entity {
     }
 
     public void teleport( Location l, boolean onGround ) {
-        boolean lookChanged = l.yaw() != location.yaw() || l.pitch() != location.pitch();
+        boolean lookChanged = l.getYaw() != location.getYaw() || l.getPitch() != location.getPitch();
         Location position = this.location; // prevent rc
-        boolean positionChanged = l.x() != this.location.x() || l.y() != position.y() || l.z() != this.location.z();
+        boolean positionChanged = l.getX() != this.location.getX() || l.getY() != position.getY() || l.getZ() != this.location.getZ();
         if( this.location.distanceSquared( l ) < 64 ) {
-            double dx = ( l.x() * 32 - getLocation().x() * 32 ) * 128;
-            double dy = ( l.y() * 32 - getLocation().y() * 32 ) * 128;
-            double dz = ( l.z() * 32 - getLocation().z() * 32 ) * 128;
+            double dx = ( l.getX() * 32 - getLocation().getX() * 32 ) * 128;
+            double dy = ( l.getY() * 32 - getLocation().getY() * 32 ) * 128;
+            double dz = ( l.getZ() * 32 - getLocation().getZ() * 32 ) * 128;
             for ( Player player : getWorld().getPlayers() ) {
                 if( !player.equals( this ) ) {
                     if( positionChanged && lookChanged ) {
-                        player.getConnectionHandler().sendMessage( new MessageS27EntityRelMoveLook( getEntityId(), (short) dx, (short) dy, (short) dz, l.yaw(), l.pitch(), onGround ) );
+                        player.getConnectionHandler().sendMessage( new MessageS27EntityRelMoveLook( getEntityId(), (short) dx, (short) dy, (short) dz, l.getYaw(), l.getPitch(), onGround ) );
                     } else if( positionChanged ) {
                         player.getConnectionHandler().sendMessage( new MessageS26EntityRelMove( getEntityId(), (short) dx, (short) dy, (short) dz, onGround ) );
                     } else if( lookChanged ) {
-                        player.getConnectionHandler().sendMessage( new MessageS28EntityLook( getEntityId(), l.yaw(), l.pitch(), onGround ) );
+                        player.getConnectionHandler().sendMessage( new MessageS28EntityLook( getEntityId(), l.getYaw(), l.getPitch(), onGround ) );
                     }
                     if( lookChanged ) {
-                        player.getConnectionHandler().sendMessage( new MessageS36EntityHeadLook( getEntityId(), l.yaw() ) );
+                        player.getConnectionHandler().sendMessage( new MessageS36EntityHeadLook( getEntityId(), l.getYaw() ) );
                     }
                 }
             }
         } else {
             for ( Player player : getWorld().getPlayers() ) {
                 if( !player.equals( this ) ) {
-                    player.getConnectionHandler().sendMessage( new MessageS4CEntityTeleport( getEntityId(), l.x(), l.y(), l.z(), l.yaw(), l.pitch(), onGround ) );
-                    player.getConnectionHandler().sendMessage( new MessageS36EntityHeadLook( getEntityId(), l.yaw() ) );
+                    player.getConnectionHandler().sendMessage( new MessageS4CEntityTeleport( getEntityId(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), onGround ) );
+                    player.getConnectionHandler().sendMessage( new MessageS36EntityHeadLook( getEntityId(), l.getYaw() ) );
                 }
             }
         }
@@ -115,5 +115,4 @@ public abstract class Entity {
         alive = false;
     }
 
-    public abstract EntityType getType();
 }

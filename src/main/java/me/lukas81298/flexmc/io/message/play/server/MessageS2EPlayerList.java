@@ -5,8 +5,8 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import me.lukas81298.flexmc.Flex;
 import me.lukas81298.flexmc.io.message.Message;
-import me.lukas81298.flexmc.util.GameMode;
 import net.md_5.bungee.api.chat.BaseComponent;
+import org.bukkit.GameMode;
 
 import java.io.IOException;
 import java.util.List;

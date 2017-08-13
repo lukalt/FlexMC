@@ -1,9 +1,7 @@
 package me.lukas81298.flexmc.io.message;
 
-import com.evilco.mc.nbt.stream.NbtInputStream;
-import com.evilco.mc.nbt.stream.NbtOutputStream;
-import com.evilco.mc.nbt.tag.TagCompound;
 import com.google.common.base.Charsets;
+import io.gomint.taglib.NBTTagCompound;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import me.lukas81298.flexmc.inventory.ItemStack;
@@ -11,6 +9,7 @@ import me.lukas81298.flexmc.inventory.ItemStack;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.ByteOrder;
 import java.util.UUID;
 
 /**
@@ -145,11 +144,10 @@ public abstract class Message {
         }
     }
 
-    public static void writeNbtTag( TagCompound tag, ByteBuf buf ) {
+    public static void writeNbtTag( NBTTagCompound tag, ByteBuf buf ) {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         try {
-            NbtOutputStream n = new NbtOutputStream( os );
-            n.write( tag );
+            tag.writeTo( os, false, ByteOrder.BIG_ENDIAN );
             buf.writeBytes( os.toByteArray() );
         } catch ( IOException e ) {
             e.printStackTrace();
@@ -158,7 +156,7 @@ public abstract class Message {
 
     public static ItemStack readItemStack( ByteBuf buf ) {
         short blockId = buf.readShort();
-        if( blockId != -1 ) {
+        if ( blockId != -1 ) {
             byte count = buf.readByte();
             short damage = buf.readShort();
             return new ItemStack( (int) blockId, count, damage, readNbtTag( buf ) );
@@ -166,11 +164,10 @@ public abstract class Message {
         return new ItemStack( blockId );
     }
 
-    public static TagCompound readNbtTag( ByteBuf buf ) {
+    public static NBTTagCompound readNbtTag( ByteBuf buf ) {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream( Unpooled.buffer().writeBytes( buf ).array() );
         try {
-            NbtInputStream in = new NbtInputStream( byteArrayInputStream );
-            return (TagCompound) in.readTag();
+            return NBTTagCompound.readFrom( byteArrayInputStream, false, ByteOrder.BIG_ENDIAN );
         } catch ( IOException e ) {
             e.printStackTrace();
         }

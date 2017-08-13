@@ -1,6 +1,8 @@
 package me.lukas81298.flexmc.util;
 
 import lombok.*;
+import org.bukkit.Location;
+import org.bukkit.World;
 
 /**
  * @author lukas
@@ -29,11 +31,21 @@ public class Vector3i {
     }
 
     public Location toLocation() {
-        return new Location( x, y, z );
+        return this.toLocation( null );
+    }
+
+    public Location toLocation( World world ) {
+        return new Location( world, x, y, z );
+    }
+
+    public Location toMidLocation( World world ) {
+        return new Location( world, x + .5, y, z + .5 );
     }
 
     public Location toMidLocation() {
-        return new Location( x + .5, y, z + .5 );
+        return this.toMidLocation( null );
     }
+
+
 
 }

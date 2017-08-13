@@ -3,17 +3,16 @@ package me.lukas81298.flexmc.entity;
 import me.lukas81298.flexmc.entity.metadata.MetaDataType;
 import me.lukas81298.flexmc.inventory.ItemStack;
 import me.lukas81298.flexmc.io.message.play.server.MessageS4BCollectItem;
-import me.lukas81298.flexmc.util.Location;
 import me.lukas81298.flexmc.util.Vector3i;
 import me.lukas81298.flexmc.world.World;
+import org.bukkit.Location;
 
-import javax.annotation.Nullable;
 
 /**
  * @author lukas
  * @since 07.08.2017
  */
-public class Item extends Entity implements EntityObject {
+public class Item extends FlexEntity implements EntityObject {
 
     private double fallSpeed = 0D; // no concurrency needed here, entity is ticked by the same thread every time
     public Item( int entityId, Location location, World world ) {
@@ -24,7 +23,6 @@ public class Item extends Entity implements EntityObject {
         this.metaData.set( (byte) 6, MetaDataType.SLOT, itemStack );
     }
 
-    @Nullable
     public ItemStack getItemStack() {
         return this.metaData.get( (byte) 6 );
     }
@@ -51,24 +49,19 @@ public class Item extends Entity implements EntityObject {
                     }
                 }
             }
-            boolean k = Math.ceil( l.y() ) != l.y();
-            boolean m = getWorld().getBlockAt( new Vector3i( (int) l.x(), ( (int) l.y() ) - 1, (int) l.z() ) ).getTypeId() == 0;
+            boolean k = Math.ceil( l.getY() ) != l.getY();
+            boolean m = getWorld().getBlockAt( new Vector3i( l.getBlockX(), l.getBlockY() - 1, l.getBlockZ() ) ).getTypeId() == 0;
             if( m || k ){
                 if( m ) {
                     fallSpeed += 0.03999999910593033D;
-                    location = new Location( l.x(), l.y() - fallSpeed, l.z() );
+                    location = new Location( null, l.getBlockX(), l.getY() - fallSpeed, l.getZ() );
                 } else {
-                    location = new Location( l.x(), Math.ceil( l.y() ), l.z() );
+                    location = new Location( null, l.getX(), Math.ceil( l.getY() ), l.getZ() );
                 }
             } else {
                 fallSpeed = 0D;
             }
         }
-    }
-
-    @Override
-    public EntityType getType() {
-        return EntityType.ITEM;
     }
 
     @Override

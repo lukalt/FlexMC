@@ -13,5 +13,6 @@ public class ClientSettingsListener implements MessageInboundListener<MessageC04
     @Override
     public void handle( ConnectionHandler connectionHandler, MessageC04ClientSettings message ) {
         // todo implement
+        connectionHandler.getPlayer().setViewDistance( message.getViewDistance() );
     }
 }

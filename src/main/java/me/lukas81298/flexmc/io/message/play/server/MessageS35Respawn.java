@@ -3,9 +3,9 @@ package me.lukas81298.flexmc.io.message.play.server;
 import io.netty.buffer.ByteBuf;
 import lombok.*;
 import me.lukas81298.flexmc.io.message.Message;
-import me.lukas81298.flexmc.util.Difficulty;
-import me.lukas81298.flexmc.util.GameMode;
 import me.lukas81298.flexmc.world.Dimension;
+import org.bukkit.Difficulty;
+import org.bukkit.GameMode;
 
 import java.io.IOException;
 

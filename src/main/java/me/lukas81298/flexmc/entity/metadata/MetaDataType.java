@@ -1,6 +1,6 @@
 package me.lukas81298.flexmc.entity.metadata;
 
-import com.evilco.mc.nbt.tag.TagCompound;
+import io.gomint.taglib.NBTTagCompound;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -109,7 +109,7 @@ public enum MetaDataType {
     NBT_TAG( new BiConsumer<ByteBuf, Object>() {
         @Override
         public void accept( ByteBuf buf, Object o ) {
-            TagCompound tagCompound = (TagCompound) o;
+            NBTTagCompound tagCompound = (NBTTagCompound) o;
             Message.writeNbtTag( tagCompound, buf );
         }
     } );

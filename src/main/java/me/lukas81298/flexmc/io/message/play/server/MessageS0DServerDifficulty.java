@@ -3,7 +3,7 @@ package me.lukas81298.flexmc.io.message.play.server;
 import io.netty.buffer.ByteBuf;
 import lombok.*;
 import me.lukas81298.flexmc.io.message.Message;
-import me.lukas81298.flexmc.util.Difficulty;
+import org.bukkit.Difficulty;
 
 import java.io.IOException;
 

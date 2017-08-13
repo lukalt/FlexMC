@@ -17,6 +17,16 @@
             <id>evil-co</id>
             <url>http://basket.cindyscats.com/content/repositories/releases/</url>
         </repository>
+        <!--<repository>
+            <id>gomint-repo</id>
+            <name>GoMint Release Repository</name>
+            <url>https://repo.gomint.io/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>gomint-snapshots</id>
+            <name>GoMint Snapshot Repository</name>
+            <url>https://repo.gomint.io/content/repositories/snapshots/</url>
+        </repository>-->
     </repositories>
 
     <build>
@@ -87,14 +97,19 @@
             <version>1.12-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.evilco.mc</groupId>
-            <artifactId>nbt</artifactId>
-            <version>1.0.2</version>
+            <groupId>io.gomint</groupId>
+            <artifactId>taglib</artifactId>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.github.czyzby</groupId>
             <artifactId>noise4j</artifactId>
             <version>0.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>1.12.1-R0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

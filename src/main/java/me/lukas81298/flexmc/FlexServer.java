@@ -20,6 +20,9 @@ import me.lukas81298.flexmc.util.crafting.RecipeManager;
 import me.lukas81298.flexmc.util.crypt.AuthHelper;
 import me.lukas81298.flexmc.world.World;
 import me.lukas81298.flexmc.world.block.Blocks;
+import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.SimplePluginManager;
 
 import java.io.File;
 import java.security.KeyPair;
@@ -32,7 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author lukas
  * @since 04.08.2017
  */
-public class FlexServer {
+public class FlexServer{
 
     @Getter
     private final MainConfig config;
@@ -54,6 +57,9 @@ public class FlexServer {
     private KeyPair keyPair;
     @Getter
     private RecipeManager recipeManager = new RecipeManager();
+
+    private final SimpleCommandMap commandMap = new SimpleCommandMap( null );
+    private final SimplePluginManager pluginManager = new SimplePluginManager( null, this.commandMap );
 
     public FlexServer( MainConfig config, File configFolder ) {
         this.config = config;
@@ -99,6 +105,10 @@ public class FlexServer {
 
 
 
+                pluginManager.loadPlugin( new File( "plugins" ) );
+                for ( Plugin plugin : pluginManager.getPlugins() ) {
+                    pluginManager.enablePlugin( plugin );
+                }
                 Blocks.initBlocks(); // register all blocks
                 Items.initItems();
 
@@ -150,6 +160,8 @@ public class FlexServer {
     }
 
     public void stop() {
+        System.out.println( "Disabling plugins" );
+        pluginManager.disablePlugins();
         if ( this.running.compareAndSet( false, true ) ) {
             System.out.println( "Stopping server..." );
             for( Player player : playerManager.getOnlinePlayers() ) {
@@ -160,4 +172,6 @@ public class FlexServer {
             System.out.println( "Attempting to shut down server but already stopped or currently shutting down" );
         }
     }
+
+
 }

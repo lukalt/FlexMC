@@ -3,8 +3,7 @@ package me.lukas81298.flexmc.io.message.play.server;
 import io.netty.buffer.ByteBuf;
 import lombok.*;
 import me.lukas81298.flexmc.io.message.Message;
-import me.lukas81298.flexmc.util.Location;
-import me.lukas81298.flexmc.util.Vector3i;
+import org.bukkit.Location;
 
 import java.io.IOException;
 
@@ -33,9 +32,9 @@ public class MessageS19NamedSoundEffect extends Message {
     public void write( ByteBuf buf ) throws IOException {
         writeString( name, buf );
         writeString( category, buf );
-        buf.writeInt( (int) (position.x() * 8 ) );
-        buf.writeInt( (int) (position.y() * 8 ) );
-        buf.writeInt( (int) (position.z() * 8 ) );
+        buf.writeInt( (int) (position.getX() * 8 ) );
+        buf.writeInt( (int) (position.getY() * 8 ) );
+        buf.writeInt( (int) (position.getZ() * 8 ) );
         writeFloats( buf, volume, pitch );
     }
 }

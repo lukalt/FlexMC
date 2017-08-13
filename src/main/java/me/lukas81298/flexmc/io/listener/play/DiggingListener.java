@@ -8,11 +8,11 @@ import me.lukas81298.flexmc.io.listener.MessageInboundListener;
 import me.lukas81298.flexmc.io.message.play.client.MessageC14PlayerDigging;
 import me.lukas81298.flexmc.io.message.play.server.MessageS08BlockBreakAnimation;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
-import me.lukas81298.flexmc.util.Location;
 import me.lukas81298.flexmc.world.BlockState;
 import me.lukas81298.flexmc.world.World;
 import me.lukas81298.flexmc.world.block.BlockSpec;
 import me.lukas81298.flexmc.world.block.Blocks;
+import org.bukkit.Location;
 
 import java.util.Collections;
 

@@ -1,6 +1,6 @@
 package me.lukas81298.flexmc.inventory;
 
-import com.evilco.mc.nbt.tag.TagCompound;
+import io.gomint.taglib.NBTTagCompound;
 import io.netty.buffer.ByteBuf;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -25,7 +25,7 @@ public class ItemStack extends YamlConfig {
     private int type;
     private int amount = 1;
     private short damage;
-    private transient TagCompound meta = new TagCompound( "ItemStack" );
+    private transient NBTTagCompound meta = new NBTTagCompound( "ItemStack" );
 
     public ItemStack( Material material ) {
         this.type = material.getId();

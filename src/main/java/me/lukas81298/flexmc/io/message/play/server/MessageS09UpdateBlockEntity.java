@@ -1,6 +1,6 @@
 package me.lukas81298.flexmc.io.message.play.server;
 
-import com.evilco.mc.nbt.tag.TagCompound;
+import io.gomint.taglib.NBTTagCompound;
 import io.netty.buffer.ByteBuf;
 import lombok.*;
 import me.lukas81298.flexmc.io.message.Message;
@@ -21,7 +21,7 @@ public class MessageS09UpdateBlockEntity extends Message {
 
     private Vector3i position;
     private byte action;
-    private TagCompound tag;
+    private NBTTagCompound tag;
 
     @Override
     public void read( ByteBuf buf ) throws IOException {

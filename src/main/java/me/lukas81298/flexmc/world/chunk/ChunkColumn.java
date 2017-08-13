@@ -17,7 +17,7 @@ import java.util.UUID;
 @Getter
 @ToString
 @EqualsAndHashCode( of = { "x", "z" } )
-public class ChunkColumn {
+public class ChunkColumn  {
 
     private final int x, z;
     private final ChunkSection[] sections;

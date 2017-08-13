@@ -5,20 +5,20 @@ import gnu.trove.map.hash.TByteObjectHashMap;
 import gnu.trove.procedure.TObjectProcedure;
 import lombok.Getter;
 import me.lukas81298.flexmc.Flex;
-import me.lukas81298.flexmc.entity.Entity;
 import me.lukas81298.flexmc.entity.EntityObject;
+import me.lukas81298.flexmc.entity.FlexEntity;
 import me.lukas81298.flexmc.entity.Item;
 import me.lukas81298.flexmc.entity.Player;
 import me.lukas81298.flexmc.inventory.ItemStack;
 import me.lukas81298.flexmc.io.message.play.server.*;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
-import me.lukas81298.flexmc.util.Difficulty;
-import me.lukas81298.flexmc.util.Location;
 import me.lukas81298.flexmc.util.Vector3i;
 import me.lukas81298.flexmc.world.chunk.ChunkColumn;
 import me.lukas81298.flexmc.world.chunk.ChunkSection;
 import me.lukas81298.flexmc.world.generator.ChunkGenerator;
 import me.lukas81298.flexmc.world.generator.OverWorldChunkGenerator;
+import org.bukkit.Difficulty;
+import org.bukkit.Location;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,7 @@ public class World {
     private final ReadWriteLock chunkLock = new ReentrantReadWriteLock();
     private final TByteObjectMap<TByteObjectMap<ChunkColumn>> columns = new TByteObjectHashMap<>();
 
-    private final Set<Entity> entities = ConcurrentHashMap.newKeySet();
+    private final Set<FlexEntity> entities = ConcurrentHashMap.newKeySet();
     @Getter
     private final Set<Player> players = ConcurrentHashMap.newKeySet();
 
@@ -148,7 +148,7 @@ public class World {
     }
 
     private void tickEntities() {
-        for( Entity entity : this.entities ) {
+        for( FlexEntity entity : this.entities ) {
             entity.tick();
             if( !entity.isAlive() && !( entity instanceof Player ) ) { // repawning is handled differently for players
                 this.removeEntity( entity );
@@ -181,28 +181,28 @@ public class World {
         this.addEntity( item, false );
     }
 
-    public void addEntity( Entity entity, boolean changeWorld ) {
+    public void addEntity( FlexEntity FlexEntity, boolean changeWorld ) {
         if( changeWorld ) {
-            entity.changeWorld( this, nextEntityId() );
+            FlexEntity.changeWorld( this, nextEntityId() );
         }
-        if ( entity instanceof Player ) {
-            Player player = (Player) entity;
+        if ( FlexEntity instanceof Player ) {
+            Player player = (Player) FlexEntity;
             for ( Player t : players ) {
                 sendToPlayer( t, player.getConnectionHandler() );
                 sendToPlayer( player, t.getConnectionHandler() );
             }
             synchronized ( this ) {
-                this.entities.add( entity );
+                this.entities.add( FlexEntity );
                 this.players.add( player );
             }
         } else {
-            this.entities.add( entity );
-            if( entity instanceof EntityObject ) {
-                byte t = ((EntityObject) entity).getObjectType();
-                Location l = entity.getLocation();
+            this.entities.add( FlexEntity );
+            if( FlexEntity instanceof EntityObject ) {
+                byte t = ((EntityObject) FlexEntity).getObjectType();
+                Location l = FlexEntity.getLocation();
                 for( Player player : players ) {
-                    player.getConnectionHandler().sendMessage( new MessageS00SpawnObject( entity.getEntityId(), UUID.randomUUID(), t, l.x(), l.y(), l.z(), 3F, 3F ) );
-                    player.getConnectionHandler().sendMessage( new MessageS3CEntityMetaData( entity.getEntityId(), entity.getMetaData() ) );
+                    player.getConnectionHandler().sendMessage( new MessageS00SpawnObject( FlexEntity.getEntityId(), UUID.randomUUID(), t, l.getX(), l.getY(), l.getZ(), 3F, 3F ) );
+                    player.getConnectionHandler().sendMessage( new MessageS3CEntityMetaData( FlexEntity.getEntityId(), FlexEntity.getMetaData() ) );
                 }
             }
         }
@@ -210,21 +210,21 @@ public class World {
 
     private void sendToPlayer( Player player, ConnectionHandler connectionHandler ) {
         Location playerLocation = player.getLocation();
-        connectionHandler.sendMessage( new MessageS05SpawnPlayer( player.getEntityId(), player.getUuid(), playerLocation.x(), playerLocation.y(), playerLocation.z(),
-                playerLocation.yaw(), playerLocation.pitch(), player.getMetaData() ) );
+        connectionHandler.sendMessage( new MessageS05SpawnPlayer( player.getEntityId(), player.getUuid(), playerLocation.getX(), playerLocation.getY(), playerLocation.getZ(),
+                playerLocation.getYaw(), playerLocation.getPitch(), player.getMetaData() ) );
     }
 
-    public void removeEntity( Entity entity ) {
-        if ( entity instanceof Player ) {
+    public void removeEntity( FlexEntity FlexEntity ) {
+        if ( FlexEntity instanceof Player ) {
             synchronized ( this ) {
-                this.entities.remove( entity );
-                this.players.remove( entity );
+                this.entities.remove( FlexEntity );
+                this.players.remove( FlexEntity );
             }
         } else {
-            this.entities.remove( entity );
+            this.entities.remove( FlexEntity );
         }
         for( Player player : this.players ) {
-            player.getConnectionHandler().sendMessage( new MessageS32DestroyEntities( entity.getEntityId() ) );
+            player.getConnectionHandler().sendMessage( new MessageS32DestroyEntities( FlexEntity.getEntityId() ) );
         }
     }
 
@@ -238,7 +238,7 @@ public class World {
     }
 
     public Location getSpawnLocation() {
-        return new Location( 0, 70, 0 );
+        return new Location( null, 0, 70, 0 );
     }
 
     public ChunkColumn getChunkAt( int x, int z ) {
