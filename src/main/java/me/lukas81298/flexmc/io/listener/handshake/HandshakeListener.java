@@ -14,9 +14,6 @@ public class HandshakeListener implements MessageInboundListener<MessageC00HandH
 
     @Override
     public void handle( ConnectionHandler connectionHandler, MessageC00HandHake message ) {
-        if( message.getProtocolVersion() < 338 ) {
-            throw new RuntimeException( "Unsupported protocol version " + message.getProtocolVersion() );
-        }
         connectionHandler.setVersion( message.getProtocolVersion() );
         connectionHandler.setConnectionInfo( new ConnectionInfo( message.getServerAddress(), message.getPort() ) );
         if( message.getNextState() == 1 ) { // status

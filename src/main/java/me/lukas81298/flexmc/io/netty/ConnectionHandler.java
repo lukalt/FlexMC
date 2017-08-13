@@ -10,12 +10,14 @@ import lombok.Setter;
 import me.lukas81298.flexmc.Flex;
 import me.lukas81298.flexmc.entity.FlexPlayer;
 import me.lukas81298.flexmc.io.message.Message;
+import me.lukas81298.flexmc.io.message.login.server.MessageS00Disconnect;
 import me.lukas81298.flexmc.io.message.login.server.MessageS02LoginSuccess;
 import me.lukas81298.flexmc.io.protocol.ProtocolState;
-import me.lukas81298.flexmc.util.ConnectionInfo;
-import me.lukas81298.flexmc.util.VerifySession;
+import me.lukas81298.flexmc.util.*;
 import me.lukas81298.flexmc.util.crypt.AuthHelper;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.event.player.PlayerLoginEvent;
 
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
@@ -117,6 +119,12 @@ public class ConnectionHandler extends SimpleChannelInboundHandler<Message> {
     }
 
     public void loginSuccess( String name, UUID uuid ) {
+        BiTuple<String, PlayerLoginEvent.Result> result = this.checkLogin( name, uuid );
+        PlayerLoginEvent event = EventFactory.call( new PlayerLoginEvent( new TempPlayer( this, name, uuid ), connectionInfo.getHost(), getSocketAddress().getAddress(), result.getB(), result.getA() ) );
+        if( event.getResult() != PlayerLoginEvent.Result.ALLOWED ) {
+            sendMessage( new MessageS00Disconnect( "{\"text\": \"" + event.getKickMessage() + "\"}" ) );
+            return;
+        }
         sendMessage( new MessageS02LoginSuccess( name, uuid.toString() ) );
         System.out.println( name + " logged in with uuid " + uuid.toString() );
         setProtocolState( ProtocolState.PLAY );
@@ -137,4 +145,16 @@ public class ConnectionHandler extends SimpleChannelInboundHandler<Message> {
             }
         }
     }
+
+    private BiTuple<String, PlayerLoginEvent.Result> checkLogin( String name, UUID uuid ) {
+        if( Bukkit.getIPBans().contains( this.getIpAddress() ) ) {
+            return new BiTuple<>( "Your IP Address has been banned from the server", PlayerLoginEvent.Result.KICK_BANNED );
+        }
+        if( Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers() ) {
+            return new BiTuple<>( "The server is full", PlayerLoginEvent.Result.KICK_FULL );
+        }
+
+        return new BiTuple<>( null, PlayerLoginEvent.Result.ALLOWED );
+    }
+
 }

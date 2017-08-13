@@ -1,156 +1,78 @@
-package me.lukas81298.flexmc.entity;
+package me.lukas81298.flexmc.util;
 
-import io.netty.buffer.Unpooled;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import me.lukas81298.flexmc.entity.metadata.EntityFlag;
-import me.lukas81298.flexmc.inventory.FlexPlayerInventory;
-import me.lukas81298.flexmc.io.message.play.client.MessageC04ClientSettings;
-import me.lukas81298.flexmc.io.message.play.server.*;
+import lombok.RequiredArgsConstructor;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
-import me.lukas81298.flexmc.util.EventFactory;
-import me.lukas81298.flexmc.util.Vector3i;
-import me.lukas81298.flexmc.world.BlockState;
-import me.lukas81298.flexmc.world.Dimension;
-import me.lukas81298.flexmc.world.FlexWorld;
-import me.lukas81298.flexmc.world.chunk.ChunkColumn;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.advancement.AdvancementProgress;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.block.Block;
+import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.entity.*;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.*;
 import org.bukkit.map.MapView;
+import org.bukkit.metadata.MetadataValue;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 
 import java.net.InetSocketAddress;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.*;
 
 /**
  * @author lukas
- * @since 05.08.2017
+ * @since 13.08.2017
  */
-@EqualsAndHashCode( of = { "name", "uuid" }, callSuper = false )
-public class FlexPlayer extends FlexLivingEntity implements CommandSender, Player {
+@RequiredArgsConstructor
+public class TempPlayer implements Player {
 
-    @Getter
-    private final String name;
-    @Getter
-    private final UUID uuid;
-
-    @Getter
     private final ConnectionHandler connectionHandler;
-    @Setter
-    @Getter
-    private volatile long lastKeepAlive = System.currentTimeMillis();
-    @Getter
-    private volatile GameMode gameMode = GameMode.SURVIVAL;
-    private final AtomicBoolean online = new AtomicBoolean( true );
-    @Getter
-    private final FlexPlayerInventory inventory;
-    @Getter
-    private volatile int heldItemSlot = 0;
-    private AtomicInteger foodLevel = new AtomicInteger( 20 );
-    private final Set<ChunkColumn> shownChunks = ConcurrentHashMap.newKeySet();
-
-    @Setter
-    private int viewDistance = 7;
-
-    @Setter
-    private String displayName;
-    @Setter
-    private String playerListName;
-    @Getter
-    private Location spawnLocation;
-    @Setter
-    private MessageC04ClientSettings settings;
-    private final Set<String> pluginMessageChannels = ConcurrentHashMap.newKeySet();
-
-    private byte healthCounter = 0;
-
-    public FlexPlayer( int entityId, Location position, String name, UUID uuid, ConnectionHandler connectionHandler, FlexWorld world ) {
-        super( entityId, position, world );
-        this.spawnLocation = new Location( world, 0, 100, 0 );
-        this.name = name;
-        this.uuid = uuid;
-        this.connectionHandler = connectionHandler;
-        this.inventory = new FlexPlayerInventory( this );
-    }
-
-    public void spawnPlayer() {
-        connectionHandler.sendMessage( new MessageS23JoinGame( this.getEntityId(), gameMode, Dimension.OVER_WORLD, Difficulty.PEACEFUL, "default", false ) );
-        connectionHandler.sendMessage( new MessageS0DServerDifficulty( Difficulty.PEACEFUL ) );
-        connectionHandler.sendMessage( new MessageS46SpawnPosition( new Vector3i( 0, 10, 0 ) ) );
-        connectionHandler.sendMessage( new MessageS2CPlayerAbilities( (byte) 0, .2F, .2F ) );
-        connectionHandler.sendMessage( new MessageS2FPlayerPositionAndLook( getLocation().getX(), getLocation().getY(), getLocation().getZ(), 0F, 0F, (byte) 0, 0 ) );
-        this.refreshShownChunks();
-        inventory.addItem( new ItemStack( 278, 1 ) );
-        inventory.addItem( new ItemStack( 279, 1 ) );
-        inventory.addItem( new ItemStack( 277, 1 ) );
-        inventory.addItem( new ItemStack( 276, 1 ) );
-        for ( int i = 4; i < 10; i++ ) {
-            getInventory().setItem( i, new ItemStack( Material.LOG ) );
-        }
-    }
-
-    public void refreshShownChunks() {
-        Location location = this.getLocation();
-        int x = location.getBlockX() / 16, z = location.getBlockZ() / 16;
-        for ( ChunkColumn column : this.getWorld().getColumns() ) {
-            if ( Math.abs( x - column.getX() ) <= viewDistance && Math.abs( z - column.getZ() ) <= viewDistance ) {
-                if ( shownChunks.add( column ) ) {
-                    this.connectionHandler.sendMessage( new MessageS20ChunkData( column ) );
-                }
-            } else {
-                if ( shownChunks.remove( column ) ) {
-                    this.connectionHandler.sendMessage( new MessageS1DUnloadChunk( column.getX(), column.getZ() ) );
-                }
-            }
-        }
-    }
+    private final String name;
+    private final UUID uuid;
 
     @Override
     public String getDisplayName() {
-        String displayName = this.displayName;
-        return displayName == null ? this.name : displayName;
+        return null;
+    }
+
+    @Override
+    public void setDisplayName( String s ) {
+
     }
 
     @Override
     public String getPlayerListName() {
-        String playerListName = this.playerListName;
-        return playerListName == null ? this.name : playerListName;
+        return null;
+    }
+
+    @Override
+    public void setPlayerListName( String s ) {
+
     }
 
     @Override
     public void setCompassTarget( Location location ) {
-        this.spawnLocation = location;
-        connectionHandler.sendMessage( new MessageS46SpawnPosition( new Vector3i( location.getBlockX(), location.getBlockY(), location.getBlockZ() ) ) );
+
     }
 
     @Override
     public Location getCompassTarget() {
-        return this.spawnLocation;
+        return null;
     }
 
     @Override
     public InetSocketAddress getAddress() {
-        return this.connectionHandler.getSocketAddress();
+        return connectionHandler.getSocketAddress();
     }
 
     @Override
@@ -178,22 +100,14 @@ public class FlexPlayer extends FlexLivingEntity implements CommandSender, Playe
 
     }
 
-
     @Override
     public void sendRawMessage( String s ) {
-        this.connectionHandler.sendMessage( new MessageS0FChatMessage( s, (byte) 0 ) );
-    }
 
+    }
 
     @Override
-    public void sendMessage( String message  ) {
-        this.sendMessage( new String[] { message } );
-    }
+    public void kickPlayer( String s ) {
 
-    public void kickPlayer( String reason ) {
-        if ( this.online.compareAndSet( true, false ) ) {
-            this.connectionHandler.sendMessage( new MessageS1ADisconnect( new TextComponent( reason ) ) );
-        }
     }
 
     @Override
@@ -206,81 +120,24 @@ public class FlexPlayer extends FlexLivingEntity implements CommandSender, Playe
         return false;
     }
 
-    public int getLatency() {
-        return 0b00101010; // 42 ;D
-    }
-
     @Override
-    public void sendMessage( String... messages ) {
-        for ( String message : messages ) {
-            this.sendMessage( TextComponent.fromLegacyText( message ) );
-        }
-    }
-
-    @Override
-    public void sendMessage( BaseComponent... components ) {
-        this.connectionHandler.sendMessage( new MessageS0FChatMessage( components, (byte) 0 ) );
-    }
-
-    @Override
-    public boolean hasPermission( String permission ) {
-        return true; // todo change
-    }
-
-    public void setGameMode( GameMode gameMode ) {
-        synchronized ( this ) {
-            if ( this.gameMode != gameMode ) {
-                this.gameMode = gameMode;
-                connectionHandler.sendMessage( new MessageS1EChangeGameState( (byte) 3, gameMode.getValue() ) );
-            }
-        }
-    }
-
-    @Override
-    public boolean isBlocking() {
+    public boolean isSneaking() {
         return false;
     }
 
     @Override
-    public boolean isHandRaised() {
+    public void setSneaking( boolean b ) {
+
+    }
+
+    @Override
+    public boolean isSprinting() {
         return false;
     }
 
     @Override
-    public int getExpToLevel() {
-        return 0;
-    }
+    public void setSprinting( boolean b ) {
 
-    @Override
-    public Entity getShoulderEntityLeft() {
-        return null;
-    }
-
-    @Override
-    public void setShoulderEntityLeft( Entity entity ) {
-
-    }
-
-    @Override
-    public Entity getShoulderEntityRight() {
-        return null;
-    }
-
-    @Override
-    public void setShoulderEntityRight( Entity entity ) {
-
-    }
-
-    public String getIpAddress() {
-        return connectionHandler.getIpAddress();
-    }
-
-    public void setSneaking( boolean flag ) {
-        this.setFlag( EntityFlag.CROUCHED, flag );
-    }
-
-    public void setSprinting( boolean flag ) {
-        this.setFlag( EntityFlag.SPRINTING, false );
     }
 
     @Override
@@ -375,7 +232,6 @@ public class FlexPlayer extends FlexLivingEntity implements CommandSender, Playe
 
     @Override
     public void sendBlockChange( Location location, int i, byte b ) {
-        getConnectionHandler().sendMessage( new MessageS0BBlockChange( new Vector3i( location ), new BlockState( i, b ) ) );
 
     }
 
@@ -391,7 +247,7 @@ public class FlexPlayer extends FlexLivingEntity implements CommandSender, Playe
 
     @Override
     public void updateInventory() {
-        getInventory().setContents( getInventory().getContents() );
+
     }
 
     @Override
@@ -601,17 +457,17 @@ public class FlexPlayer extends FlexLivingEntity implements CommandSender, Playe
 
     @Override
     public int getFoodLevel() {
-        return foodLevel.get();
+        return 0;
     }
 
     @Override
     public void setFoodLevel( int i ) {
-        this.foodLevel.set( i );
+
     }
 
     @Override
     public boolean isOnline() {
-        return true;
+        return false;
     }
 
     @Override
@@ -631,7 +487,7 @@ public class FlexPlayer extends FlexLivingEntity implements CommandSender, Playe
 
     @Override
     public Player getPlayer() {
-        return this;
+        return null;
     }
 
     @Override
@@ -856,19 +712,22 @@ public class FlexPlayer extends FlexLivingEntity implements CommandSender, Playe
 
     @Override
     public String getLocale() {
-        return settings == null ? "en_US" : settings.getLocale();
+        return null;
     }
 
-    public boolean isSneaking() {
-        return this.getFlag( EntityFlag.CROUCHED );
+    @Override
+    public Map<String, Object> serialize() {
+        return null;
     }
 
-    public boolean isSprinting() {
-        return this.getFlag( EntityFlag.SPRINTING );
+    @Override
+    public String getName() {
+        return name;
     }
 
-    public void handleSetHeldItemSlot( int slot ) {
-        this.heldItemSlot = slot; // todo update equipment to other players
+    @Override
+    public PlayerInventory getInventory() {
+        return null;
     }
 
     @Override
@@ -878,7 +737,7 @@ public class FlexPlayer extends FlexLivingEntity implements CommandSender, Playe
 
     @Override
     public MainHand getMainHand() {
-        return MainHand.RIGHT;
+        return null;
     }
 
     @Override
@@ -926,23 +785,24 @@ public class FlexPlayer extends FlexLivingEntity implements CommandSender, Playe
 
     }
 
+    @Override
     public ItemStack getItemInHand() {
-        return this.inventory.getItem( heldItemSlot );
+        return null;
     }
 
     @Override
     public void setItemInHand( ItemStack itemStack ) {
-        this.getInventory().setItem( this.heldItemSlot, itemStack );
+
     }
 
     @Override
     public ItemStack getItemOnCursor() {
-        return this.inventory.getItemOnCursor();
+        return null;
     }
 
     @Override
     public void setItemOnCursor( ItemStack itemStack ) {
-        this.inventory.setItemOnCursor( itemStack );
+
     }
 
     @Override
@@ -971,78 +831,687 @@ public class FlexPlayer extends FlexLivingEntity implements CommandSender, Playe
     }
 
     @Override
-    protected void updateHealth( double health ) {
-        super.updateHealth( health );
-        if ( health >= 0 ) {
-            connectionHandler.sendMessage( new MessageS41UpdateHealth( (float) health, foodLevel.get(), 0F ) );
-        }
+    public GameMode getGameMode() {
+        return null;
     }
 
     @Override
-    public void teleport( Location l, boolean onGround ) {
-        Location k = this.getLocation();
-        if ( l.getBlockX() / 16 != k.getBlockX() / 16 ) {
-            if ( l.getBlockZ() / 16 != k.getBlockZ() / 16 ) {
-                this.refreshShownChunks();
-            }
-        }
-        super.teleport( l, onGround );
-        EventFactory.call( new PlayerMoveEvent( this, k, l ) );
+    public void setGameMode( GameMode gameMode ) {
 
-    }
-
-    public synchronized void respawn() {
-        alive = true;
-        foodLevel.set( 20 );
-        setHealth( 20D );
-        connectionHandler.sendMessage( new MessageS35Respawn( getWorld().getDimension(), getWorld().getDifficulty(), gameMode, "default" ) );
-        shownChunks.clear();
-        refreshShownChunks();
-        location = getWorld().getSpawnLocation();
-        connectionHandler.sendMessage( new MessageS2FPlayerPositionAndLook( location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch(), (byte) 0, 0 ) );
-        getInventory().setContents( new ItemStack[36] );
-
-    }
-
-    public void dropItem( ItemStack itemStack ) {
-        float yaw = location.getYaw(), pitch = location.getPitch();
-        Vector vector = new Vector( -Math.cos( pitch ) * Math.sin( yaw ), 0D, Math.cos( pitch ) * Math.sin( yaw ) ).multiply( 3D );
-        vector.setX( Math.min( 2, vector.getX() ) );
-        vector.setZ( Math.min( 2, vector.getZ() ) );
-        this.getWorld().spawnItem( new Location( getWorld(),location.getX() + vector.getX(), location.getY(), location.getZ() + vector.getZ() ), itemStack );
     }
 
     @Override
-    public void tick() {
-        super.tick();
-        healthCounter++;
-        if ( healthCounter == 80 ) {
-            healthCounter = 0;
-            double health = getHealth();
-            double maxHealth = getMaxHealth();
-            if ( health < maxHealth ) {
-                setHealth( Math.min( health + 1, maxHealth ) );
-            }
-        }
+    public boolean isBlocking() {
+        return false;
+    }
+
+    @Override
+    public boolean isHandRaised() {
+        return false;
+    }
+
+    @Override
+    public int getExpToLevel() {
+        return 0;
+    }
+
+    @Override
+    public Entity getShoulderEntityLeft() {
+        return null;
+    }
+
+    @Override
+    public void setShoulderEntityLeft( Entity entity ) {
+
+    }
+
+    @Override
+    public Entity getShoulderEntityRight() {
+        return null;
+    }
+
+    @Override
+    public void setShoulderEntityRight( Entity entity ) {
+
+    }
+
+    @Override
+    public double getEyeHeight() {
+        return 0;
+    }
+
+    @Override
+    public double getEyeHeight( boolean b ) {
+        return 0;
+    }
+
+    @Override
+    public Location getEyeLocation() {
+        return null;
+    }
+
+    @Override
+    public List<Block> getLineOfSight( Set<Material> set, int i ) {
+        return null;
+    }
+
+    @Override
+    public Block getTargetBlock( Set<Material> set, int i ) {
+        return null;
+    }
+
+    @Override
+    public List<Block> getLastTwoTargetBlocks( Set<Material> set, int i ) {
+        return null;
+    }
+
+    @Override
+    public int getRemainingAir() {
+        return 0;
+    }
+
+    @Override
+    public void setRemainingAir( int i ) {
+
+    }
+
+    @Override
+    public int getMaximumAir() {
+        return 0;
+    }
+
+    @Override
+    public void setMaximumAir( int i ) {
+
+    }
+
+    @Override
+    public int getMaximumNoDamageTicks() {
+        return 0;
+    }
+
+    @Override
+    public void setMaximumNoDamageTicks( int i ) {
+
+    }
+
+    @Override
+    public double getLastDamage() {
+        return 0;
+    }
+
+    @Override
+    public void setLastDamage( double v ) {
+
+    }
+
+    @Override
+    public int getNoDamageTicks() {
+        return 0;
+    }
+
+    @Override
+    public void setNoDamageTicks( int i ) {
+
+    }
+
+    @Override
+    public Player getKiller() {
+        return null;
+    }
+
+    @Override
+    public boolean addPotionEffect( PotionEffect potionEffect ) {
+        return false;
+    }
+
+    @Override
+    public boolean addPotionEffect( PotionEffect potionEffect, boolean b ) {
+        return false;
+    }
+
+    @Override
+    public boolean addPotionEffects( Collection<PotionEffect> collection ) {
+        return false;
+    }
+
+    @Override
+    public boolean hasPotionEffect( PotionEffectType potionEffectType ) {
+        return false;
+    }
+
+    @Override
+    public PotionEffect getPotionEffect( PotionEffectType potionEffectType ) {
+        return null;
+    }
+
+    @Override
+    public void removePotionEffect( PotionEffectType potionEffectType ) {
+
+    }
+
+    @Override
+    public Collection<PotionEffect> getActivePotionEffects() {
+        return null;
+    }
+
+    @Override
+    public boolean hasLineOfSight( Entity entity ) {
+        return false;
+    }
+
+    @Override
+    public boolean getRemoveWhenFarAway() {
+        return false;
+    }
+
+    @Override
+    public void setRemoveWhenFarAway( boolean b ) {
+
+    }
+
+    @Override
+    public EntityEquipment getEquipment() {
+        return null;
+    }
+
+    @Override
+    public void setCanPickupItems( boolean b ) {
+
+    }
+
+    @Override
+    public boolean getCanPickupItems() {
+        return false;
+    }
+
+    @Override
+    public boolean isLeashed() {
+        return false;
+    }
+
+    @Override
+    public Entity getLeashHolder() throws IllegalStateException {
+        return null;
+    }
+
+    @Override
+    public boolean setLeashHolder( Entity entity ) {
+        return false;
+    }
+
+    @Override
+    public boolean isGliding() {
+        return false;
+    }
+
+    @Override
+    public void setGliding( boolean b ) {
+
+    }
+
+    @Override
+    public void setAI( boolean b ) {
+
+    }
+
+    @Override
+    public boolean hasAI() {
+        return false;
+    }
+
+    @Override
+    public void setCollidable( boolean b ) {
+
+    }
+
+    @Override
+    public boolean isCollidable() {
+        return false;
+    }
+
+    @Override
+    public AttributeInstance getAttribute( Attribute attribute ) {
+        return null;
+    }
+
+    @Override
+    public void damage( double v ) {
+
+    }
+
+    @Override
+    public void damage( double v, Entity entity ) {
+
+    }
+
+    @Override
+    public double getHealth() {
+        return 0;
+    }
+
+    @Override
+    public void setHealth( double v ) {
+
+    }
+
+    @Override
+    public double getMaxHealth() {
+        return 0;
+    }
+
+    @Override
+    public void setMaxHealth( double v ) {
+
+    }
+
+    @Override
+    public void resetMaxHealth() {
+
+    }
+
+    @Override
+    public Location getLocation() {
+        return null;
+    }
+
+    @Override
+    public Location getLocation( Location location ) {
+        return null;
+    }
+
+    @Override
+    public void setVelocity( Vector vector ) {
+
+    }
+
+    @Override
+    public Vector getVelocity() {
+        return null;
+    }
+
+    @Override
+    public double getHeight() {
+        return 0;
+    }
+
+    @Override
+    public double getWidth() {
+        return 0;
+    }
+
+    @Override
+    public boolean isOnGround() {
+        return false;
+    }
+
+    @Override
+    public World getWorld() {
+        return null;
+    }
+
+    @Override
+    public boolean teleport( Location location ) {
+        return false;
+    }
+
+    @Override
+    public boolean teleport( Location location, PlayerTeleportEvent.TeleportCause teleportCause ) {
+        return false;
+    }
+
+    @Override
+    public boolean teleport( Entity entity ) {
+        return false;
+    }
+
+    @Override
+    public boolean teleport( Entity entity, PlayerTeleportEvent.TeleportCause teleportCause ) {
+        return false;
+    }
+
+    @Override
+    public List<Entity> getNearbyEntities( double v, double v1, double v2 ) {
+        return null;
+    }
+
+    @Override
+    public int getEntityId() {
+        return 0;
+    }
+
+    @Override
+    public int getFireTicks() {
+        return 0;
+    }
+
+    @Override
+    public int getMaxFireTicks() {
+        return 0;
+    }
+
+    @Override
+    public void setFireTicks( int i ) {
+
+    }
+
+    @Override
+    public void remove() {
+
+    }
+
+    @Override
+    public boolean isDead() {
+        return false;
+    }
+
+    @Override
+    public boolean isValid() {
+        return false;
+    }
+
+    @Override
+    public void sendMessage( String s ) {
+
+    }
+
+    @Override
+    public void sendMessage( String[] strings ) {
+
+    }
+
+    @Override
+    public Server getServer() {
+        return null;
+    }
+
+    @Override
+    public Entity getPassenger() {
+        return null;
+    }
+
+    @Override
+    public boolean setPassenger( Entity entity ) {
+        return false;
+    }
+
+    @Override
+    public List<Entity> getPassengers() {
+        return null;
+    }
+
+    @Override
+    public boolean addPassenger( Entity entity ) {
+        return false;
+    }
+
+    @Override
+    public boolean removePassenger( Entity entity ) {
+        return false;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public boolean eject() {
+        return false;
+    }
+
+    @Override
+    public float getFallDistance() {
+        return 0;
+    }
+
+    @Override
+    public void setFallDistance( float v ) {
+
+    }
+
+    @Override
+    public void setLastDamageCause( EntityDamageEvent entityDamageEvent ) {
+
+    }
+
+    @Override
+    public EntityDamageEvent getLastDamageCause() {
+        return null;
+    }
+
+    @Override
+    public UUID getUniqueId() {
+        return uuid;
+    }
+
+    @Override
+    public int getTicksLived() {
+        return 0;
+    }
+
+    @Override
+    public void setTicksLived( int i ) {
+
+    }
+
+    @Override
+    public void playEffect( EntityEffect entityEffect ) {
+
     }
 
     @Override
     public EntityType getType() {
-        return EntityType.PLAYER;
+        return null;
     }
 
     @Override
-    public Map<String, Object> serialize() {
-        return Collections.emptyMap();
+    public boolean isInsideVehicle() {
+        return false;
+    }
+
+    @Override
+    public boolean leaveVehicle() {
+        return false;
+    }
+
+    @Override
+    public Entity getVehicle() {
+        return null;
+    }
+
+    @Override
+    public void setCustomNameVisible( boolean b ) {
+
+    }
+
+    @Override
+    public boolean isCustomNameVisible() {
+        return false;
+    }
+
+    @Override
+    public void setGlowing( boolean b ) {
+
+    }
+
+    @Override
+    public boolean isGlowing() {
+        return false;
+    }
+
+    @Override
+    public void setInvulnerable( boolean b ) {
+
+    }
+
+    @Override
+    public boolean isInvulnerable() {
+        return false;
+    }
+
+    @Override
+    public boolean isSilent() {
+        return false;
+    }
+
+    @Override
+    public void setSilent( boolean b ) {
+
+    }
+
+    @Override
+    public boolean hasGravity() {
+        return false;
+    }
+
+    @Override
+    public void setGravity( boolean b ) {
+
+    }
+
+    @Override
+    public int getPortalCooldown() {
+        return 0;
+    }
+
+    @Override
+    public void setPortalCooldown( int i ) {
+
+    }
+
+    @Override
+    public Set<String> getScoreboardTags() {
+        return null;
+    }
+
+    @Override
+    public boolean addScoreboardTag( String s ) {
+        return false;
+    }
+
+    @Override
+    public boolean removeScoreboardTag( String s ) {
+        return false;
+    }
+
+    @Override
+    public PistonMoveReaction getPistonMoveReaction() {
+        return null;
+    }
+
+    @Override
+    public String getCustomName() {
+        return null;
+    }
+
+    @Override
+    public void setCustomName( String s ) {
+
+    }
+
+    @Override
+    public void setMetadata( String s, MetadataValue metadataValue ) {
+
+    }
+
+    @Override
+    public List<MetadataValue> getMetadata( String s ) {
+        return null;
+    }
+
+    @Override
+    public boolean hasMetadata( String s ) {
+        return false;
+    }
+
+    @Override
+    public void removeMetadata( String s, Plugin plugin ) {
+
+    }
+
+    @Override
+    public boolean isPermissionSet( String s ) {
+        return false;
+    }
+
+    @Override
+    public boolean isPermissionSet( Permission permission ) {
+        return false;
+    }
+
+    @Override
+    public boolean hasPermission( String s ) {
+        return false;
+    }
+
+    @Override
+    public boolean hasPermission( Permission permission ) {
+        return false;
+    }
+
+    @Override
+    public PermissionAttachment addAttachment( Plugin plugin, String s, boolean b ) {
+        return null;
+    }
+
+    @Override
+    public PermissionAttachment addAttachment( Plugin plugin ) {
+        return null;
+    }
+
+    @Override
+    public PermissionAttachment addAttachment( Plugin plugin, String s, boolean b, int i ) {
+        return null;
+    }
+
+    @Override
+    public PermissionAttachment addAttachment( Plugin plugin, int i ) {
+        return null;
+    }
+
+    @Override
+    public void removeAttachment( PermissionAttachment permissionAttachment ) {
+
+    }
+
+    @Override
+    public void recalculatePermissions() {
+
+    }
+
+    @Override
+    public Set<PermissionAttachmentInfo> getEffectivePermissions() {
+        return null;
+    }
+
+    @Override
+    public boolean isOp() {
+        return false;
+    }
+
+    @Override
+    public void setOp( boolean b ) {
+
     }
 
     @Override
     public void sendPluginMessage( Plugin plugin, String s, byte[] bytes ) {
-        this.connectionHandler.sendMessage( new MessageS18PluginMessage( s, Unpooled.wrappedBuffer(  bytes ) ) );
+
     }
 
     @Override
     public Set<String> getListeningPluginChannels() {
-        return this.pluginMessageChannels;
+        return null;
+    }
+
+    @Override
+    public <T extends Projectile> T launchProjectile( Class<? extends T> aClass ) {
+        return null;
+    }
+
+    @Override
+    public <T extends Projectile> T launchProjectile( Class<? extends T> aClass, Vector vector ) {
+        return null;
     }
 }

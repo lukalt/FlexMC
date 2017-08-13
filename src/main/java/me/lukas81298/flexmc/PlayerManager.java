@@ -2,6 +2,10 @@ package me.lukas81298.flexmc;
 
 import me.lukas81298.flexmc.entity.FlexPlayer;
 import me.lukas81298.flexmc.io.message.play.server.MessageS2EPlayerList;
+import me.lukas81298.flexmc.util.EventFactory;
+import org.bukkit.Bukkit;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,7 +40,6 @@ public class PlayerManager {
         this.players.put( player.getUuid(), player );
         List<MessageS2EPlayerList.PlayerItem> items = new ArrayList<>();
         for ( FlexPlayer target : this.getOnlinePlayers() ) {
-            target.sendMessage( "§e" + player.getName() + " joined the game." );
             if( !target.equals( player ) ) {
                 target.getConnectionHandler().sendMessage( new MessageS2EPlayerList( MessageS2EPlayerList.Action.ADD_PLAYER,
                         Collections.singletonList( new MessageS2EPlayerList.PlayerItem().setUuid( player.getUuid() ).setName( player.getName() ).setGameMode( player.getGameMode() ).setPing( player.getLatency() ) ) ) );
@@ -47,16 +50,25 @@ public class PlayerManager {
         System.out.println( player.getName() + " (" + player.getUuid().toString() + ") logged in from " + player.getIpAddress() );
         player.spawnPlayer();
         player.getWorld().addEntity( player, true );
+
+        String joinMessage = EventFactory.call( new PlayerJoinEvent( player, "§e" + player.getName() + " joined the game." ) ).getJoinMessage();
+        if( joinMessage != null && !joinMessage.isEmpty() ) {
+            Bukkit.broadcastMessage( joinMessage );
+        }
+
     }
 
     public void handlePlayerQuit( FlexPlayer player ) {
         if( this.players.remove( player.getUuid() ) != null ) {
             this.getOnlinePlayers().forEach( (t) -> {
-                t.sendMessage( "§e" + player.getName() + " left the game" );
                 t.getConnectionHandler().sendMessage( new MessageS2EPlayerList( MessageS2EPlayerList.Action.REMOVE_PLAYER, Collections.singletonList( new MessageS2EPlayerList.PlayerItem().setUuid( player.getUuid() ) ) ) );
             } );
             System.out.println( player.getName() + " has disconnected" );
             player.getWorld().removeEntity( player );
+            String quitMessage = EventFactory.call( new PlayerQuitEvent( player,"§e" + player.getName() + " left the game"  ) ).getQuitMessage();
+            if( quitMessage != null && !quitMessage.isEmpty() ) {
+                Bukkit.broadcastMessage( quitMessage );
+            }
         }
     }
 }

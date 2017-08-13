@@ -11,6 +11,7 @@ import me.lukas81298.flexmc.entity.FlexItem;
 import me.lukas81298.flexmc.entity.FlexPlayer;
 import me.lukas81298.flexmc.io.message.play.server.*;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
+import me.lukas81298.flexmc.util.EventFactory;
 import me.lukas81298.flexmc.util.Vector3i;
 import me.lukas81298.flexmc.world.chunk.ChunkColumn;
 import me.lukas81298.flexmc.world.chunk.ChunkSection;
@@ -20,6 +21,7 @@ import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
+import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
@@ -182,10 +184,11 @@ public class FlexWorld implements World {
     }
 
     public void spawnItem( Location location, ItemStack itemStack ) {
-
         FlexItem item = new FlexItem( nextEntityId(), location, this );
         item.setItemStack( itemStack );
-        this.addEntity( item, false );
+        if( !EventFactory.call( new ItemSpawnEvent( item, location ) ).isCancelled() ) {
+            this.addEntity( item, false );
+        }
     }
 
     public void addEntity( FlexEntity FlexEntity, boolean changeWorld ) {

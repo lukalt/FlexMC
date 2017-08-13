@@ -2,6 +2,7 @@ package me.lukas81298.flexmc;
 
 import me.lukas81298.flexmc.entity.FlexPlayer;
 import me.lukas81298.flexmc.impl.scheduler.FlexScheduler;
+import me.lukas81298.flexmc.inventory.meta.FlexItemFactory;
 import org.bukkit.*;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.boss.BarColor;
@@ -12,14 +13,18 @@ import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.conversations.Conversation;
+import org.bukkit.conversations.ConversationAbandonedEvent;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.help.HelpMap;
 import org.bukkit.inventory.*;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.map.MapView;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.ServicesManager;
@@ -31,22 +36,44 @@ import org.bukkit.util.CachedServerIcon;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 /**
  * @author lukas
  * @since 13.08.2017
  */
-public class FlexServerImpl implements Server {
+public class FlexServerImpl implements Server, ConsoleCommandSender {
 
     private final FlexServer flex;
     private final FlexScheduler scheduler;
     private final Logger logger = Logger.getLogger( "Server" );
+    private final FlexItemFactory itemFactory = new FlexItemFactory();
     private volatile GameMode defaultGameMode = GameMode.SURVIVAL;
+    private final Map<Plugin,PermissionAttachment> permissionAttachments = new ConcurrentHashMap<>();
+    private final Set<String> bannedIps = ConcurrentHashMap.newKeySet();
 
     public FlexServerImpl( FlexServer flex ) {
         this.flex = flex;
         this.scheduler = new FlexScheduler();
+    }
+
+    @Override
+    public void sendMessage( String s ) {
+        logger.info( s );
+    }
+
+    @Override
+    public void sendMessage( String[] strings ) {
+        for ( String string : strings ) {
+            sendMessage( string );
+        }
+    }
+
+    @Override
+    public Server getServer() {
+        return this;
     }
 
     @Override
@@ -176,12 +203,12 @@ public class FlexServerImpl implements Server {
 
     @Override
     public Player getPlayer( String s ) {
-        return (Player) this.flex.getPlayerManager().getPlayer( s );
+        return this.flex.getPlayerManager().getPlayer( s );
     }
 
     @Override
     public Player getPlayerExact( String s ) {
-        return (Player) this.flex.getPlayerManager().getPlayer( s );
+        return this.flex.getPlayerManager().getPlayer( s );
     }
 
     @Override
@@ -189,7 +216,7 @@ public class FlexServerImpl implements Server {
         List<Player> players = new ArrayList<>();
         for ( FlexPlayer player : this.flex.getPlayerManager().getOnlinePlayers() ) {
             if( player.getName().toLowerCase().startsWith( s.toLowerCase() ) ) {
-                players.add( (Player) player );
+                players.add( player );
             }
         }
         return players;
@@ -197,7 +224,7 @@ public class FlexServerImpl implements Server {
 
     @Override
     public Player getPlayer( UUID uuid ) {
-        return (Player) this.flex.getPlayerManager().getPlayer( uuid );
+        return this.flex.getPlayerManager().getPlayer( uuid );
     }
 
     @Override
@@ -362,17 +389,17 @@ public class FlexServerImpl implements Server {
 
     @Override
     public Set<String> getIPBans() {
-        return Collections.emptySet();
+        return this.bannedIps;
     }
 
     @Override
     public void banIP( String s ) {
-
+        this.bannedIps.add( s );
     }
 
     @Override
     public void unbanIP( String s ) {
-
+        this.bannedIps.remove( s );
     }
 
     @Override
@@ -402,7 +429,7 @@ public class FlexServerImpl implements Server {
 
     @Override
     public ConsoleCommandSender getConsoleSender() {
-        return null;
+        return this;
     }
 
     @Override
@@ -493,42 +520,7 @@ public class FlexServerImpl implements Server {
 
     @Override
     public ItemFactory getItemFactory() {
-        return new ItemFactory() {
-            @Override
-            public ItemMeta getItemMeta( Material material ) {
-                return null;
-            }
-
-            @Override
-            public boolean isApplicable( ItemMeta itemMeta, ItemStack itemStack ) throws IllegalArgumentException {
-                return false;
-            }
-
-            @Override
-            public boolean isApplicable( ItemMeta itemMeta, Material material ) throws IllegalArgumentException {
-                return false;
-            }
-
-            @Override
-            public boolean equals( ItemMeta itemMeta, ItemMeta itemMeta1 ) throws IllegalArgumentException {
-                return false;
-            }
-
-            @Override
-            public ItemMeta asMetaFor( ItemMeta itemMeta, ItemStack itemStack ) throws IllegalArgumentException {
-                return itemMeta;
-            }
-
-            @Override
-            public ItemMeta asMetaFor( ItemMeta itemMeta, Material material ) throws IllegalArgumentException {
-                return itemMeta;
-            }
-
-            @Override
-            public Color getDefaultLeatherColor() {
-                return Color.GRAY;
-            }
-        };
+        return itemFactory;
     }
 
     @Override
@@ -542,12 +534,12 @@ public class FlexServerImpl implements Server {
     }
 
     @Override
-    public CachedServerIcon loadServerIcon( File file ) throws IllegalArgumentException, Exception {
+    public CachedServerIcon loadServerIcon( File file ) throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public CachedServerIcon loadServerIcon( BufferedImage bufferedImage ) throws IllegalArgumentException, Exception {
+    public CachedServerIcon loadServerIcon( BufferedImage bufferedImage ) throws Exception {
         throw new UnsupportedOperationException();
     }
 
@@ -593,11 +585,116 @@ public class FlexServerImpl implements Server {
 
     @Override
     public void sendPluginMessage( Plugin plugin, String s, byte[] bytes ) {
-
+        for ( FlexPlayer flexPlayer : this.flex.getPlayerManager().getOnlinePlayers() ) {
+            flexPlayer.sendPluginMessage( plugin, s, bytes );
+        }
     }
 
     @Override
     public Set<String> getListeningPluginChannels() {
         return Collections.emptySet();
+    }
+
+    @Override
+    public boolean isConversing() {
+        return false;
+    }
+
+    @Override
+    public void acceptConversationInput( String s ) {
+
+    }
+
+    @Override
+    public boolean beginConversation( Conversation conversation ) {
+        return false;
+    }
+
+    @Override
+    public void abandonConversation( Conversation conversation ) {
+
+    }
+
+    @Override
+    public void abandonConversation( Conversation conversation, ConversationAbandonedEvent conversationAbandonedEvent ) {
+
+    }
+
+    @Override
+    public void sendRawMessage( String s ) {
+        sendMessage( s );
+    }
+
+    @Override
+    public boolean isPermissionSet( String s ) {
+        return true;
+    }
+
+    @Override
+    public boolean isPermissionSet( Permission permission ) {
+        return true;
+    }
+
+    @Override
+    public boolean hasPermission( String s ) {
+        return true;
+    }
+
+    @Override
+    public boolean hasPermission( Permission permission ) {
+        return true;
+    }
+
+
+    @Override
+    public PermissionAttachment addAttachment( Plugin plugin, String s, boolean b ) {
+        PermissionAttachment permissionAttachment = this.addAttachment( plugin );
+        permissionAttachment.setPermission( s, b );
+        return permissionAttachment;
+    }
+
+    @Override
+    public PermissionAttachment addAttachment( Plugin plugin ) {
+        return this.permissionAttachments.computeIfAbsent( plugin, new Function<Plugin, PermissionAttachment>() {
+            @Override
+            public PermissionAttachment apply( Plugin plugin1 ) {
+                return new PermissionAttachment( plugin1, FlexServerImpl.this );
+            }
+        } );
+    }
+
+    @Override
+    public PermissionAttachment addAttachment( Plugin plugin, String s, boolean b, int i ) {
+        return this.addAttachment( plugin, s, b );
+    }
+
+    @Override
+    public PermissionAttachment addAttachment( Plugin plugin, int i ) {
+        return this.addAttachment( plugin );
+    }
+
+    @Override
+    public void removeAttachment( PermissionAttachment permissionAttachment ) {
+        this.permissionAttachments.entrySet().removeIf( (value) -> permissionAttachment.equals( value ) );
+    }
+
+    @Override
+    public void recalculatePermissions() {
+
+    }
+
+    @Override
+    public Set<PermissionAttachmentInfo> getEffectivePermissions() {
+        return Collections.emptySet();
+    }
+
+    @Override
+    public boolean isOp() {
+        return true;
+    }
+
+    @Override
+    public void setOp( boolean b ) {
+
     }
 }

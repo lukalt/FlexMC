@@ -23,7 +23,7 @@ import java.util.List;
  * @author lukas
  * @since 07.08.2017
  */
-public class PlayerInventory extends FlexInventory implements CraftingInput, org.bukkit.inventory.PlayerInventory {
+public class FlexPlayerInventory extends FlexInventory implements CraftingInput, org.bukkit.inventory.PlayerInventory {
 
     private final ItemStack[] armor = new ItemStack[4];
 
@@ -35,7 +35,7 @@ public class PlayerInventory extends FlexInventory implements CraftingInput, org
     private volatile ItemStack itemOffHand = null;
     private ItemStack[] craftingSlots = new ItemStack[5];
 
-    public PlayerInventory( FlexPlayer player ) {
+    public FlexPlayerInventory( FlexPlayer player ) {
         super( 36, (byte) 0, "Inventory" );
         this.viewers.add( player );
     }
