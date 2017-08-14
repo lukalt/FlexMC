@@ -682,9 +682,13 @@ public class FlexWorld implements World {
 
     @Override
     public Block getBlockAt( int i, int i1, int i2 ) {
+        return this.getBlock0( i, i1, i2, false );
+    }
+
+    public Block getBlock0( int i, int i1, int i2, boolean virtual ) {
         Vector3i position = new Vector3i( i, i1, i2 );
         BlockState state = this.getBlockAt( position );
-        return new FlexBlock( this, position, state );
+        return new FlexBlock( this, position, state, virtual );
     }
 
     @Override

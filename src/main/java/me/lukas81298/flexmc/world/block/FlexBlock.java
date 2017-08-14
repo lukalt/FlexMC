@@ -26,6 +26,7 @@ public class FlexBlock implements Block {
     private FlexWorld world;
     private Vector3i position;
     private me.lukas81298.flexmc.world.BlockState state;
+    private final boolean virtual;
 
     @Override
     public byte getData() {
@@ -113,45 +114,59 @@ public class FlexBlock implements Block {
     @Override
     public synchronized void setData( byte b ) {
         state = new me.lukas81298.flexmc.world.BlockState( getType(), b );
-        world.setBlock( position, state );
+        if( !virtual ) {
+            world.setBlock( position, state );
+        }
     }
 
     @Override
     public synchronized void setData( byte b, boolean b1 ) {
         state = new me.lukas81298.flexmc.world.BlockState( getType(), b );
-        world.setBlock( position, state );
+        if( !virtual ) {
+            world.setBlock( position, state );
+        }
     }
 
     @Override
     public synchronized void setType( Material material ) {
         state = new me.lukas81298.flexmc.world.BlockState( material, getData() );
-        world.setBlock( position, state );
+        if( !virtual ) {
+            world.setBlock( position, state );
+        }
     }
 
     @Override
     public synchronized void setType( Material material, boolean b ) {
         state = new me.lukas81298.flexmc.world.BlockState( material, getData() );
-        world.setBlock( position, state );
+        if( !virtual ) {
+            world.setBlock( position, state );
+        }
     }
 
     @Override
     public synchronized boolean setTypeId( int i ) {
         state = new me.lukas81298.flexmc.world.BlockState( i, getData() );
-        world.setBlock( position, state );
+        if( !virtual ) {
+            world.setBlock( position, state );
+        }
         return true;
     }
 
     @Override
     public synchronized boolean setTypeId( int i, boolean b ) {
         state = new me.lukas81298.flexmc.world.BlockState( i, getData() );
-        world.setBlock( position, state );
+        if( !virtual ) {
+            world.setBlock( position, state );
+        }
         return true;
     }
 
     @Override
     public synchronized boolean setTypeIdAndData( int i, byte b, boolean b1 ) {
         state = new me.lukas81298.flexmc.world.BlockState( i, b );
-        world.setBlock( position, state );
+        if( !virtual ) {
+            world.setBlock( position, state );
+        }
         return true;
     }
 

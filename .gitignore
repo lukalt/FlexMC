@@ -1,5 +1,9 @@
+# IntelliJ and Maven
 target/
-config/
 .idea/
 *.iml
+
+# Server files
 libs/
+config/
+plugins/

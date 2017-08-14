@@ -117,7 +117,11 @@ public class FlexServer{
                 commandMap = new SimpleCommandMap( server );
                 pluginManager = new SimplePluginManager( server, commandMap );
                 System.out.println( "Loading plugins..." );
-                pluginManager.loadPlugin( new File( "plugins" ) );
+                File plugins = new File( "plugins" );
+                if( !plugins.exists() ) {
+                    plugins.mkdir();
+                }
+                pluginManager.loadPlugin( plugins );
                 System.out.println( "Enabling plugins" );
                 for ( Plugin plugin : pluginManager.getPlugins() ) {
                     pluginManager.enablePlugin( plugin );

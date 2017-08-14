@@ -34,20 +34,18 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 
 import java.net.InetSocketAddress;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 /**
  * @author lukas
  * @since 05.08.2017
  */
 @EqualsAndHashCode( of = { "name", "uuid" }, callSuper = false )
-public class FlexPlayer extends FlexLivingEntity implements CommandSender, Player {
+public class FlexPlayer extends FlexLivingEntity implements Player {
 
     @Getter
     private final String name;
@@ -83,6 +81,9 @@ public class FlexPlayer extends FlexLivingEntity implements CommandSender, Playe
     private final Set<String> pluginMessageChannels = ConcurrentHashMap.newKeySet();
 
     private byte healthCounter = 0;
+
+    private final Map<Statistic, AtomicInteger> statistics = Collections.synchronizedMap( new EnumMap<>( Statistic.class ) );
+    private final Set<Achievement> achievements = ConcurrentHashMap.newKeySet();
 
     public FlexPlayer( int entityId, Location position, String name, UUID uuid, ConnectionHandler connectionHandler, FlexWorld world ) {
         super( entityId, position, world );
@@ -217,7 +218,6 @@ public class FlexPlayer extends FlexLivingEntity implements CommandSender, Playe
         }
     }
 
-    @Override
     public void sendMessage( BaseComponent... components ) {
         this.connectionHandler.sendMessage( new MessageS0FChatMessage( components, (byte) 0 ) );
     }
@@ -365,7 +365,7 @@ public class FlexPlayer extends FlexLivingEntity implements CommandSender, Playe
 
     @Override
     public void sendBlockChange( Location location, Material material, byte b ) {
-
+        sendBlockChange( location, material.getId(), b );
     }
 
     @Override
@@ -396,47 +396,58 @@ public class FlexPlayer extends FlexLivingEntity implements CommandSender, Playe
 
     @Override
     public void awardAchievement( Achievement achievement ) {
-
+        this.achievements.add( achievement );
     }
 
     @Override
     public void removeAchievement( Achievement achievement ) {
-
+        this.achievements.remove( achievement );
     }
 
     @Override
     public boolean hasAchievement( Achievement achievement ) {
-        return false;
+        return this.achievements.contains( achievement );
     }
 
     @Override
     public void incrementStatistic( Statistic statistic ) throws IllegalArgumentException {
-
+        incrementStatistic( statistic, 1 );
     }
 
     @Override
     public void decrementStatistic( Statistic statistic ) throws IllegalArgumentException {
-
+        incrementStatistic( statistic, -1 );
     }
 
     @Override
     public void incrementStatistic( Statistic statistic, int i ) throws IllegalArgumentException {
-
+        this.statistics.computeIfAbsent( statistic, new Function<Statistic, AtomicInteger>() {
+            @Override
+            public AtomicInteger apply( Statistic statistic ) {
+                return new AtomicInteger();
+            }
+        } ).addAndGet( i );
     }
 
     @Override
     public void decrementStatistic( Statistic statistic, int i ) throws IllegalArgumentException {
-
+        incrementStatistic( statistic, -i );
     }
 
     @Override
     public void setStatistic( Statistic statistic, int i ) throws IllegalArgumentException {
-
+        this.statistics.computeIfAbsent( statistic, new Function<Statistic, AtomicInteger>() {
+            @Override
+            public AtomicInteger apply( Statistic statistic ) {
+                return new AtomicInteger();
+            }
+        } ).set( i );
     }
 
     @Override
     public int getStatistic( Statistic statistic ) throws IllegalArgumentException {
-        return 0;
+        AtomicInteger i = this.statistics.get( statistic );
+        return i == null ? 0 : i.get();
     }
 
     @Override
