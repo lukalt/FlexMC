@@ -84,11 +84,11 @@ public class FlexWorld implements World {
                 System.out.print( "Generating chunks for " + name + " [" );
                 float count = 64 * 64;
                 int k = 0;
-                int f = (int) (count / 30);
+                int f = (int) ( count / 30 );
                 for ( int x = -32; x < 32; x++ ) {
                     for ( int z = -32; z < 32; z++ ) {
                         generateColumn( x, z );
-                        if( k % f == 0 ) {
+                        if ( k % f == 0 ) {
                             System.out.print( "." );
                         }
 
@@ -154,15 +154,15 @@ public class FlexWorld implements World {
     }
 
     private void tickPlayers() {
-        for( FlexPlayer player : this.playerSet ) {
+        for ( FlexPlayer player : this.playerSet ) {
             player.tick();
         }
     }
 
     private void tickEntities() {
-        for( FlexEntity entity : this.entitySet ) {
+        for ( FlexEntity entity : this.entitySet ) {
             entity.tick();
-            if( !entity.isAlive() && !( entity instanceof FlexPlayer ) ) { // repawning is handled differently for playerSet
+            if ( !entity.isAlive() && !( entity instanceof FlexPlayer ) ) { // repawning is handled differently for playerSet
                 this.removeEntity( entity );
             }
         }
@@ -176,7 +176,7 @@ public class FlexWorld implements World {
             }
         } );
         int age = worldAge.incrementAndGet();
-        if( timeCounter == 20 ) {
+        if ( timeCounter == 20 ) {
             timeCounter = 0;
             for ( FlexPlayer player : playerSet ) {
                 player.getConnectionHandler().sendMessage( new MessageS47TimeUpdate( age, time ) );
@@ -189,13 +189,13 @@ public class FlexWorld implements World {
     public void spawnItem( Location location, ItemStack itemStack ) {
         FlexItem item = new FlexItem( nextEntityId(), location, this );
         item.setItemStack( itemStack );
-        if( !EventFactory.call( new ItemSpawnEvent( item, location ) ).isCancelled() ) {
+        if ( !EventFactory.call( new ItemSpawnEvent( item, location ) ).isCancelled() ) {
             this.addEntity( item, false );
         }
     }
 
     public void addEntity( FlexEntity FlexEntity, boolean changeWorld ) {
-        if( changeWorld ) {
+        if ( changeWorld ) {
             FlexEntity.changeWorld( this, nextEntityId() );
         }
         if ( FlexEntity instanceof FlexPlayer ) {
@@ -210,10 +210,10 @@ public class FlexWorld implements World {
             }
         } else {
             this.entitySet.add( FlexEntity );
-            if( FlexEntity instanceof EntityObject ) {
-                byte t = ((EntityObject) FlexEntity).getObjectType();
+            if ( FlexEntity instanceof EntityObject ) {
+                byte t = ( (EntityObject) FlexEntity ).getObjectType();
                 Location l = FlexEntity.getLocation();
-                for( FlexPlayer player : playerSet ) {
+                for ( FlexPlayer player : playerSet ) {
                     player.getConnectionHandler().sendMessage( new MessageS00SpawnObject( FlexEntity.getEntityId(), UUID.randomUUID(), t, l.getX(), l.getY(), l.getZ(), 3F, 3F ) );
                     player.getConnectionHandler().sendMessage( new MessageS3CEntityMetaData( FlexEntity.getEntityId(), FlexEntity.getMetaData() ) );
                 }
@@ -236,7 +236,7 @@ public class FlexWorld implements World {
         } else {
             this.entitySet.remove( FlexEntity );
         }
-        for( FlexPlayer player : this.playerSet ) {
+        for ( FlexPlayer player : this.playerSet ) {
             player.getConnectionHandler().sendMessage( new MessageS32DestroyEntities( FlexEntity.getEntityId() ) );
         }
     }
@@ -261,22 +261,22 @@ public class FlexWorld implements World {
 
     @Override
     public long getTime() {
-        return 0;
+        return time.get();
     }
 
     @Override
     public void setTime( long l ) {
-
+        this.time.set( (int) l );
     }
 
     @Override
     public long getFullTime() {
-        return 0;
+        return this.worldAge.get();
     }
 
     @Override
     public void setFullTime( long l ) {
-
+        this.worldAge.set( (int) l );
     }
 
     @Override
@@ -346,7 +346,7 @@ public class FlexWorld implements World {
 
     @Override
     public Environment getEnvironment() {
-        return null;
+        return Environment.NORMAL;
     }
 
     @Override
@@ -506,7 +506,7 @@ public class FlexWorld implements World {
 
     @Override
     public WorldType getWorldType() {
-        return null;
+        return WorldType.NORMAL;
     }
 
     @Override
@@ -725,7 +725,13 @@ public class FlexWorld implements World {
         this.chunkLock.readLock().lock();
         try {
             int i = x / 16;
+            if ( x < 0 ) {
+                i--;
+            }
             int j = z / 16;
+            if ( z < 0 ) {
+                j--;
+            }
             TByteObjectMap<ChunkColumn> map = this.columns.get( (byte) i );
             if ( map == null ) {
                 return null;
@@ -875,7 +881,7 @@ public class FlexWorld implements World {
     public List<LivingEntity> getLivingEntities() {
         List<LivingEntity> livingEntities = new ArrayList<>();
         for ( FlexEntity flexEntity : entitySet ) {
-            if( flexEntity instanceof LivingEntity ) {
+            if ( flexEntity instanceof LivingEntity ) {
                 livingEntities.add( (LivingEntity) flexEntity );
             }
         }
@@ -891,7 +897,7 @@ public class FlexWorld implements World {
     public <T extends Entity> Collection<T> getEntitiesByClass( Class<T> aClass ) {
         List<T> filteredEnties = new ArrayList<>();
         for ( FlexEntity flexEntity : entitySet ) {
-            if( aClass.isAssignableFrom( flexEntity.getClass() ) ) {
+            if ( aClass.isAssignableFrom( flexEntity.getClass() ) ) {
                 filteredEnties.add( (T) flexEntity );
             }
         }
@@ -912,7 +918,7 @@ public class FlexWorld implements World {
     public Collection<Entity> getNearbyEntities( Location location, double v, double v1, double v2 ) {
         List<Entity> nearbyEntities = new ArrayList<>();
         for ( FlexEntity flexEntity : entitySet ) {
-            if( Math.abs( flexEntity.getLocation().getX() - location.getX() ) < v
+            if ( Math.abs( flexEntity.getLocation().getX() - location.getX() ) < v
                     && Math.abs( flexEntity.getLocation().getY() - location.getY() ) < v1
                     && Math.abs( flexEntity.getLocation().getZ() - location.getZ() ) < v2 ) {
                 nearbyEntities.add( flexEntity );
@@ -931,7 +937,7 @@ public class FlexWorld implements World {
         try {
             ChunkColumn chunkColumnColumn = new ChunkColumn( x, z, this );
             for ( int i = 0; i < chunkColumnColumn.getSections().length; i++ ) {
-                ChunkSection section = new ChunkSection(  chunkColumnColumn );
+                ChunkSection section = new ChunkSection( chunkColumnColumn );
                 chunkColumnColumn.getSections()[i] = section;
             }
             this.generator.generate( chunkColumnColumn );
@@ -966,7 +972,7 @@ public class FlexWorld implements World {
         ChunkColumn column = this.getChunkAt( position.getX(), position.getZ() );
         int sectionIndex = position.getY() / 16;
         ChunkSection section = column.getSections()[sectionIndex];
-        int i = section.getBlock( fixIndex( position.getX() % 16 ), position.getY() % 16, fixIndex( position.getZ() % 16 ) );
+        int i = section.getBlock( position.getX() & 0xF, position.getZ() & 0xF, position.getY() & 0xF );
         int type = i >> 4;
         int data = i & 15;
         return new BlockState( type, data );
@@ -977,13 +983,13 @@ public class FlexWorld implements World {
         int sectionIndex = position.getY() / 16;
         ChunkSection section = column.getSections()[sectionIndex];
         section.setBlock( fixIndex( position.getX() % 16 ), position.getY() % 16, fixIndex( position.getZ() % 16 ), state.getTypeId(), state.getData() );
-        for( FlexPlayer player : this.playerSet ) {
+        for ( FlexPlayer player : this.playerSet ) {
             player.getConnectionHandler().sendMessage( new MessageS0BBlockChange( position, state ) );
         }
     }
 
     private int fixIndex( int z ) {
-        if( z >= 0 ) {
+        if ( z >= 0 ) {
             return z;
         }
         return 16 + z;

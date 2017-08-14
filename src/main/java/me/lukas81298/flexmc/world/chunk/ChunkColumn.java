@@ -123,8 +123,7 @@ public class ChunkColumn implements Chunk, ChunkSnapshot {
 
     public BlockState getBlockAt( int x, int y, int z ) {
         ChunkSection section = this.sections[ y / 16 ];
-        y = y % 16;
-        int j = section.getBlock( x, y, z );
+        int j = section.getBlock( x, y & 0xF, z );
         int type = j >> 4;
         int data = j & 15;
         return new BlockState( type, data );
