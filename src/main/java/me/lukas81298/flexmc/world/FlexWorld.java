@@ -43,6 +43,7 @@ import java.util.function.IntUnaryOperator;
  * @author lukas
  * @since 06.08.2017
  */
+@SuppressWarnings( "deprecation" )
 public class FlexWorld implements World {
 
     private static final int maxWorldTicks = 180000;
@@ -63,6 +64,8 @@ public class FlexWorld implements World {
     private final AtomicInteger entityIdCounter = new AtomicInteger( 0 );
 
     private final ChunkGenerator generator = new OverWorldChunkGenerator();
+    @Getter
+    private final WorldBorder worldBorder = new FlexWorldBorder( this );
 
     @Getter
     private Difficulty difficulty = Difficulty.PEACEFUL;
@@ -75,6 +78,7 @@ public class FlexWorld implements World {
     private byte timeCounter = 0;
 
     private final UUID uid = UUID.randomUUID();
+    private final Map<String, String> gameRules = new ConcurrentHashMap<>();
 
     public FlexWorld( String name ) {
         this.name = name;
@@ -186,12 +190,13 @@ public class FlexWorld implements World {
         }
     }
 
-    public void spawnItem( Location location, ItemStack itemStack ) {
+    public FlexItem spawnItem( Location location, ItemStack itemStack ) {
         FlexItem item = new FlexItem( nextEntityId(), location, this );
         item.setItemStack( itemStack );
         if ( !EventFactory.call( new ItemSpawnEvent( item, location ) ).isCancelled() ) {
             this.addEntity( item, false );
         }
+        return item;
     }
 
     public void addEntity( FlexEntity FlexEntity, boolean changeWorld ) {
@@ -596,27 +601,23 @@ public class FlexWorld implements World {
 
     @Override
     public String[] getGameRules() {
-        return new String[0];
+        return gameRules.keySet().toArray( new String[ gameRules.keySet().size() ] );
     }
 
     @Override
     public String getGameRuleValue( String s ) {
-        return null;
+        return this.gameRules.get( s );
     }
 
     @Override
     public boolean setGameRuleValue( String s, String s1 ) {
-        return false;
+        this.gameRules.put( s, s1 );
+        return true;
     }
 
     @Override
     public boolean isGameRule( String s ) {
-        return false;
-    }
-
-    @Override
-    public WorldBorder getWorldBorder() {
-        return null;
+        return  "true".equals( this.getGameRuleValue( s ) );
     }
 
     @Override
@@ -703,22 +704,23 @@ public class FlexWorld implements World {
 
     @Override
     public int getHighestBlockYAt( int i, int i1 ) {
-        return 0;
+        ChunkColumn column = this.getChunkAt( i, i1 );
+        return column.getHighestYAt( i & 0xF, i1 & 0xF );
     }
 
     @Override
     public int getHighestBlockYAt( Location location ) {
-        return 0;
+        return getHighestBlockYAt( location.getBlockX(), location.getBlockZ() );
     }
 
     @Override
     public Block getHighestBlockAt( int i, int i1 ) {
-        return null;
+        return getBlockAt( i, getHighestBlockYAt( i, i1 ), i1 );
     }
 
     @Override
     public Block getHighestBlockAt( Location location ) {
-        return null;
+        return getHighestBlockAt( location.getBlockX(), location.getBlockZ() );
     }
 
     public ChunkColumn getChunkAt( int x, int z ) {
@@ -744,22 +746,23 @@ public class FlexWorld implements World {
 
     @Override
     public Chunk getChunkAt( Location location ) {
-        return null;
+        return this.getChunkAt( location.getBlockX(), location.getBlockZ() );
     }
 
     @Override
     public Chunk getChunkAt( Block block ) {
-        return null;
+        return this.getChunkAt( block.getX(), block.getZ() );
     }
 
     @Override
     public boolean isChunkLoaded( Chunk chunk ) {
-        return false;
+        return true;
     }
 
     @Override
     public Chunk[] getLoadedChunks() {
-        return new Chunk[0];
+        List<ChunkColumn> columns = this.getColumns();
+        return columns.toArray( new Chunk[ columns.size() ] );
     }
 
     @Override
@@ -794,12 +797,12 @@ public class FlexWorld implements World {
 
     @Override
     public boolean unloadChunk( int i, int i1 ) {
-        return false;
+        return this.getChunkAt( i, i1 ).unload();
     }
 
     @Override
     public boolean unloadChunk( int i, int i1, boolean b ) {
-        return false;
+        return this.getChunkAt( i, i1 ).unload( b );
     }
 
     @Override
@@ -829,12 +832,12 @@ public class FlexWorld implements World {
 
     @Override
     public org.bukkit.entity.Item dropItem( Location location, org.bukkit.inventory.ItemStack itemStack ) {
-        return null;
+        return spawnItem( location, itemStack );
     }
 
     @Override
     public org.bukkit.entity.Item dropItemNaturally( Location location, org.bukkit.inventory.ItemStack itemStack ) {
-        return null;
+        return spawnItem( location, itemStack );
     }
 
     @Override
@@ -982,7 +985,7 @@ public class FlexWorld implements World {
         ChunkColumn column = this.getChunkAt( position.getX(), position.getZ() );
         int sectionIndex = position.getY() / 16;
         ChunkSection section = column.getSections()[sectionIndex];
-        section.setBlock( fixIndex( position.getX() % 16 ), position.getY() % 16, fixIndex( position.getZ() % 16 ), state.getTypeId(), state.getData() );
+        section.setBlock( position.getX() & 0xF, position.getY() & 0xF, position.getZ() & 0xF, state.getTypeId(), state.getData() );
         for ( FlexPlayer player : this.playerSet ) {
             player.getConnectionHandler().sendMessage( new MessageS0BBlockChange( position, state ) );
         }
