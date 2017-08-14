@@ -24,7 +24,10 @@ public class ChatListener implements MessageInboundListener<MessageC02ChatMessag
         FlexPlayer player = connectionHandler.getPlayer();
         if( player != null && message.getMessage().length() < 256 ) {
             if( message.getMessage().startsWith( "/" ) ) {
-                player.sendMessage( "Unknown command. Type /help for help" );
+                String commandLine = message.getMessage().length() == 1 ? "" : message.getMessage().substring( 1 );
+                if( !Flex.getServer().getCommandMap().dispatch( player, commandLine ) ) {
+                    player.sendMessage( "Unknown command. Type /help for help" );
+                }
                 return;
             }
             PlayerChatEvent oldEvent = EventFactory.call( new PlayerChatEvent( player, message.getMessage(), "<%1$s> %2$s", new HashSet<>( Flex.getServer().getPlayerManager().getOnlinePlayers() ) ) );

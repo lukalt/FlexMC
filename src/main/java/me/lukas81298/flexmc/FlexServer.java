@@ -60,9 +60,10 @@ public class FlexServer{
     @Getter
     private RecipeManager recipeManager = new RecipeManager();
 
-    private final SimpleCommandMap commandMap = new SimpleCommandMap( null );
     @Getter
-    private final SimplePluginManager pluginManager = new SimplePluginManager( null, this.commandMap );
+    private SimpleCommandMap commandMap;
+    @Getter
+    private SimplePluginManager pluginManager;
     @Getter
     private final WorldManager worldManager = new WorldManager();
     @Getter
@@ -113,6 +114,8 @@ public class FlexServer{
 
                 server = new FlexServerImpl( FlexServer.this );
                 Bukkit.setServer( server );
+                commandMap = new SimpleCommandMap( server );
+                pluginManager = new SimplePluginManager( server, commandMap );
                 System.out.println( "Loading plugins..." );
                 pluginManager.loadPlugin( new File( "plugins" ) );
                 System.out.println( "Enabling plugins" );

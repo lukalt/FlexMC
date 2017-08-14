@@ -137,7 +137,7 @@ public class OverWorldChunkGenerator extends LayeredChunkGenerator {
     }
 
     private void generateTree( ChunkColumn column, int x, int z ) {
-        byte biome = column.getBiome( x, z );
+        byte biome = column.getRawBiome( x, z );
         switch ( biome ) {
             case 1:
                 column.setBlock( x, column.getHighestYAt( x, z ) + 1, z, new BlockState( 31, 1 ) );

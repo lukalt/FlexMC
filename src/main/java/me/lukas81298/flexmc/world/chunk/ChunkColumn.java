@@ -4,16 +4,19 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import me.lukas81298.flexmc.entity.FlexEntity;
+import me.lukas81298.flexmc.util.Vector3i;
 import me.lukas81298.flexmc.world.BlockState;
 import me.lukas81298.flexmc.world.FlexWorld;
-import org.bukkit.Chunk;
-import org.bukkit.ChunkSnapshot;
-import org.bukkit.Material;
-import org.bukkit.World;
+import me.lukas81298.flexmc.world.block.FlexBlock;
+import org.bukkit.*;
+import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -24,7 +27,7 @@ import java.util.UUID;
 @Getter
 @ToString
 @EqualsAndHashCode( of = { "x", "z" } )
-public class ChunkColumn implements Chunk {
+public class ChunkColumn implements Chunk, ChunkSnapshot {
 
     private final int x, z;
     private final ChunkSection[] sections;
@@ -41,8 +44,67 @@ public class ChunkColumn implements Chunk {
         Arrays.fill( biome, (byte) biomeId );
     }
 
-    public byte getBiome( int x, int z ) {
+    @Override
+    public String getWorldName() {
+        return this.world.getName();
+    }
+
+    @Override
+    public int getBlockTypeId( int i, int i1, int i2 ) {
+        return this.getBlockAt( i, i1, i2 ).getTypeId();
+    }
+
+    @Override
+    public int getBlockData( int i, int i1, int i2 ) {
+        return this.getBlockAt( i, i1, i2 ).getData();
+    }
+
+    @Override
+    public int getBlockSkyLight( int i, int i1, int i2 ) {
+        return 15;
+    }
+
+    @Override
+    public int getBlockEmittedLight( int i, int i1, int i2 ) {
+        return 15;
+    }
+
+    @Override
+    public int getHighestBlockYAt( int i, int i1 ) {
+        return 0;
+    }
+
+    @Override
+    public Biome getBiome( int i, int i1 ) {
+        int biome = this.getRawBiome( i, i1 );
+        if( biome == 127 ) {
+            return Biome.VOID;
+        }
+        return Biome.values()[ biome ];
+    }
+
+    public byte getRawBiome( int x, int z ) {
         return biome[ z * 16 | x ];
+    }
+
+    @Override
+    public double getRawBiomeTemperature( int i, int i1 ) {
+        return 0;
+    }
+
+    @Override
+    public double getRawBiomeRainfall( int i, int i1 ) {
+        return 0;
+    }
+
+    @Override
+    public long getCaptureFullTime() {
+        return 0;
+    }
+
+    @Override
+    public boolean isSectionEmpty( int i ) {
+        return this.sections[i].isEmpty();
     }
 
     public void setBiome( int x, int z, byte biome ) {
@@ -80,27 +142,41 @@ public class ChunkColumn implements Chunk {
 
     @Override
     public World getWorld() {
-        return null;
+        return this.world;
     }
 
     @Override
     public Block getBlock( int i, int i1, int i2 ) {
-        return null;
+        Vector3i position = new Vector3i( i, i1, i2 ); // todo change to absolute ccordinates
+        return new FlexBlock(  world, position, this.getBlockAt( i1, i1, i2 ) );
     }
 
     @Override
-    public ChunkSnapshot getChunkSnapshot() {
-        return null;
+    public ChunkSnapshot getChunkSnapshot(){
+        // we actually do not need chunk snapshots, thats just a dummy to prevent plugin breaking
+        return this;
     }
 
     @Override
     public ChunkSnapshot getChunkSnapshot( boolean b, boolean b1, boolean b2 ) {
-        return null;
+        return this;
     }
 
     @Override
     public Entity[] getEntities() {
-        return new Entity[0];
+        int minX = this.x * 16;
+        int minZ = this.z * 16;
+        int maxX = this.x + ( this.x < 0 ? -1 : 1 ) * 16;
+        int maxZ = this.x + ( this.x < 0 ? -1 : 1 ) * 16;
+
+        List<Entity> list = new ArrayList<>();
+        for ( FlexEntity flexEntity : this.world.getEntitySet() ) {
+            Location l = flexEntity.getLocation();
+            if( l.getX() > minX && l.getX() < maxX && l.getZ() > minZ && l.getZ() < maxZ ) {
+                list.add( flexEntity );
+            }
+        }
+        return list.toArray( new Entity[list.size()] );
     }
 
     @Override
@@ -110,7 +186,7 @@ public class ChunkColumn implements Chunk {
 
     @Override
     public boolean isLoaded() {
-        return false;
+        return true;
     }
 
     @Override

@@ -10,6 +10,7 @@ import me.lukas81298.flexmc.io.message.Message;
 import me.lukas81298.flexmc.util.Vector3i;
 import me.lukas81298.flexmc.world.BlockState;
 
+import java.util.Arrays;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -26,6 +27,20 @@ public class ChunkSection {
     @Getter private final ChunkColumn column;
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
+
+    public boolean isEmpty() {
+        this.lock.readLock().lock();
+        try {
+            for ( int block : blocks ) {
+                if( block != 0 ) {
+                    return false;
+                }
+            }
+            return true;
+        } finally {
+            this.lock.readLock().unlock();
+        }
+    }
 
     public ChunkSection( ChunkColumn column  ) {
         this.column = column;
