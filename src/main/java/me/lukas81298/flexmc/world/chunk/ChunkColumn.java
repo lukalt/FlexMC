@@ -147,7 +147,7 @@ public class ChunkColumn implements Chunk, ChunkSnapshot {
     @Override
     public Block getBlock( int i, int i1, int i2 ) {
         Vector3i position = new Vector3i( i, i1, i2 ); // todo change to absolute ccordinates
-        return new FlexBlock(  world, position, this.getBlockAt( i1, i1, i2 ) );
+        return new FlexBlock( world, position, this.getBlockAt( i1, i1, i2 ), false );
     }
 
     @Override

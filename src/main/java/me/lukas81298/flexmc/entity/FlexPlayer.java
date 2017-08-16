@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.lukas81298.flexmc.entity.metadata.EntityFlag;
 import me.lukas81298.flexmc.inventory.FlexPlayerInventory;
+import me.lukas81298.flexmc.io.message.play.client.MessageC02ChatMessage;
 import me.lukas81298.flexmc.io.message.play.client.MessageC04ClientSettings;
 import me.lukas81298.flexmc.io.message.play.server.*;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
@@ -199,7 +200,7 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
 
     @Override
     public void chat( String s ) {
-
+        connectionHandler.getConnectionManager().getListenerManager().invokeListeners( connectionHandler, new MessageC02ChatMessage( s ) );
     }
 
     @Override

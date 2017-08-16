@@ -979,7 +979,7 @@ public class FlexWorld implements World {
         ChunkColumn column = this.getChunkAt( position.getX(), position.getZ() );
         int sectionIndex = position.getY() / 16;
         ChunkSection section = column.getSections()[sectionIndex];
-        int i = section.getBlock( position.getX() & 0xF, position.getZ() & 0xF, position.getY() & 0xF );
+        int i = section.getBlock( position.getX() & 0xF, position.getY() & 0xF, position.getZ() & 0xF );
         int type = i >> 4;
         int data = i & 15;
         return new BlockState( type, data );

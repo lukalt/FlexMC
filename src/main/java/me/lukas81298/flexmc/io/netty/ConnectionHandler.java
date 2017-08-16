@@ -41,6 +41,7 @@ public class ConnectionHandler extends SimpleChannelInboundHandler<Message> {
     @Getter
     @Setter
     private ConnectionInfo connectionInfo;
+    @Getter
     private final ConnectionManager connectionManager;
 
     @Getter

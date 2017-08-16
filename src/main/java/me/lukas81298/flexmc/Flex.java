@@ -24,8 +24,6 @@ public class Flex {
 
         System.out.println( "Loading flex... Please wait" );
 
-        System.out.println( "Loading libraries..." );
-
         LibraryManager libraryManager = new LibraryManager();
         libraryManager.init();
 
