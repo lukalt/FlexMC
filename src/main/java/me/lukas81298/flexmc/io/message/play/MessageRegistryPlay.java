@@ -85,5 +85,7 @@ public class MessageRegistryPlay extends MessageRegistry {
         registerClientMessage( 0x1A, MessageC1AHeldItemChange.class );
         registerClientMessage( 0x1D, MessageC1DAnimation.class );
         registerClientMessage( 0x1F, MessageC1FBlockPlacement.class );
+        registerClientMessage( 0x20, MessageC20UseItem.class );
+
     }
 }

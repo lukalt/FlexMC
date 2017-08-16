@@ -69,7 +69,7 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
     private final Set<ChunkColumn> shownChunks = ConcurrentHashMap.newKeySet();
 
     @Setter
-    private int viewDistance = 7;
+    private int viewDistance = 8;
 
     @Setter
     private String displayName;
@@ -993,10 +993,8 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
     @Override
     public void teleport( Location l, boolean onGround ) {
         Location k = this.getLocation();
-        if ( l.getBlockX() / 16 != k.getBlockX() / 16 ) {
-            if ( l.getBlockZ() / 16 != k.getBlockZ() / 16 ) {
-                this.refreshShownChunks();
-            }
+        if ( ( l.getBlockX() / 16 != k.getBlockX() / 16 ) || (  l.getBlockZ() / 16 != k.getBlockZ() / 16 ) ) {
+            this.refreshShownChunks();
         }
         super.teleport( l, onGround );
         EventFactory.call( new PlayerMoveEvent( this, k, l ) );

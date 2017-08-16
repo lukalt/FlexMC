@@ -30,6 +30,10 @@ public class DiggingListener implements MessageInboundListener<MessageC14PlayerD
             FlexWorld world = player.getWorld();
             if( message.getStatus() == 2 ) {
                 BlockState previous = world.getBlockAt( message.getPosition() );
+                BlockSpec blockSpec = Blocks.getBlockSpec( previous.getTypeId() );
+                if( blockSpec != null ) {
+                    blockSpec.breakBlock( player, player.getWorld(), message.getPosition() );
+                }
                 world.setBlock( message.getPosition(), new BlockState( 0, 0 ) );
                 spawnItems( player, message.getPosition().toMidLocation( player.getWorld() ), previous );
                 ItemStack itemStack = player.getItemInHand();
@@ -43,6 +47,7 @@ public class DiggingListener implements MessageInboundListener<MessageC14PlayerD
                         }
                     }
                 }
+
             } else if( message.getStatus() ==  0 ) {
                 for( FlexPlayer t : world.getPlayerSet() ) {
                     t.getConnectionHandler().sendMessage( new MessageS08BlockBreakAnimation( player.getEntityId(), message.getPosition(), (byte) 1 ) );

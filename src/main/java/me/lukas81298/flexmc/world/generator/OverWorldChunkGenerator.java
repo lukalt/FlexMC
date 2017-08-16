@@ -46,7 +46,6 @@ public class OverWorldChunkGenerator extends LayeredChunkGenerator {
             int z = random.nextInt( size );
             int tx = 8 * 16 + random.nextInt( 3 * 16 );
             int tz = 8 * 16 + random.nextInt( 3 * 16 );
-          //  System.out.println( x + "," + z + "," + tx + "," + tz );
             graphics.fillOval( x, z, tx, tz );
         }
         /*try {
@@ -80,14 +79,22 @@ public class OverWorldChunkGenerator extends LayeredChunkGenerator {
         int cz = column.getZ() * 16 + size / 2;
         for ( int x = 0; x < 16; x++ ) {
             for ( int z = 0; z < 16; z++ ) {
-                byte biome = (byte) biomeGrid.getRGB( x + cx, z + cz );
-                column.setBiome( x, z, biome );
                 float height = Math.max( 0F, grid.get( x + cx, z + cz ) - .5F );
                 int v = (int) ( 50 * height );
+                byte biome = (byte) biomeGrid.getRGB( x + cx, z + cz );
+                if( v == 0 ) {
+                    biome = 0;
+                }
+                column.setBiome( x, z, biome );
+
+
                 for ( int i = 0; i < v; i++ ) {
 
                     BlockState type;
                     switch ( biome ) {
+                        case 0:
+                            type = new BlockState( Material.STATIONARY_WATER, 0 );
+                            break;
                         case 2:
                             type = new BlockState( i > v - 6 ? Material.SAND : Material.SANDSTONE );
                             break;

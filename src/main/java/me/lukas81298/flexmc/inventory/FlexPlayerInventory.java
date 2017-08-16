@@ -1,5 +1,6 @@
 package me.lukas81298.flexmc.inventory;
 
+import com.google.common.collect.Iterables;
 import lombok.Getter;
 import lombok.Setter;
 import me.lukas81298.flexmc.Flex;
@@ -308,12 +309,20 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
 
     @Override
     public ItemStack getItemInHand() {
-        return null;
+        return getItem( getOwner().getHeldItemSlot() );
     }
 
     @Override
     public void setItemInHand( ItemStack itemStack ) {
+        setItem( getOwner().getHeldItemSlot(), itemStack );
+    }
 
+    private FlexPlayer getOwner() {
+        FlexPlayer t = Iterables.getFirst( viewers, null );
+        if( t == null ) {
+            throw new NullPointerException();
+        }
+        return t;
     }
 
     @Override
