@@ -397,5 +397,4 @@ public abstract class FlexInventory implements Inventory {
             }
         };
     }
-
 }

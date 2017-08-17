@@ -34,7 +34,7 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
     @Setter
     @Getter
     private volatile ItemStack itemOffHand = null;
-    private ItemStack[] craftingSlots = new ItemStack[5];
+    private final ItemStack[] craftingSlots = new ItemStack[5];
 
     public FlexPlayerInventory( FlexPlayer player ) {
         super( 36, (byte) 0, "Inventory" );
@@ -73,12 +73,12 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
                     } else if ( currentlyInSlot != null && currentlyInSlot.getType() != Material.AIR && itemOnCursor == null ) {
                         itemOnCursor = currentlyInSlot;
                         setRawSlot( slot, null );
-                        if( slot == 0 ) {
+                        if ( slot == 0 ) {
                             for ( int i = 1; i < craftingSlots.length; i++ ) {
-                                ItemStack stack = craftingSlots[ i ];
-                                if( stack != null && stack.getType() != Material.AIR ) {
+                                ItemStack stack = craftingSlots[i];
+                                if ( stack != null && stack.getType() != Material.AIR ) {
                                     stack.setAmount( stack.getAmount() - 1 );
-                                    if( stack.getAmount() <= 0 ) {
+                                    if ( stack.getAmount() <= 0 ) {
                                         stack = null;
                                     }
                                     setRawSlot( (short) i, stack );
@@ -87,8 +87,21 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
                         }
                         System.out.println( "Picked up " + itemOnCursor );
                         return true;
+                    } else if ( currentlyInSlot != null ) {
+                        int remaining = getMaxStackSize() - currentlyInSlot.getAmount();
+                        int add = Math.min( remaining, itemOnCursor.getAmount() );
+                        currentlyInSlot.setAmount( currentlyInSlot.getAmount() + add );
+                        itemOnCursor.setAmount( itemOnCursor.getAmount() - add );
+                        if ( itemOnCursor.getAmount() <= 0 ) {
+                            itemOnCursor = null;
+                        }
+                        setRawSlot( slot, currentlyInSlot );
+                        System.out.println( "Added " + add + " to " + currentlyInSlot.toString() );
+                        return true;
                     } else {
+                        System.out.println( "dewrtz78" );
                         // empty slot clicked
+                        return true;
                     }
                     // left click
                 } else if ( button == 2 ) {
@@ -189,7 +202,7 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
         if ( slot < 5 ) {
             // crafting
             craftingSlots[slot] = itemStack;
-            if( slot > 0 ) {
+            if ( slot > 0 ) {
                 Recipe recipe = Flex.getServer().getRecipeManager().getRecipe( this );
                 if ( recipe != null ) {
                     setRawSlot( (short) 0, recipe.getResult() );
@@ -319,7 +332,7 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
 
     private FlexPlayer getOwner() {
         FlexPlayer t = Iterables.getFirst( viewers, null );
-        if( t == null ) {
+        if ( t == null ) {
             throw new NullPointerException();
         }
         return t;
@@ -350,7 +363,7 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
         int count = 0;
         int i = 0;
         for ( ItemStack craftingSlot : craftingSlots ) {
-            if( i != 0 ) {
+            if ( i != 0 ) {
                 if ( craftingSlot != null && craftingSlot.getType() != Material.AIR ) {
                     if ( craftingSlot.isSimilar( itemStack ) ) {
                         count++;
@@ -367,7 +380,7 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
         List<ItemStack> items = new ArrayList<>();
         int i = 0;
         for ( ItemStack craftingSlot : craftingSlots ) {
-            if( i != 0 ) {
+            if ( i != 0 ) {
                 if ( craftingSlot != null && craftingSlot.getType() != Material.AIR ) {
                     items.add( craftingSlot );
                 }
@@ -378,8 +391,25 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
     }
 
     @Override
+    public ItemStack[][] getInputArray() {
+        synchronized ( craftingSlots ) {
+            return new ItemStack[][]{ new ItemStack[]{ craftingSlots[1], craftingSlots[2] }, new ItemStack[]{ craftingSlots[3], craftingSlots[4] } };
+        }
+    }
+
+    @Override
     public int getInputSize() {
-        return 4;
+        return getInputHeight() * getInputWidth();
+    }
+
+    @Override
+    public int getInputHeight() {
+        return 2;
+    }
+
+    @Override
+    public int getInputWidth() {
+        return 2;
     }
 
     @Override
@@ -387,4 +417,18 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
         return InventoryType.PLAYER;
     }
 
+    public void resetCrafting() {
+        synchronized ( this.craftingSlots ) {
+            for ( int i = 0; i < craftingSlots.length; i++ ) {
+                ItemStack item = craftingSlots[ i ];
+                if( item != null ) {
+                    if( item.getType() != Material.AIR ) {
+                        getOwner().getWorld().dropItem( getOwner().getLocation(), item );
+                    }
+                    this.setRawSlot( (short) i, null );
+                }
+            }
+        }
+
+    }
 }

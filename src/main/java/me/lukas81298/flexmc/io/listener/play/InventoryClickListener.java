@@ -18,7 +18,6 @@ public class InventoryClickListener implements MessageInboundListener<MessageC07
             connectionHandler.sendMessage( new MessageS11ConfirmTransaction( (byte) 0, message.getAction(), confirm ) );
         } else {
             connectionHandler.sendMessage( new MessageS11ConfirmTransaction( (byte) message.getWindowId(), message.getAction(), false ) );
-            connectionHandler.getPlayer().getInventory().setContents( connectionHandler.getPlayer().getInventory().getContents() );
         }
     }
 

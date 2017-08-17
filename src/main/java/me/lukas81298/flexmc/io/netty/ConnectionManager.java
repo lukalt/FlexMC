@@ -53,6 +53,7 @@ public class ConnectionManager {
         this.listenerManager.registerListener( new EncryptionResponseListener() );
         this.listenerManager.registerListener( new InventoryClickListener() );
         this.listenerManager.registerListener( new ItemUseListener() );
+        this.listenerManager.registerListener( new CloseWindowListener() );
     }
 
     public MessageRegistry getRegistry( ConnectionHandler connectionHandler ) {

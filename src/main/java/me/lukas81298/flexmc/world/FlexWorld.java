@@ -995,13 +995,6 @@ public class FlexWorld implements World {
         }
     }
 
-    private int fixIndex( int z ) {
-        if ( z >= 0 ) {
-            return z;
-        }
-        return 16 + z;
-    }
-
     @Override
     public void setMetadata( String s, MetadataValue metadataValue ) {
 

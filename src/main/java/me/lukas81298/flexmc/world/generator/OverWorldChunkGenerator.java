@@ -35,7 +35,7 @@ public class OverWorldChunkGenerator extends LayeredChunkGenerator {
         Graphics graphics = biomeGrid.getGraphics();
         graphics.setColor( new Color( 1 ) );
         graphics.fillRect( 0, 0, size, size );
-        int specialBiomes = 10 + random.nextInt( 6 );
+        int specialBiomes = 16 + random.nextInt( 6 );
         List<Biome> biomes = new ArrayList<>();
         biomes.add( Biome.FOREST );
         biomes.add( Biome.DESERT );
@@ -147,7 +147,7 @@ public class OverWorldChunkGenerator extends LayeredChunkGenerator {
         byte biome = column.getRawBiome( x, z );
         switch ( biome ) {
             case 1:
-                column.setBlock( x, column.getHighestYAt( x, z ) + 1, z, new BlockState( 31, 1 ) );
+                column.setBlock( x, column.getHighestYAt( x, z ) + 1, z, new BlockState( Material.LONG_GRASS, 1 ) );
                 break;
             case 2:
                 int y = column.getHighestYAt( x, z ) + 1;

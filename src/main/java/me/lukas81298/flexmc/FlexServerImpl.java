@@ -3,7 +3,6 @@ package me.lukas81298.flexmc;
 import me.lukas81298.flexmc.entity.FlexPlayer;
 import me.lukas81298.flexmc.impl.scheduler.FlexScheduler;
 import me.lukas81298.flexmc.inventory.meta.FlexItemFactory;
-import me.lukas81298.flexmc.util.RedirectPrintWriter;
 import org.bukkit.*;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.boss.BarColor;
@@ -59,7 +58,7 @@ public class FlexServerImpl implements Server, ConsoleCommandSender {
         this.flex = flex;
         this.scheduler = new FlexScheduler();
         this.logger = Logger.getLogger( "Server" );
-        System.setOut( new RedirectPrintWriter( logger ) );
+      //  System.setOut( new RedirectPrintWriter( logger ) );
     }
 
     @Override

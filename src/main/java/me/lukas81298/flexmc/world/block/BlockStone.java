@@ -20,7 +20,7 @@ public class BlockStone extends BlockSpec {
     @Override
     public Collection<ItemStack> getDrops( FlexPlayer player, int data ) {
         ItemStack itemInHand = player.getItemInHand();
-        if( itemInHand == null || itemInHand.getType() == Material.AIR ) {
+        if( itemInHand == null || itemInHand.getType() == Material.AIR || !itemInHand.getType().name().contains( "PICKAXE" ) ) {
             return Collections.emptyList();
         }
         if( data == 0 ) {

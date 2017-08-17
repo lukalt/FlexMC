@@ -14,6 +14,12 @@ public interface CraftingInput {
 
     Collection<ItemStack> getInputs();
 
+    ItemStack[][] getInputArray();
+
     int getInputSize();
+
+    int getInputHeight();
+
+    int getInputWidth();
 
 }
