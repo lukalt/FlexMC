@@ -13,6 +13,7 @@ public class CloseWindowListener implements MessageInboundListener<MessageC08Clo
 
     @Override
     public void handle( ConnectionHandler connectionHandler, MessageC08CloseWindow message ) throws Exception {
+        connectionHandler.getPlayer().getOpenInventory().setTopInventory( null );
         connectionHandler.getPlayer().getInventory().resetCrafting();
         connectionHandler.sendMessage( new MessageS14WindowItems( (byte) 0, connectionHandler.getPlayer().getInventory().getRawSlotsArray() ) );
     }

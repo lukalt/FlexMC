@@ -17,6 +17,7 @@ import java.util.function.Function;
  * @author lukas
  * @since 04.08.2017
  */
+@SuppressWarnings( "unchecked" )
 public class ListenerManager {
 
     private final TMap<Class<? extends Message>, List<MessageInboundListener>> registered = new THashMap<>();

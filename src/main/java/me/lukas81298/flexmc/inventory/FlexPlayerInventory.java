@@ -42,7 +42,7 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
     private DragType dragType = DragType.NONE;
 
     public FlexPlayerInventory( FlexPlayer player ) {
-        super( 36, (byte) 0, "Inventory" );
+        super( 36, (byte) 0, "Inventory", "minecraft:crafting_table" );
         this.viewers.add( player );
     }
 
@@ -297,10 +297,8 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
                 Recipe recipe = Flex.getServer().getRecipeManager().getRecipe( this );
                 if ( recipe != null ) {
                     setRawSlot( (short) 0, recipe.getResult() );
-                    System.out.println( "Recipe found" );
                 } else {
                     setRawSlot( (short) 0, null );
-                    System.out.println( "no recipe found" );
                 }
             }
         } else if ( slot < 9 ) {

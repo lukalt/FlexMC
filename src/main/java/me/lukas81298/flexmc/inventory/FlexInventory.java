@@ -23,14 +23,20 @@ public abstract class FlexInventory implements Inventory {
 
     private ItemStack[] items;
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    @Getter
     private final byte windowId;
-    @Getter private final String title;
+    @Getter
+    private final String title;
     protected final Set<FlexPlayer> viewers = ConcurrentHashMap.newKeySet();
+    @Getter
+    private final String rawType;
 
-    public FlexInventory( int size, byte windowId, String title ) {
+
+    public FlexInventory( int size, byte windowId, String title, String rawType ) {
         this.items = new ItemStack[ size ];
         this.windowId = windowId;
         this.title = title;
+        this.rawType = rawType;
     }
 
     public void addItem( ItemStack itemStack ) {

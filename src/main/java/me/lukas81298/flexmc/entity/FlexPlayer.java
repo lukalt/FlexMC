@@ -5,12 +5,17 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import me.lukas81298.flexmc.entity.metadata.EntityFlag;
+import me.lukas81298.flexmc.inventory.FlexInventory;
+import me.lukas81298.flexmc.inventory.FlexInventoryView;
 import me.lukas81298.flexmc.inventory.FlexPlayerInventory;
+import me.lukas81298.flexmc.inventory.FlexWorkbenchInventory;
 import me.lukas81298.flexmc.io.message.play.client.MessageC02ChatMessage;
 import me.lukas81298.flexmc.io.message.play.client.MessageC04ClientSettings;
+import me.lukas81298.flexmc.io.message.play.client.MessageC08CloseWindow;
 import me.lukas81298.flexmc.io.message.play.server.*;
 import me.lukas81298.flexmc.io.netty.ConnectionHandler;
 import me.lukas81298.flexmc.util.EventFactory;
+import me.lukas81298.flexmc.util.IdProvider;
 import me.lukas81298.flexmc.util.Vector3i;
 import me.lukas81298.flexmc.world.BlockState;
 import me.lukas81298.flexmc.world.Dimension;
@@ -80,12 +85,18 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
     private Location spawnLocation;
     @Setter
     private MessageC04ClientSettings settings;
+    @Getter
+    private final IdProvider windowIdProvider = new IdProvider( (byte) 127 );
+
     private final Set<String> pluginMessageChannels = ConcurrentHashMap.newKeySet();
 
     private byte healthCounter = 0;
 
     private final Map<Statistic, AtomicInteger> statistics = Collections.synchronizedMap( new EnumMap<>( Statistic.class ) );
     private final Set<Achievement> achievements = ConcurrentHashMap.newKeySet();
+
+    @Getter
+    private FlexInventoryView openInventory;
 
     public FlexPlayer( int entityId, Location position, String name, UUID uuid, ConnectionHandler connectionHandler, FlexWorld world ) {
         super( entityId, position, world );
@@ -94,6 +105,7 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
         this.uuid = uuid;
         this.connectionHandler = connectionHandler;
         this.inventory = new FlexPlayerInventory( this );
+        this.openInventory = new FlexInventoryView( this );
     }
 
     public void spawnPlayer() {
@@ -907,18 +919,20 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
     }
 
     @Override
-    public InventoryView getOpenInventory() {
-        return null;
-    }
-
-    @Override
     public InventoryView openInventory( Inventory inventory ) {
-        return null;
+        if( !( inventory instanceof FlexInventory ) ) {
+            throw new IllegalArgumentException( "Inventory does not extend FlexInventory" );
+        }
+        FlexInventory flexInventory = (FlexInventory) inventory;
+        this.openInventory.setTopInventory( flexInventory );
+        this.connectionHandler.sendMessage( new MessageS13OpenWindow( flexInventory.getWindowId(), flexInventory.getRawType(), new TextComponent( flexInventory.getTitle() ),
+                (byte) flexInventory.getSize(), -1 ) );
+        return this.openInventory;
     }
 
     @Override
     public InventoryView openWorkbench( Location location, boolean b ) {
-        return null;
+        return openInventory( new FlexWorkbenchInventory( this.windowIdProvider.getNextId(), this ) );
     }
 
     @Override
@@ -943,7 +957,7 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
 
     @Override
     public void closeInventory() {
-
+        this.connectionHandler.sendMessage( new MessageC08CloseWindow() );
     }
 
     public ItemStack getItemInHand() {

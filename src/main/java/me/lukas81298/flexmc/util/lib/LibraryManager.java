@@ -60,7 +60,6 @@ public class LibraryManager {
         } else {
             try {
                 String hash = hash( targetFile );
-                System.out.println( targetFile.getName() + " has been hashed to " + hash );
                 if ( !hash.equals( library.getHash() ) ) {
                     System.out.println( "Hashes did not match, attempting to redownload from " + library.getUrl() );
                     download = true;
@@ -109,7 +108,6 @@ public class LibraryManager {
                 method.setAccessible( true );
             }
             method.invoke( systemClassLoader, url );
-            System.out.println( "added " + url.toString() + " to classpath" );
         } catch ( NoSuchMethodException | InvocationTargetException | IllegalAccessException e ) {
             throw new RuntimeException( e );
         }
