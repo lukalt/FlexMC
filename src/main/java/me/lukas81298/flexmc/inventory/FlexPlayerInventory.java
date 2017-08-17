@@ -1,16 +1,17 @@
 package me.lukas81298.flexmc.inventory;
 
 import com.google.common.collect.Iterables;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import me.lukas81298.flexmc.Flex;
 import me.lukas81298.flexmc.entity.FlexPlayer;
+import me.lukas81298.flexmc.inventory.crafting.CraftingInput;
+import me.lukas81298.flexmc.inventory.crafting.Recipe;
 import me.lukas81298.flexmc.io.message.play.server.MessageS16SetSlot;
 import me.lukas81298.flexmc.io.message.play.server.MessageS3FEntityEquipment;
-import me.lukas81298.flexmc.util.crafting.CraftingInput;
-import me.lukas81298.flexmc.util.crafting.Recipe;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryType;
@@ -36,6 +37,10 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
     private volatile ItemStack itemOffHand = null;
     private final ItemStack[] craftingSlots = new ItemStack[5];
 
+    private final TIntSet draggingSlots = new TIntHashSet();
+    @NonNull
+    private DragType dragType = DragType.NONE;
+
     public FlexPlayerInventory( FlexPlayer player ) {
         super( 36, (byte) 0, "Inventory" );
         this.viewers.add( player );
@@ -51,15 +56,12 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
 
     @Override
     public synchronized boolean click( FlexPlayer player, short slot, byte button, int mode, ItemStack itemStack ) {
-        if ( slot < 0 ) { // todo handle -999
-            return false;
-        }
-        ItemStack currentlyInSlot = this.getItemFromRawSlot( slot );
+        ItemStack currentlyInSlot = slot < 0 ? null : this.getItemFromRawSlot( slot );
         if ( mode != 2 && ( mode != 4 && !( button == 1 || button == 2 ) ) ) {
-            /*if ( !ItemStack.( currentlyInSlot, itemStack ) ) {
-                System.out.println( "Slots did not match: " + currentlyInSlot + " " + itemStack );
+            if ( !ItemStackConstants.equals( currentlyInSlot, itemStack ) ) {
+                System.out.println( "Slots did not match: " + ( currentlyInSlot == null ? ItemStackConstants.AIR : currentlyInSlot ) + " " + itemStack );
                 return false;
-            }*/
+            }
         }
 
         switch ( mode ) {
@@ -104,20 +106,11 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
                         return true;
                     }
                     // left click
-                } else if ( button == 2 ) {
-                    if ( itemOnCursor != null && itemOnCursor.getType() != Material.AIR ) {
-                        // todo i gave up here
-                    }
                 }
                 return false;
             case 1:
-                switch ( button ) {
-                    case 0:
-                        // left shift click
-                        break;
-                    case 1:
-                        // right shift click
-                        break;
+                if( currentlyInSlot != null ) {
+
                 }
                 break;
             case 2:
@@ -127,8 +120,7 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
                 ItemStack target = getItem( button );
                 setRawSlot( slot, target );
                 setItem( button, currentlyInSlot );
-                break;
-
+                return true;
             case 3:
                 // ignored for now
                 break;
@@ -149,23 +141,119 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
                         if ( currentlyInSlot != null && currentlyInSlot.getType() != Material.AIR ) {
                             player.dropItem( new ItemStack( currentlyInSlot.getType(), currentlyInSlot.getAmount(), currentlyInSlot.getDurability() ) );
                             setRawSlot( slot, null );
-                            return true;
                         }
                         break;
-                    case 2:
-                    case 3:
-                        // no action here
-                        break;
                 }
-                break;
+                return true;
             case 5:
-                TextComponent textComponent = new TextComponent( "Item dragging is not supported yet!" );
-                textComponent.setColor( ChatColor.RED );
-                player.sendMessage( textComponent );
-                break;
-            case 6:
+                switch ( button ) {
+                    case 0:
+                        dragType = DragType.LEFT;
+                        break;
+                    case 4:
+                        dragType = DragType.RIGHT;
+                        break;
+                    case 8:
+                        dragType = DragType.MIDDLE;
+                        break;
+                    case 1:
+                        if( dragType != DragType.LEFT ) {
+                            return false;
+                        }
+                        draggingSlots.add( slot );
+                        break;
+                    case 5:
+                        if( dragType != DragType.RIGHT ) {
+                            return false;
+                        }
+                        draggingSlots.add( slot );
+                        break;
+                    case 9:
+                        if( dragType != DragType.MIDDLE ) {
+                            return false;
+                        }
+                        draggingSlots.add( slot );
+                        break;
+                    case 2:
+                        if( dragType != DragType.LEFT ) {
+                            return false;
+                        }
+                        dragType = DragType.NONE;
 
-                break;
+                        if( !draggingSlots.isEmpty() ) {
+                            int perSlot = itemOnCursor.getAmount() / draggingSlots.size();
+                            int remaining = itemOnCursor.getAmount() % draggingSlots.size();
+
+                            draggingSlots.forEach( (s) -> {
+                                ItemStack clone = itemOnCursor.clone();
+                                clone.setAmount( perSlot );
+                                setRawSlot( (short) s, clone );
+                                return true;
+                            } );
+
+                            itemOnCursor.setAmount( remaining );
+                        }
+
+                        draggingSlots.clear();
+                        break;
+                    case 6:
+                        if( dragType != DragType.RIGHT ) {
+                            return false;
+                        }
+                        dragType = DragType.NONE;
+
+                        if( !draggingSlots.isEmpty() ) {
+                            int perSlot = draggingSlots.size();
+                            int remaining = itemOnCursor.getAmount() - perSlot;
+
+                            draggingSlots.forEach( (s) -> {
+                                ItemStack clone = itemOnCursor.clone();
+                                clone.setAmount( 1 );
+                                setRawSlot( (short) s, clone );
+                                return true;
+                            } );
+
+                            itemOnCursor.setAmount( remaining );
+                            if( itemOnCursor.getAmount() == 0 ) {
+                                itemOnCursor = null;
+                            }
+                        }
+                        draggingSlots.clear();
+                        break;
+                    case 10:
+                        if( dragType != DragType.MIDDLE ) {
+                            return false;
+                        }
+                        return false;
+                    default:
+                        return false;
+                }
+                return true;
+            case 6:
+                if( currentlyInSlot != null && currentlyInSlot.getType() != Material.AIR && currentlyInSlot.getAmount() < 64 ) {
+                    int s = -1;
+                    if( slot >= 36 && slot <= 44 ) {
+                        s = slot - 36;
+                    } else if( slot >= 9 && slot <= 35 ) {
+                        s = slot;
+                    }
+                    int i = 0;
+                    for( ItemStack stack : getContents() ) {
+                        if( currentlyInSlot.getAmount() >= 64 ) {
+                            break;
+                        }
+                        if( s != i && stack != null && stack.isSimilar( currentlyInSlot ) ) {
+                            int amount = Math.min( stack.getAmount(), 64 - currentlyInSlot.getAmount() );
+                            stack.setAmount( stack.getAmount() - amount );
+                            currentlyInSlot.setAmount( currentlyInSlot.getAmount() + amount );
+                            setItem( i, stack );
+                        }
+                        i++;
+                    }
+                    setRawSlot( slot, currentlyInSlot );
+                    System.out.println( "Collected to slot " + ItemStackConstants.toString( currentlyInSlot ) );
+                    return true;
+                }
         }
         return false;
     }
@@ -199,6 +287,9 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
     }
 
     private void setRawSlot( short slot, ItemStack itemStack ) {
+        if( slot == -999 ) {
+            return;
+        }
         if ( slot < 5 ) {
             // crafting
             craftingSlots[slot] = itemStack;
@@ -239,6 +330,17 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
         }
     }
 
+    public synchronized ItemStack[] getRawSlotsArray() {
+        ItemStack[] r = new ItemStack[ 46 ];
+        System.arraycopy( craftingSlots, 0, r, 0 , 5 );
+        System.arraycopy( armor, 0, r, 5, 4 );
+        ItemStack[] contents = this.getContents();
+        System.arraycopy( contents, 9, r, 9, 9 * 3 );
+        System.arraycopy( contents, 0, r, 36, 9 );
+        r[ 45 ] = itemOffHand;
+        return r;
+    }
+
     public ItemStack[] getArmorContents() {
         ItemStack[] copy = new ItemStack[4];
         System.arraycopy( armor, 0, copy, 0, 4 );
@@ -252,22 +354,22 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
 
     @Override
     public ItemStack getHelmet() {
-        return null;
+        return armor[0];
     }
 
     @Override
     public ItemStack getChestplate() {
-        return null;
+        return armor[1];
     }
 
     @Override
     public ItemStack getLeggings() {
-        return null;
+        return armor[2];
     }
 
     @Override
     public ItemStack getBoots() {
-        return null;
+        return armor[3];
     }
 
     @Override
@@ -282,42 +384,43 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
 
     @Override
     public void setHelmet( ItemStack itemStack ) {
-
+        setRawSlot( (short) 5, itemStack );
     }
 
     @Override
     public void setChestplate( ItemStack itemStack ) {
-
+        setRawSlot( (short) 6, itemStack );
     }
 
     @Override
     public void setLeggings( ItemStack itemStack ) {
-
+        setRawSlot( (short) 7, itemStack );
     }
 
     @Override
     public void setBoots( ItemStack itemStack ) {
-
+        setRawSlot( (short) 8, itemStack );
     }
 
     @Override
     public ItemStack getItemInMainHand() {
-        return null;
+        return getItemInHand();
     }
 
     @Override
     public void setItemInMainHand( ItemStack itemStack ) {
-
+        this.setItemInHand( itemStack );
     }
 
     @Override
     public ItemStack getItemInOffHand() {
-        return null;
+        return itemOffHand;
     }
 
     @Override
     public void setItemInOffHand( ItemStack itemStack ) {
-
+        itemOffHand = itemStack;
+        setRawSlot( (short) 45, itemStack );
     }
 
     @Override
@@ -340,12 +443,12 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
 
     @Override
     public int getHeldItemSlot() {
-        return 0;
+        return getOwner().getHeldItemSlot();
     }
 
     @Override
     public void setHeldItemSlot( int i ) {
-
+        getOwner().setHeldItemSlot( i );
     }
 
     @Override
@@ -355,7 +458,7 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
 
     @Override
     public HumanEntity getHolder() {
-        return null;
+        return getOwner();
     }
 
     @Override

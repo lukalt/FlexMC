@@ -1,4 +1,4 @@
-package me.lukas81298.flexmc.util.crafting.shape;
+package me.lukas81298.flexmc.inventory.crafting.shape;
 
 import gnu.trove.map.TCharObjectMap;
 import gnu.trove.map.hash.TCharObjectHashMap;
@@ -36,8 +36,8 @@ public class ShapeBuilder {
         return this.add( c, new ItemStack( material, ItemStackConstants.IGNORE_DATA_VALUE ) );
     }
 
-    public Shape build() {
-        return new Shape( palette, pattern );
+    public CompiledShape build() {
+        return new CompiledShape( palette, pattern );
     }
 
 }

@@ -53,7 +53,6 @@ public class FlexWorld implements World {
 
     private final ReadWriteLock chunkLock = new ReentrantReadWriteLock();
     private final TByteObjectMap<TByteObjectMap<ChunkColumn>> columns = new TByteObjectHashMap<>();
-
     @Getter
     private final Set<FlexEntity> entitySet = ConcurrentHashMap.newKeySet();
     @Getter
@@ -451,12 +450,12 @@ public class FlexWorld implements World {
 
     @Override
     public Biome getBiome( int i, int i1 ) {
-        return null;
+        return getChunkAt( i, i1 ).getBiome( i & 0xF, i1 & 0xF );
     }
 
     @Override
     public void setBiome( int i, int i1, Biome biome ) {
-
+        getChunkAt( i, i1 ).setBiome( i & 0xF, i1 & 0xF, (byte) biome.ordinal() );
     }
 
     @Override

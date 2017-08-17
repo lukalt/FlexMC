@@ -1,6 +1,6 @@
-package me.lukas81298.flexmc.util.crafting.shape;
+package me.lukas81298.flexmc.inventory.crafting.shape;
 
-import me.lukas81298.flexmc.util.crafting.CraftingInput;
+import me.lukas81298.flexmc.inventory.crafting.CraftingInput;
 
 /**
  * @author lukas

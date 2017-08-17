@@ -17,7 +17,7 @@ public class ItemStackConstants {
 
     public static String toString( ItemStack[][] f ) {
         List<String> s = new ArrayList<>();
-        for( ItemStack[] t : f ) {
+        for ( ItemStack[] t : f ) {
             s.add( toString( t ) );
         }
         return "[" + String.join( ",", s ) + "]";
@@ -26,9 +26,9 @@ public class ItemStackConstants {
     public static String toString( ItemStack[] t ) {
         StringBuilder builder = new StringBuilder();
         builder.append( "[" );
-        for( int i = 0; i < t.length; i++ ) {
+        for ( int i = 0; i < t.length; i++ ) {
             builder.append( toString( t[i] ) );
-            if( i < t.length - 1 ) {
+            if ( i < t.length - 1 ) {
                 builder.append( "," );
             }
         }
@@ -36,8 +36,18 @@ public class ItemStackConstants {
         return builder.toString();
     }
 
-    public static String toString( ItemStack t)  {
+    public static String toString( ItemStack t ) {
         return t == null ? "null" : ( t.getType().name() + ":" + t.getAmount() + ":" + t.getDurability() );
+    }
+
+    public static boolean equals( ItemStack a, ItemStack b ) {
+        if( a == null ) {
+            a = ItemStackConstants.AIR;
+        }
+        if( b == null ) {
+            b = ItemStackConstants.AIR;
+        }
+        return a == b || ( a.getType() == b.getType() && a.getAmount() == b.getAmount() && a.getDurability() == b.getDurability() );
     }
 
 }

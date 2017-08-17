@@ -64,6 +64,7 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
     @Getter
     private final FlexPlayerInventory inventory;
     @Getter
+    @Setter
     private volatile int heldItemSlot = 0;
     private AtomicInteger foodLevel = new AtomicInteger( 20 );
     private final Set<ChunkColumn> shownChunks = ConcurrentHashMap.newKeySet();
@@ -101,20 +102,27 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
         connectionHandler.sendMessage( new MessageS46SpawnPosition( new Vector3i( 0, 10, 0 ) ) );
         connectionHandler.sendMessage( new MessageS2CPlayerAbilities( (byte) 0, .2F, .2F ) );
         connectionHandler.sendMessage( new MessageS2FPlayerPositionAndLook( getLocation().getX(), getLocation().getY(), getLocation().getZ(), 0F, 0F, (byte) 0, 0 ) );
-        this.refreshShownChunks();
+        this.refreshShownChunks( true );
         inventory.addItem( new ItemStack( 278, 1 ) );
         inventory.addItem( new ItemStack( 279, 1 ) );
         inventory.addItem( new ItemStack( 277, 1 ) );
         inventory.addItem( new ItemStack( 276, 1 ) );
-        for ( int i = 4; i < 10; i++ ) {
-            getInventory().setItem( i, new ItemStack( Material.LOG ) );
-        }
+        inventory.addItem( new ItemStack( Material.LOG, 16 ) );
     }
 
-    public void refreshShownChunks() {
+    public void refreshShownChunks( boolean first ) {
         Location location = this.getLocation();
         int x = location.getBlockX() / 16, z = location.getBlockZ() / 16;
-        for ( ChunkColumn column : this.getWorld().getColumns() ) {
+        List<ChunkColumn> columns = this.getWorld().getColumns();
+        if( first ) { // send the chunks close to the player first so they do not glitch in void
+            columns.sort( new Comparator<ChunkColumn>() {
+                @Override
+                public int compare( ChunkColumn o1, ChunkColumn o2 ) {
+                    return Double.compare( location.distanceSquared( new Location( getWorld(), o1.getX(), 0, o1.getZ() ) ), location.distanceSquared( new Location( getWorld(), o2.getX(), 0, o2.getZ() ) ) );
+                }
+            } );
+        }
+        for ( ChunkColumn column : columns ) {
             if ( Math.abs( x - column.getX() ) <= viewDistance && Math.abs( z - column.getZ() ) <= viewDistance ) {
                 if ( shownChunks.add( column ) ) {
                     this.connectionHandler.sendMessage( new MessageS20ChunkData( column ) );
@@ -994,7 +1002,7 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
     public void teleport( Location l, boolean onGround ) {
         Location k = this.getLocation();
         if ( ( l.getBlockX() / 16 != k.getBlockX() / 16 ) || (  l.getBlockZ() / 16 != k.getBlockZ() / 16 ) ) {
-            this.refreshShownChunks();
+            this.refreshShownChunks( false );
         }
         super.teleport( l, onGround );
         EventFactory.call( new PlayerMoveEvent( this, k, l ) );
@@ -1007,7 +1015,7 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
         setHealth( 20D );
         connectionHandler.sendMessage( new MessageS35Respawn( getWorld().getDimension(), getWorld().getDifficulty(), gameMode, "default" ) );
         shownChunks.clear();
-        refreshShownChunks();
+        refreshShownChunks( true );
         location = getWorld().getSpawnLocation();
         connectionHandler.sendMessage( new MessageS2FPlayerPositionAndLook( location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch(), (byte) 0, 0 ) );
         getInventory().setContents( new ItemStack[36] );

@@ -1,4 +1,4 @@
-package me.lukas81298.flexmc.util.crafting;
+package me.lukas81298.flexmc.inventory.crafting;
 
 import org.bukkit.inventory.ItemStack;
 

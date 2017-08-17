@@ -1,4 +1,4 @@
-package me.lukas81298.flexmc.util.crafting;
+package me.lukas81298.flexmc.inventory.crafting;
 
 import org.bukkit.inventory.ItemStack;
 
@@ -11,4 +11,6 @@ public interface Recipe {
     boolean apply( CraftingInput input );
 
     ItemStack getResult();
+
+    org.bukkit.inventory.Recipe toBukkitRecipe();
 }

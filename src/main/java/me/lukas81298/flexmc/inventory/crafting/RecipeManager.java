@@ -1,6 +1,6 @@
-package me.lukas81298.flexmc.util.crafting;
+package me.lukas81298.flexmc.inventory.crafting;
 
-import me.lukas81298.flexmc.util.crafting.shape.ShapeBuilder;
+import me.lukas81298.flexmc.inventory.crafting.shape.ShapeBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 

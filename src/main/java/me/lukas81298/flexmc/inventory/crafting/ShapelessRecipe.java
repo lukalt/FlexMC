@@ -1,4 +1,4 @@
-package me.lukas81298.flexmc.util.crafting;
+package me.lukas81298.flexmc.inventory.crafting;
 
 import org.bukkit.inventory.ItemStack;
 
@@ -32,5 +32,14 @@ public class ShapelessRecipe implements Recipe {
     @Override
     public ItemStack getResult() {
         return this.result;
+    }
+
+    @Override
+    public org.bukkit.inventory.Recipe toBukkitRecipe() {
+        org.bukkit.inventory.ShapelessRecipe c = new org.bukkit.inventory.ShapelessRecipe( result );
+        for ( ItemStack ingredient : ingredients ) {
+            c.addIngredient( ingredient.getAmount(), ingredient.getType(), ingredient.getDurability() );
+        }
+        return c;
     }
 }

@@ -1,22 +1,22 @@
-package me.lukas81298.flexmc.util.crafting.shape;
+package me.lukas81298.flexmc.inventory.crafting.shape;
 
 import gnu.trove.map.TCharObjectMap;
+import lombok.RequiredArgsConstructor;
 import me.lukas81298.flexmc.inventory.ItemStackConstants;
-import me.lukas81298.flexmc.util.crafting.CraftingInput;
+import me.lukas81298.flexmc.inventory.crafting.CraftingInput;
 import org.bukkit.inventory.ItemStack;
 
 /**
  * @author lukas
  * @since 17.08.2017
  */
-public class Shape implements RecipeShape {
+@RequiredArgsConstructor
+public class CompiledShape implements RecipeShape {
 
-    private final TCharObjectMap<ItemStack> match;
-    private final char[][] shape;
+    private final ItemStack[][] shape;
 
-    public Shape( TCharObjectMap<ItemStack> match, String... lines ) {
-        this.match = match;
-        this.match.putIfAbsent( '0', null );
+    public CompiledShape( TCharObjectMap<ItemStack> match, String... lines ) {
+        match.putIfAbsent( '0', null );
         char[][] array = new char[ lines.length ][];
         int lastLength = -1;
         for( int i = 0; i < lines.length; i++ ) {
@@ -31,7 +31,15 @@ public class Shape implements RecipeShape {
                 }
             }
         }
-        this.shape = array;
+        this.shape = new ItemStack[ array.length ][];
+        for( int i = 0; i < array.length; i++ ) {
+            char[] b = array[ i ];
+            ItemStack[] r = new ItemStack[ b.length ];
+            for( int k = 0; k < r.length; k++ ) {
+                r[ k ] = match.get( b[ k ] );
+            }
+            shape[ i ] = r;
+        }
     }
 
     @Override
@@ -39,7 +47,6 @@ public class Shape implements RecipeShape {
         if( this.getWidth() > input.getInputWidth() || this.getHeight() > input.getInputHeight() ) {
             return false;
         }
-        ItemStack[][] array = this.toItemStackArray();
 
         ItemStack[][] inputArray = input.getInputArray();
     //    System.out.println( "Matching " + ItemStackConstants.toString( inputArray ) );
@@ -47,7 +54,7 @@ public class Shape implements RecipeShape {
         for( int i = 0; i <= input.getInputWidth() - this.getWidth(); i++ ) {
             for( int j = 0; j <= input.getInputHeight() - this.getHeight(); j++ ) {
              //   System.out.println( "Matching for " + i + ", " + j );
-                if( matchSubArray( array, inputArray, i, j ) ) {
+                if( matchSubArray( inputArray, i, j ) ) {
                     return true;
                 }
             }
@@ -60,9 +67,9 @@ public class Shape implements RecipeShape {
         return expect == found || expect != null && found != null && expect.getType() == found.getType() && ( expect.getDurability() == ItemStackConstants.IGNORE_DATA_VALUE || expect.getDurability() == found.getDurability() );
     }
 
-    private boolean matchSubArray( ItemStack[][] shape, ItemStack[][] inputArray, int vi, int vj ) {
-        for( int i = 0; i < shape.length; i++ )  {
-            ItemStack[] l = shape[ i ];
+    private boolean matchSubArray( ItemStack[][] inputArray, int vi, int vj ) {
+        for( int i = 0; i < this.shape.length; i++ )  {
+            ItemStack[] l = this.shape[ i ];
             for( int j = 0; j < l.length; j++ ) {
                 ItemStack found = l[ j ];
                 ItemStack expected = inputArray[ i + vi ][ j + vj ];
@@ -73,20 +80,6 @@ public class Shape implements RecipeShape {
         }
         return true;
     }
-
-    private ItemStack[][] toItemStackArray() {
-        ItemStack[][] array = new ItemStack[ this.shape.length ][];
-        for( int i = 0; i < array.length; i++ ) {
-            char[] b = shape[ i ];
-            ItemStack[] r = new ItemStack[ b.length ];
-            for( int k = 0; k < r.length; k++ ) {
-                r[ k ] = match.get( b[ k ] );
-            }
-            array[ i ] = r;
-        }
-        return array;
-    }
-
     @Override
     public int getWidth() {
         return this.shape.length;
@@ -96,4 +89,5 @@ public class Shape implements RecipeShape {
     public int getHeight() {
         return this.shape[0].length;
     }
+
 }
