@@ -30,7 +30,9 @@ public class MessageS0BBlockChange extends Message {
 
     @Override
     public void write( ByteBuf buf ) throws IOException {
-        buf.writeLong( position.asLong() );
-        writeVarInt( block.getTypeId() << 4 | ( block.getData() & 15 ), buf );
+        long l = position.asLong();
+        buf.writeLong( l );
+        int value = block.getTypeId() << 4 | ( block.getData() & 15 );
+        writeVarInt( value, buf );
     }
 }

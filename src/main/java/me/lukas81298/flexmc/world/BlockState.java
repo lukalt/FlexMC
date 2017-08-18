@@ -3,6 +3,7 @@ package me.lukas81298.flexmc.world;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.bukkit.Material;
 
 /**
@@ -12,6 +13,7 @@ import org.bukkit.Material;
 @RequiredArgsConstructor
 @Getter
 @EqualsAndHashCode( callSuper = false )
+@ToString
 public class BlockState {
 
     private final Material type;

@@ -15,7 +15,7 @@ import java.io.IOException;
 @Getter
 @Setter
 @EqualsAndHashCode( callSuper = false )
-public class MessageS12CLoseWindow extends Message {
+public class MessageS12CloseWindow extends Message {
 
     private byte windowId;
 

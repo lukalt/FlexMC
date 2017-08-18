@@ -90,6 +90,10 @@ public abstract class FlexInventory implements Inventory {
         }
     }
 
+    public void onClose() {
+
+    }
+
     public void setContents( ItemStack[] items ) {
         this.lock.writeLock().lock();
         try {

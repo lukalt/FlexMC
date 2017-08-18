@@ -30,7 +30,7 @@ public class MessageRegistryPlay extends MessageRegistry {
         registerServerMessage( 0x0E, MessageS0ETabComeplete.class );
         registerServerMessage( 0x0F, MessageS0FChatMessage.class );
         registerServerMessage( 0x11, MessageS11ConfirmTransaction.class );
-        registerServerMessage( 0x12, MessageS12CLoseWindow.class );
+        registerServerMessage( 0x12, MessageS12CloseWindow.class );
         registerServerMessage( 0x13, MessageS13OpenWindow.class );
         registerServerMessage( 0x14, MessageS14WindowItems.class );
         registerServerMessage( 0x15, MessageS15WindowProperty.class );

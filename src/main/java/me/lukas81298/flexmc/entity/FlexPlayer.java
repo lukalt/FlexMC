@@ -94,6 +94,7 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
 
     private final Map<Statistic, AtomicInteger> statistics = Collections.synchronizedMap( new EnumMap<>( Statistic.class ) );
     private final Set<Achievement> achievements = ConcurrentHashMap.newKeySet();
+    private final Set<UUID> hiddenPlayers = ConcurrentHashMap.newKeySet();
 
     @Getter
     private FlexInventoryView openInventory;
@@ -643,7 +644,7 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
 
     @Override
     public boolean isOnline() {
-        return true;
+        return online.get();
     }
 
     @Override
@@ -707,18 +708,29 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
     }
 
     @Override
-    public void hidePlayer( Player player ) {
-
+    public void hidePlayer( Player target ) {
+        if( this.hiddenPlayers.add( target.getUniqueId() ) ) {
+            this.connectionHandler.sendMessage( new MessageS32DestroyEntities( target.getEntityId() ) );
+            this.connectionHandler.sendMessage( new MessageS2EPlayerList( MessageS2EPlayerList.Action.REMOVE_PLAYER, Collections.singletonList(
+                    new MessageS2EPlayerList.PlayerItem().setUuid( target.getUniqueId() ) )
+            ) );
+        }
     }
 
     @Override
     public void showPlayer( Player player ) {
-
+        FlexPlayer target = (FlexPlayer) player;
+        if( this.hiddenPlayers.contains( target.getUniqueId() ) ) {
+            this.connectionHandler.sendMessage( new MessageS2EPlayerList( MessageS2EPlayerList.Action.ADD_PLAYER,
+                    Collections.singletonList( new MessageS2EPlayerList.PlayerItem().setUuid( target.getUniqueId() )
+                            .setName( target.getName() ).setGameMode( target.getGameMode() ).setPing( 0 ) ) ) );
+            this.connectionHandler.sendMessage( new MessageS05SpawnPlayer( target.getEntityId(), target.getUniqueId(), target.getLocation(), target.metaData ) );
+        }
     }
 
     @Override
     public boolean canSee( Player player ) {
-        return false;
+        return this.hiddenPlayers.contains( player.getUniqueId() );
     }
 
     @Override
@@ -942,7 +954,7 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
 
     @Override
     public void openInventory( InventoryView inventoryView ) {
-
+        this.openInventory( inventoryView.getTopInventory() );
     }
 
     @Override
@@ -958,6 +970,10 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
     @Override
     public void closeInventory() {
         this.connectionHandler.sendMessage( new MessageC08CloseWindow() );
+        FlexInventory i = this.openInventory.getTopInventory();
+        if( i != null ) {
+            i.onClose();
+        }
     }
 
     public ItemStack getItemInHand() {

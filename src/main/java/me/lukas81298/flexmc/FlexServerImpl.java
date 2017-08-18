@@ -2,6 +2,7 @@ package me.lukas81298.flexmc;
 
 import me.lukas81298.flexmc.entity.FlexPlayer;
 import me.lukas81298.flexmc.impl.scheduler.FlexScheduler;
+import me.lukas81298.flexmc.impl.scoreboard.FlexScoreboardManager;
 import me.lukas81298.flexmc.inventory.meta.FlexItemFactory;
 import org.bukkit.*;
 import org.bukkit.advancement.Advancement;
@@ -53,6 +54,7 @@ public class FlexServerImpl implements Server, ConsoleCommandSender {
     private volatile GameMode defaultGameMode = GameMode.SURVIVAL;
     private final Map<Plugin,PermissionAttachment> permissionAttachments = new ConcurrentHashMap<>();
     private final Set<String> bannedIps = ConcurrentHashMap.newKeySet();
+    private final ScoreboardManager scoreboardManager = new FlexScoreboardManager();
 
     public FlexServerImpl( FlexServer flex ) {
         this.flex = flex;
@@ -528,7 +530,7 @@ public class FlexServerImpl implements Server, ConsoleCommandSender {
 
     @Override
     public ScoreboardManager getScoreboardManager() {
-        throw new UnsupportedOperationException();
+        return this.scoreboardManager;
     }
 
     @Override

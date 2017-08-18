@@ -31,8 +31,9 @@ public class Vector3i {
     public Vector3i add( int i, int j, int k ) {
         return new Vector3i( x + i, y + j, z + k );
     }
+
     public long asLong() {
-        return ( ( (long) x & 0x3FFFFFF ) << 38 | ( y & 0xFFF ) << 26 | z & 0x3FFFFFF );
+        return ( ( x & 0x3FFFFFFL ) << 38L | ( y & 0xFFFL ) << 26L | z & 0x3FFFFFFL );
     }
 
     public Vector3i clone() {
