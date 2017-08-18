@@ -1,6 +1,7 @@
 package me.lukas81298.flexmc.inventory;
 
 import lombok.Getter;
+import me.lukas81298.flexmc.Flex;
 import me.lukas81298.flexmc.entity.FlexPlayer;
 import me.lukas81298.flexmc.inventory.crafting.CraftingInput;
 import org.bukkit.Material;
@@ -37,6 +38,25 @@ public class FlexWorkbenchInventory extends FlexInventory implements CraftingInv
     @Override
     protected void setRawSlot( short slot, ItemStack itemStack ) {
         this.setItem( slot, itemStack );
+        if( slot > 0 ) {
+            me.lukas81298.flexmc.inventory.crafting.Recipe recipe = Flex.getServer().getRecipeManager().getRecipe( this );
+            if( recipe != null ) {
+                setItem( 0, recipe.getResult() );
+            }
+        }
+    }
+
+    @Override
+    protected void handleSlotClick( int slot ) {
+        if( slot == 0 ) {
+            for( int i = 1; i < getSize(); i++  ) {
+                ItemStack s = getItem( i );
+                if( s != null && s.getType() != Material.AIR ) {
+                    s.setAmount( s.getAmount() - 1 );
+                    setItem( slot, s.getAmount() <= 0 ? null : s );
+                }
+            }
+        }
     }
 
     @Override

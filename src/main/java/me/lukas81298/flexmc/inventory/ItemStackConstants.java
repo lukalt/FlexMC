@@ -41,10 +41,10 @@ public class ItemStackConstants {
     }
 
     public static boolean equals( ItemStack a, ItemStack b ) {
-        if( a == null ) {
+        if( a == null || a.getAmount() <= 0 ) {
             a = ItemStackConstants.AIR;
         }
-        if( b == null ) {
+        if( b == null || a.getAmount() <= 0 ) {
             b = ItemStackConstants.AIR;
         }
         return a == b || ( a.getType() == b.getType() && a.getAmount() == b.getAmount() && a.getDurability() == b.getDurability() );

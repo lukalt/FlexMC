@@ -121,6 +121,7 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
         inventory.addItem( new ItemStack( 277, 1 ) );
         inventory.addItem( new ItemStack( Material.WORKBENCH, 1 ) );
         inventory.addItem( new ItemStack( Material.LOG, 16 ) );
+        inventory.addItem( new ItemStack( Material.FURNACE ) );
     }
 
     public void refreshShownChunks( boolean first ) {

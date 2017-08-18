@@ -102,8 +102,8 @@ public abstract class FlexLivingEntity extends FlexEntity implements LivingEntit
                     @Override
                     public double applyAsDouble( double operand ) {
                         double finalFallDistance = operand + tempFallDistance;
-                        if( finalFallDistance > 2.5 ) {
-                            damage( finalFallDistance );
+                        if( finalFallDistance > 3 ) {
+                            damage( finalFallDistance * 0.8 );
                         }
                         return 0;
                     }

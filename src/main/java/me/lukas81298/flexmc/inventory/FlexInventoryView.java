@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 @RequiredArgsConstructor
 public class FlexInventoryView extends InventoryView {
 
+    @Getter
     private final FlexPlayer player;
 
     @Getter
@@ -35,16 +36,12 @@ public class FlexInventoryView extends InventoryView {
     }
 
     @Override
-    public FlexPlayer getPlayer() {
-        return this.player;
-    }
-
-    @Override
     public synchronized InventoryType getType() {
         return this.topInventory == null ? InventoryType.PLAYER : this.topInventory.getType();
     }
 
     public synchronized boolean click( int windowId, short slot, byte button, int mode, ItemStack itemStack ) {
+        System.out.println( windowId + " " + slot + " " + button + " " + mode + " " + itemStack );
         FlexInventory clickedInventory;
         if( windowId == 0 ) {
             clickedInventory = this.player.getInventory();
@@ -58,6 +55,7 @@ public class FlexInventoryView extends InventoryView {
             throw new IllegalArgumentException( "Clicked unknown window " + windowId );
         }
 
+        System.out.println( "Clicked inventory: " + clickedInventory.getName() );
         ItemStack currentlyInSlot = slot < 0 ? null : clickedInventory.getItemFromRawSlot( slot );
 
         if ( mode != 2 && ( mode != 4 && !( button == 1 || button == 2 ) ) ) {
