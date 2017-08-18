@@ -522,7 +522,7 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
         synchronized ( this.craftingSlots ) {
             for ( int i = 0; i < craftingSlots.length; i++ ) {
                 ItemStack item = craftingSlots[ i ];
-                if( item != null ) {
+                if( item != null && i > 0 ) {
                     if( item.getType() != Material.AIR ) {
                         getOwner().getWorld().dropItem( getOwner().getLocation(), item );
                     }

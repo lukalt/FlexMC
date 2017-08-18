@@ -32,6 +32,12 @@ public class Vector3i {
         return new Vector3i( x + i, y + j, z + k );
     }
 
+    public void modify( int i, int j, int k ) {
+        this.x += i;
+        this.y += j;
+        this.z += k;
+    }
+
     public long asLong() {
         return ( ( x & 0x3FFFFFFL ) << 38L | ( y & 0xFFFL ) << 26L | z & 0x3FFFFFFL );
     }

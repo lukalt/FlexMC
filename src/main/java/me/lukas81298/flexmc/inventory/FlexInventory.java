@@ -31,7 +31,6 @@ public abstract class FlexInventory implements Inventory {
     @Getter
     private final String rawType;
 
-
     public FlexInventory( int size, byte windowId, String title, String rawType ) {
         this.items = new ItemStack[ size ];
         this.windowId = windowId;

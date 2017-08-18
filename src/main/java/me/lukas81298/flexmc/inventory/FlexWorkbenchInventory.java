@@ -48,6 +48,7 @@ public class FlexWorkbenchInventory extends FlexInventory implements CraftingInv
         return itemStacks;
     }
 
+
     @Override
     public void setResult( ItemStack itemStack ) {
         this.setItem( 0, itemStack );

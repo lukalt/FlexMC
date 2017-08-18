@@ -119,7 +119,7 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
         inventory.addItem( new ItemStack( 278, 1 ) );
         inventory.addItem( new ItemStack( 279, 1 ) );
         inventory.addItem( new ItemStack( 277, 1 ) );
-        inventory.addItem( new ItemStack( 276, 1 ) );
+        inventory.addItem( new ItemStack( Material.WORKBENCH, 1 ) );
         inventory.addItem( new ItemStack( Material.LOG, 16 ) );
     }
 
@@ -937,8 +937,14 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
         }
         FlexInventory flexInventory = (FlexInventory) inventory;
         this.openInventory.setTopInventory( flexInventory );
+        byte size = (byte) flexInventory.getSize();
+        switch ( inventory.getType() ) {
+            case CRAFTING:
+            case FURNACE:
+                size = 0;
+        }
         this.connectionHandler.sendMessage( new MessageS13OpenWindow( flexInventory.getWindowId(), flexInventory.getRawType(), new TextComponent( flexInventory.getTitle() ),
-                (byte) flexInventory.getSize(), -1 ) );
+                size, -1 ) );
         return this.openInventory;
     }
 

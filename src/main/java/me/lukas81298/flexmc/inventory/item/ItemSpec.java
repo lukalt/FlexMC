@@ -23,4 +23,8 @@ public abstract class ItemSpec {
     public ItemStack breakBlock( FlexPlayer player, ItemStack itemStack ) {
         return itemStack;
     }
+
+    public void click( FlexPlayer player ) {
+
+    }
 }

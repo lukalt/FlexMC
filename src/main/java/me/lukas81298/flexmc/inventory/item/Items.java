@@ -29,6 +29,8 @@ public class Items {
         register( new ItemSpecDurability( 258, 251 ) );
         register( new ItemSpecDurability( 279, 33 ) );
         register( new ItemSpecDurability( 286, 1562 ) );
+
+        register( new ItemSpecWorkbench() );
     }
 
     private static void register( ItemSpec spec ) {
