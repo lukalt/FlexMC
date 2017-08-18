@@ -24,14 +24,19 @@ public class FlexWorkbenchInventory extends FlexInventory implements CraftingInv
     private final FlexPlayer player;
 
     public FlexWorkbenchInventory( byte windowId, FlexPlayer player ) {
-        super( 10, windowId, "Crafting", "minecraft:crafting_table" );
+        super( 10, windowId, "Crafting", "minecraft:crafting_table", 10 );
         this.viewers.add( player );
         this.player = player;
     }
 
     @Override
-    public boolean click( FlexPlayer player, short slot, byte button, int mode, ItemStack itemStack ) {
-        return false;
+    protected ItemStack getItemFromRawSlot( int slot ) {
+        return this.getItem( slot );
+    }
+
+    @Override
+    protected void setRawSlot( short slot, ItemStack itemStack ) {
+        this.setItem( slot, itemStack );
     }
 
     @Override

@@ -30,12 +30,15 @@ public abstract class FlexInventory implements Inventory {
     protected final Set<FlexPlayer> viewers = ConcurrentHashMap.newKeySet();
     @Getter
     private final String rawType;
+    @Getter
+    private final int specialSlots;
 
-    public FlexInventory( int size, byte windowId, String title, String rawType ) {
+    public FlexInventory( int size, byte windowId, String title, String rawType, int specialSlots ) {
         this.items = new ItemStack[ size ];
         this.windowId = windowId;
         this.title = title;
         this.rawType = rawType;
+        this.specialSlots = specialSlots;
     }
 
     public void addItem( ItemStack itemStack ) {
@@ -71,12 +74,12 @@ public abstract class FlexInventory implements Inventory {
 
     @Override
     public HashMap<Integer, ItemStack> addItem( ItemStack... itemStacks ) throws IllegalArgumentException {
-        return null;
+        return new HashMap<>();
     }
 
     @Override
     public HashMap<Integer, ItemStack> removeItem( ItemStack... itemStacks ) throws IllegalArgumentException {
-        return null;
+        return new HashMap<>();
     }
 
     private void setItem0( int slot, ItemStack itemStack ) {
@@ -87,6 +90,14 @@ public abstract class FlexInventory implements Inventory {
         for( FlexPlayer player : this.viewers ) {
             player.getConnectionHandler().sendMessage( new MessageS16SetSlot( windowId, (short) getRawSlow( slot ), itemStack == null ? ItemStackConstants.AIR : itemStack ) );
         }
+    }
+
+    protected abstract ItemStack getItemFromRawSlot( int slot );
+
+    protected abstract void setRawSlot( short slot, ItemStack itemStack );
+
+    protected void handleSlotClick( int slot ) {
+
     }
 
     public void onClose() {
@@ -372,8 +383,6 @@ public abstract class FlexInventory implements Inventory {
     protected int getRawSlow( int virtualSlot ) {
         return virtualSlot;
     }
-
-    public abstract boolean click( FlexPlayer player, short slot, byte button, int mode, ItemStack itemStack );
 
     @Override
     public void forEach( Consumer<? super ItemStack> action ) {

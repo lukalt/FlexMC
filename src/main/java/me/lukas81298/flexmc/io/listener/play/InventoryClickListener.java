@@ -14,14 +14,10 @@ public class InventoryClickListener implements MessageInboundListener<MessageC07
 
     @Override
     public void handle( ConnectionHandler connectionHandler, MessageC07ClickWindow message ) throws Exception {
-        if( message.getWindowId() == 0 ) {
-            boolean confirm = connectionHandler.getPlayer().getInventory().click( connectionHandler.getPlayer(), message.getSlot(), message.getButton(), message.getMode(), message.getItemStack() );
-            connectionHandler.sendMessage( new MessageS11ConfirmTransaction( (byte) 0, message.getAction(), confirm ) );
-            if( !confirm ) {
-                connectionHandler.sendMessage( new MessageS14WindowItems( (byte) 0, connectionHandler.getPlayer().getInventory().getRawSlotsArray() ) );
-            }
-        } else {
-            connectionHandler.sendMessage( new MessageS11ConfirmTransaction( (byte) message.getWindowId(), message.getAction(), false ) );
+        boolean confirm = connectionHandler.getPlayer().getOpenInventory().click( message.getWindowId(), message.getSlot(), message.getButton(), message.getMode(), message.getItemStack() );
+        connectionHandler.sendMessage( new MessageS11ConfirmTransaction( (byte) message.getWindowId(), message.getAction(), confirm ) );
+        if ( !confirm ) {
+            connectionHandler.sendMessage( new MessageS14WindowItems( (byte) message.getWindowId(), connectionHandler.getPlayer().getInventory().getRawSlotsArray() ) );
         }
     }
 
