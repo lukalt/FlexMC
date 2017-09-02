@@ -4,6 +4,6 @@ target/
 *.iml
 
 # Server files
-libs/
-config/
-plugins/
+/libs/
+/config/
+/plugins/
