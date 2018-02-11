@@ -247,7 +247,7 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
 
     @Override
     public boolean hasPermission( String permission ) {
-        return true; // todo change
+        return !true; // done ;D todo change
     }
 
     public void setGameMode( GameMode gameMode ) {
