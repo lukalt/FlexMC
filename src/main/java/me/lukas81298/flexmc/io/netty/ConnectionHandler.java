@@ -27,6 +27,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 /**
  * @author lukas
@@ -101,14 +102,24 @@ public class ConnectionHandler extends SimpleChannelInboundHandler<Message> {
     }
 
     public void sendMessage( Message message ) {
+        sendMessage( message, null );
+    }
+
+    public void sendMessage( Message message, Consumer<Void> done ) {
         if ( channelHandlerContext != null ) {
             if ( this.channelHandlerContext.channel().eventLoop().inEventLoop() ) {
                 flush( message );
+                if( done != null ) {
+                    done.accept( null );
+                }
             } else {
                 this.channelHandlerContext.channel().eventLoop().execute( new Runnable() {
                     @Override
                     public void run() {
                         flush( message );
+                        if( done != null ) {
+                            done.accept( null );
+                        }
                     }
                 } );
             }
@@ -126,12 +137,17 @@ public class ConnectionHandler extends SimpleChannelInboundHandler<Message> {
             sendMessage( new MessageS00Disconnect( "{\"text\": \"" + event.getKickMessage() + "\"}" ) );
             return;
         }
-        sendMessage( new MessageS02LoginSuccess( name, uuid.toString() ) );
-        System.out.println( name + " logged in with uuid " + uuid.toString() );
-        setProtocolState( ProtocolState.PLAY );
+        sendMessage( new MessageS02LoginSuccess( name, uuid.toString() ), new Consumer<Void>() {
+            @Override
+            public void accept( Void aVoid ) {
+                System.out.println( name + " logged in with uuid " + uuid.toString() );
+                setProtocolState( ProtocolState.PLAY );
 
-        this.player = new FlexPlayer( -1, new Location( Flex.getServer().getWorld(), .5, Flex.getServer().getWorld().getChunkAt( 0, 0 ).getHighestYAt( 0, 0 ) + 1, .5 ), name, uuid, this, Flex.getServer().getWorld() );
-        Flex.getServer().getPlayerManager().handlePlayerJoin( player );
+                player = new FlexPlayer( -1, new Location( Flex.getServer().getWorld(), .5, Flex.getServer().getWorld().getChunkAt( 0, 0 ).getHighestYAt( 0, 0 ) + 1, .5 ), name, uuid, ConnectionHandler.this, Flex.getServer().getWorld() );
+                Flex.getServer().getPlayerManager().handlePlayerJoin( player );
+            }
+        } );
+
     }
 
     public void startProtocolEncryption( SecretKey key ) {

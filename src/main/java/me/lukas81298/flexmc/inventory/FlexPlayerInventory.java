@@ -48,7 +48,7 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
     }
 
     @Override
-    protected ItemStack getItemFromRawSlot( int slot ) {
+    protected ItemStack getItemFromRawSlot( int slot, int specialSlots ) {
         if ( slot < 5 ) {
             return craftingSlots[slot];
         } else if ( slot < 9 ) {
@@ -56,9 +56,9 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
         } else if ( slot == 45 ) {
             return itemOffHand;
         } else if ( slot > 35 ) {
-            return getItem( slot - 36 );
+            return getItem( specialSlots == 10 ? ( slot - 36 - 1 ) : ( slot - 36 ) );
         } else {
-            return getItem( slot );
+            return getItem( specialSlots == 10 ? ( slot - 1 ) : slot );
         }
     }
 
@@ -78,7 +78,7 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
 
     @Override
     protected void setRawSlot( short slot, ItemStack itemStack ) {
-        if( slot == -999 ) {
+        if ( slot == -999 ) {
             return;
         }
         if ( slot < 5 ) {
@@ -120,13 +120,13 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
     }
 
     public synchronized ItemStack[] getRawSlotsArray() {
-        ItemStack[] r = new ItemStack[ 46 ];
-        System.arraycopy( craftingSlots, 0, r, 0 , 5 );
+        ItemStack[] r = new ItemStack[46];
+        System.arraycopy( craftingSlots, 0, r, 0, 5 );
         System.arraycopy( armor, 0, r, 5, 4 );
         ItemStack[] contents = this.getContents();
         System.arraycopy( contents, 9, r, 9, 9 * 3 );
         System.arraycopy( contents, 0, r, 36, 9 );
-        r[ 45 ] = itemOffHand;
+        r[45] = itemOffHand;
         return r;
     }
 
@@ -312,9 +312,9 @@ public class FlexPlayerInventory extends FlexInventory implements CraftingInput,
     public void resetCrafting() {
         synchronized ( this.craftingSlots ) {
             for ( int i = 0; i < craftingSlots.length; i++ ) {
-                ItemStack item = craftingSlots[ i ];
-                if( item != null && i > 0 ) {
-                    if( item.getType() != Material.AIR ) {
+                ItemStack item = craftingSlots[i];
+                if ( item != null && i > 0 ) {
+                    if ( item.getType() != Material.AIR ) {
                         getOwner().getWorld().dropItem( getOwner().getLocation(), item );
                     }
                     this.setRawSlot( (short) i, null );

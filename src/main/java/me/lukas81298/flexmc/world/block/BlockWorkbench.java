@@ -14,7 +14,7 @@ public class BlockWorkbench extends BlockSpec {
     }
 
     @Override
-    public void click( FlexPlayer player ) {
-        player.openWorkbench( player.getLocation(), false );
+    public void click( FlexPlayer player, FlexBlock block ) {
+        player.openWorkbench( block.getLocation(), false );
     }
 }

@@ -32,7 +32,7 @@ public class BlockSpec {
 
     }
 
-    public void click( FlexPlayer player ) {
+    public void click( FlexPlayer player, FlexBlock block ) {
 
     }
 }

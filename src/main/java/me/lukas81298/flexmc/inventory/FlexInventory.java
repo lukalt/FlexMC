@@ -92,7 +92,7 @@ public abstract class FlexInventory implements Inventory {
         }
     }
 
-    protected abstract ItemStack getItemFromRawSlot( int slot );
+    protected abstract ItemStack getItemFromRawSlot( int slot, int specialSlots );
 
     protected abstract void setRawSlot( short slot, ItemStack itemStack );
 

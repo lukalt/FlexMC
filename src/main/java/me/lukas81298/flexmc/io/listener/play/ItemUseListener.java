@@ -16,7 +16,6 @@ public class ItemUseListener implements MessageInboundListener<MessageC20UseItem
 
     @Override
     public void handle( ConnectionHandler connectionHandler, MessageC20UseItem message ) throws Exception {
-        connectionHandler.getPlayer().getInventory().setItemInHand( connectionHandler.getPlayer().getInventory().getItemInHand() );
         ItemStack itemStack = connectionHandler.getPlayer().getItemInHand();
         if( itemStack != null && itemStack.getType() != Material.AIR ) {
             ItemSpec spec = Items.getItemSpec( itemStack.getTypeId() );
@@ -24,6 +23,7 @@ public class ItemUseListener implements MessageInboundListener<MessageC20UseItem
                 spec.click( connectionHandler.getPlayer() );
             }
         }
+        connectionHandler.getPlayer().getInventory().setItemInHand( connectionHandler.getPlayer().getInventory().getItemInHand() );
     }
 
 }

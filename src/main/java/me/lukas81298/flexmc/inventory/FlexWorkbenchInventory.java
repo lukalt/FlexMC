@@ -31,7 +31,7 @@ public class FlexWorkbenchInventory extends FlexInventory implements CraftingInv
     }
 
     @Override
-    protected ItemStack getItemFromRawSlot( int slot ) {
+    protected ItemStack getItemFromRawSlot( int slot, int specialSlots ) {
         return this.getItem( slot );
     }
 

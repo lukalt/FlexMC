@@ -19,7 +19,6 @@ public class BlockLongGrass extends BlockSpec {
 
     @Override
     public Collection<ItemStack> getDrops( FlexPlayer player, int data ) {
-        System.out.println( "ADF " + data );
         if( data == 1 ) {
             return Collections.singletonList( new ItemStack( Material.SEEDS ) );
         }

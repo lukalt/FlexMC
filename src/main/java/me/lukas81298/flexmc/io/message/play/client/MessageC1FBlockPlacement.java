@@ -16,6 +16,7 @@ import java.io.IOException;
 @Getter
 @Setter
 @EqualsAndHashCode( callSuper = false )
+@ToString
 public class MessageC1FBlockPlacement extends Message {
 
     private Vector3i position;

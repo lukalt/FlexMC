@@ -56,7 +56,7 @@ public class FlexInventoryView extends InventoryView {
         }
 
         System.out.println( "Clicked inventory: " + clickedInventory.getName() );
-        ItemStack currentlyInSlot = slot < 0 ? null : clickedInventory.getItemFromRawSlot( slot );
+        ItemStack currentlyInSlot = slot < 0 ? null : clickedInventory.getItemFromRawSlot( slot, topInventory == null ? getBottomInventory().getSpecialSlots() : topInventory.getSpecialSlots() );
 
         if ( mode != 2 && ( mode != 4 && !( button == 1 || button == 2 ) ) ) {
             if ( !ItemStackConstants.equals( currentlyInSlot, itemStack ) ) {

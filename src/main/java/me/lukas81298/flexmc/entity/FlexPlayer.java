@@ -931,6 +931,10 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
         return false;
     }
 
+    public int getNextWindowId() {
+        return this.windowIdProvider.getNextId();
+    }
+
     @Override
     public InventoryView openInventory( Inventory inventory ) {
         if( !( inventory instanceof FlexInventory ) ) {

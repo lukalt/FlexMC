@@ -20,6 +20,7 @@ public class Blocks {
         registerBlockSpec( BlockCactus.class );
         registerBlockSpec( BlockLongGrass.class );
         registerBlockSpec( BlockWorkbench.class );
+        registerBlockSpec( BlockFurnace.class );
     }
 
     private static void registerBlockSpec( Class<? extends BlockSpec> spec ) {
