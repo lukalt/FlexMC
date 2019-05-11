@@ -22,21 +22,27 @@ public class ChatListener implements MessageInboundListener<MessageC02ChatMessag
     @Override
     public void handle( ConnectionHandler connectionHandler, MessageC02ChatMessage message ) {
         FlexPlayer player = connectionHandler.getPlayer();
-        if( player != null && message.getMessage().length() < 256 ) {
-            if( message.getMessage().startsWith( "/" ) ) {
+        if ( player != null && message.getMessage().length() < 256 ) {
+            if ( message.getMessage().startsWith( "/" ) ) {
                 String commandLine = message.getMessage().length() == 1 ? "" : message.getMessage().substring( 1 );
-                if( !Flex.getServer().getCommandMap().dispatch( player, commandLine ) ) {
-                    player.sendMessage( "Unknown command. Type /help for help" );
+                try {
+                    if ( !Flex.getServer().getCommandMap().dispatch( player, commandLine ) ) {
+                        player.sendMessage( "Unknown command. Type /help for help" );
+                    }
+                } catch ( Throwable t ) {
+                    t.printStackTrace();
+                    player.sendMessage( "§cAn internal exception occured while executing this command." );
                 }
+
                 return;
             }
             PlayerChatEvent oldEvent = EventFactory.call( new PlayerChatEvent( player, message.getMessage(), "<%1$s> %2$s", new HashSet<>( Flex.getServer().getPlayerManager().getOnlinePlayers() ) ) );
             AsyncPlayerChatEvent event = new AsyncPlayerChatEvent( true, player, oldEvent.getMessage(), oldEvent.getRecipients() );
             event.setFormat( oldEvent.getFormat() );
             EventFactory.call( event );
-            if( !event.isCancelled() ) {
-                for( Player target : event.getRecipients() ) {
-                    if( target.isOnline() ) {
+            if ( !event.isCancelled() ) {
+                for ( Player target : event.getRecipients() ) {
+                    if ( target.isOnline() ) {
                         target.sendMessage( String.format( event.getFormat(), player.getDisplayName(), message.getMessage() ) );
                     }
                 }

@@ -11,6 +11,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.Getter;
+import me.lukas81298.flexmc.commands.GamemodeCommand;
 import me.lukas81298.flexmc.config.MainConfig;
 import me.lukas81298.flexmc.entity.FlexPlayer;
 import me.lukas81298.flexmc.inventory.crafting.RecipeManager;
@@ -115,6 +116,8 @@ public class FlexServer{
                 server = new FlexServerImpl( FlexServer.this );
                 Bukkit.setServer( server );
                 commandMap = new SimpleCommandMap( server );
+                commandMap.register( "flex", new GamemodeCommand() );
+
                 pluginManager = new SimplePluginManager( server, commandMap );
                 System.out.println( "Loading plugins..." );
                 File plugins = new File( "plugins" );
@@ -180,7 +183,7 @@ public class FlexServer{
 
     public void stop() {
         System.out.println( "Disabling plugins" );
-        pluginManager.disablePlugins();
+        this.pluginManager.disablePlugins();
         if ( this.running.compareAndSet( false, true ) ) {
             System.out.println( "Stopping server..." );
             for( FlexPlayer player : playerManager.getOnlinePlayers() ) {

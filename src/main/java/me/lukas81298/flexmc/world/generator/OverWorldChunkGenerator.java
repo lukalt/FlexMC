@@ -30,7 +30,6 @@ public class OverWorldChunkGenerator extends LayeredChunkGenerator {
 
     public OverWorldChunkGenerator() {
 
-        System.out.println( "Generating biome map" );
         biomeGrid = new BufferedImage( size, size, BufferedImage.TYPE_3BYTE_BGR );
         Graphics graphics = biomeGrid.getGraphics();
         graphics.setColor( new Color( 1 ) );
@@ -56,7 +55,6 @@ public class OverWorldChunkGenerator extends LayeredChunkGenerator {
         this.addLayer( new BlockState( Material.BEDROCK ), 1 );
         this.addLayer( new BlockState( Material.STONE ), 51 );
 
-        System.out.println( "Generating height map" );
         setupStage( 32, .7F );
         setupStage( 16, 0.4f );
         setupStage( 8, 0.22f );

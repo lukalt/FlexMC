@@ -254,7 +254,7 @@ public class FlexPlayer extends FlexLivingEntity implements Player {
         synchronized ( this ) {
             if ( this.gameMode != gameMode ) {
                 this.gameMode = gameMode;
-                connectionHandler.sendMessage( new MessageS1EChangeGameState( (byte) 3, gameMode.getValue() ) );
+                this.connectionHandler.sendMessage( new MessageS1EChangeGameState( (byte) 3, gameMode.getValue() ) );
             }
         }
     }

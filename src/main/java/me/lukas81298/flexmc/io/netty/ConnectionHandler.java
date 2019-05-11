@@ -170,7 +170,6 @@ public class ConnectionHandler extends SimpleChannelInboundHandler<Message> {
         if( Bukkit.getOnlinePlayers().size() >= Bukkit.getMaxPlayers() ) {
             return new BiTuple<>( "The server is full", PlayerLoginEvent.Result.KICK_FULL );
         }
-
         return new BiTuple<>( null, PlayerLoginEvent.Result.ALLOWED );
     }
 
